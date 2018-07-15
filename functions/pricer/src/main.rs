@@ -1,15 +1,19 @@
 extern crate fang_oost_option;
-
+extern crate fang_oost;
+extern crate rayon;
+extern crate black_scholes;
 #[macro_use]
 extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
 
 use serde_json::{to_value, Value, Error};
-use fang_oost_option::option_pricing::*;
+use fang_oost_option::option_pricing;
 use std::env;
 use std::collections::VecDeque;
 use std::io;
+use rayon::prelude::*;
+
 
 const put_price:i32=0;
 const call_price:i32=1;
@@ -40,6 +44,7 @@ struct OptionParameters {
     adaV:f64,
     rho:f64,
     k:VecDeque<f64>,
+    quantile:f64,
     numU:usize
 }
 
@@ -50,15 +55,144 @@ impl OptionParameters{
     }
 }
 
+struct GraphElementIV {
+    atPoint:f64,
+    value:f64,
+    iv:f64
+}
+
+struct GraphElement {
+    atPoint:f64,
+    value:f64
+}
+
+fn get_jump_diffusion_vol(
+    sigma:f64,
+    lambda:f64,
+    mu_j:f64,
+    sig_j:f64,
+    maturity:f64
+)->f64 {
+    ((sigma.powi(2)+lambda*(mu_j.powi(2)+sig_j.powi(2)))*maturity).sqrt()
+}
+
+
+
+fn print_density_and_greeks(
+    x_values:&[f64],
+    values:&[f64]
+) { //void, prints to stdout
+    let json_value=json!(
+        x_values.iter().zip(values.iter()).for_each(|(x_val, val)|{
+            GraphElement {
+                atPoint:x_val,
+                value:val
+            }
+        }).collect::Vec<_>()
+    );
+    println!("{}", json_value.to_string())
+}
+
+fn print_call_prices(
+    strikes:&[f64],
+    values:&[f64],
+    asset:f64,
+    rate:f64,
+    maturity:f64
+) { //void, prints to stdout
+    let json_call_prices=json!(
+        strikes.iter().zip(values.iter()).map(|(strike, price)|{
+            let iv=black_scholes::call_iv(price, asset, strike, rate, maturity, 0.3);
+            GraphElement {
+                atPoint:strike,
+                value:price,
+                iv:iv
+            }
+        }).collect::Vec<_>()
+    );
+    println!("{}", json_call_prices.to_string())
+}
+
+fn adjust_density<T>(
+    num_u:usize,
+    x_max:f64,
+    cf:T    
+) 
+    where T:Fn(&Complex<f64>)->Complex<f64>+
+    std::marker::Sync+std::marker::Send
+{
+    let num_x=128;
+    let x_range=compute_x_range(
+        num_x, -x_max, x_max
+    );
+    print_density(&x_range, &fang_oost::get_density(
+        num_u, &x_range, cf
+    ).collect())
+}
+
+
+fn get_vol_from_parameters(
+    parameters:&OptionParameters
+)->f64{
+    let OptionParameters {
+        sigma, lambda, muJ, 
+        sigJ, T, ..
+    }=parameters;
+    get_jump_diffusion_vol(
+        sigma, lambda,
+        muJ, sigJ, 
+        T
+    )
+}
+
 fn main()-> Result<(), io::Error> {
     let args: Vec<String> = env::args().collect();
     println!("{}", args[1]);
     println!("{}", args[2]);
     let fn_choice:i32=args[1].parse().unwrap();
     let mut parameters:OptionParameters=serde_json::from_str(&args[2])?;
-    parameters.extend_k(5.0);
-    println!("this is sigma: {}", parameters.sigma);
-    println!("this is min k: {}", parameters.k.front().unwrap());
-    println!("this is max k: {}", parameters.k.back().unwrap());
+
+    let x_max_density=get_vol_from_parameters(&parameters)*5.0;
+    let x_max_options=x_max_density*2.0;
+    parameters.extend_k(x_max_options);
+    
+    let OptionParameters {
+        T:maturity,
+        r:rate,
+        S0:asset,
+        lambda,
+        muJ:mu_j,
+        sigJ:sig_j,
+        sigma,
+        v0,
+        speed,
+        adaV:ada_v,
+        rho,
+        k,
+        quantile,
+        numU:num_u_base
+    }=parameters; //destructure
+    let num_u=2.pow(num_u_base);
+    let strikes=Vec::from_iter(k.iter());
+    match fn_choice {
+        call_price => print_call_prices(
+                &strikes,
+                &option_pricing::fang_oost_call_price(
+                    num_u, asset, 
+                    &strikes, rate, 
+                    maturity, cf
+                ),
+                asset, rate, maturity
+            ),
+        put_price => print_density_and_greeks(
+                &strikes,
+                &option_pricing::fang_oost_put_price(
+                    num_u, asset, 
+                    &strikes, rate, 
+                    maturity, cf
+                )
+            ),
+        _ => println!("wow, nothing")
+    }
     Ok(())
 }
