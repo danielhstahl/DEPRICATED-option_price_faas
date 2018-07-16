@@ -105,35 +105,24 @@ fn generic_call_calibrator_cuckoo<T>(
 }
 */
 
+#[derive(Serialize, Deserialize)]
 struct CalibrationParameters{
-    strikesAndPrices:Vec<(f64, f64)>
+    k:Vec<f64>,
+    prices:Vec<f64>,
+    T:f64,//1,
+    r:f64,//0.05,
+    S0:f64//178.46
 }
-
 fn main()-> Result<(), io::Error> {
     let args: Vec<String> = env::args().collect();
-
-    let tmp_strikes_and_option_prices:Vec<(f64, f64)>=vec![
-        (95.0, 85.0), 
-        (130.0, 51.5), 
-        (150.0, 35.38), 
-        (160.0, 28.3), 
-        (165.0, 25.2), 
-        (170.0, 22.27), 
-        (175.0, 19.45), 
-        (185.0, 14.77), 
-        (190.0, 12.75), 
-        (195.0, 11.0), 
-        (200.0, 9.35), 
-        (210.0, 6.9), 
-        (240.0, 2.55), 
-        (250.0, 1.88)
-    ];
-    let maturity=1.0;
-    let rate=0.05;
-    let asset=178.46;
+    let fn_choice:i32=args[1].parse().unwrap();
+    let cp: CalibrationParameters = serde_json::from_str(&args[2])?;
+    let strikes_prices:Vec<(f64, f64)>=cp.k.iter()
+        .zip(cp.prices.iter())
+        .map(|(strike, price)|(*strike, *price)).collect();
     generate_spline_curves(
-        &tmp_strikes_and_option_prices,
-        asset, rate, maturity, 256
+        &strikes_prices,
+        cp.S0, cp.r, cp.T, 256
     );
 
     Ok(())
