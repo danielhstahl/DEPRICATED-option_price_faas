@@ -2,6 +2,8 @@ extern crate fang_oost_option;
 extern crate fang_oost;
 extern crate rayon;
 extern crate black_scholes;
+extern crate cf_functions;
+extern crate num_complex;
 #[macro_use]
 extern crate serde_json;
 #[macro_use]
@@ -13,6 +15,7 @@ use std::env;
 use std::collections::VecDeque;
 use std::io;
 use rayon::prelude::*;
+use num_complex::Complex;
 
 
 const put_price:i32=0;
@@ -54,13 +57,13 @@ impl OptionParameters{
         self.k.push_back(x_max.exp()*self.S0);
     }
 }
-
+#[derive(Serialize, Deserialize)]
 struct GraphElementIV {
     atPoint:f64,
     value:f64,
     iv:f64
 }
-
+#[derive(Serialize, Deserialize)]
 struct GraphElement {
     atPoint:f64,
     value:f64
@@ -83,12 +86,12 @@ fn print_density_and_greeks(
     values:&[f64]
 ) { //void, prints to stdout
     let json_value=json!(
-        x_values.iter().zip(values.iter()).for_each(|(x_val, val)|{
+        x_values.iter().zip(values.iter()).map(|(x_val, val)|{
             GraphElement {
-                atPoint:x_val,
-                value:val
+                atPoint:*x_val,
+                value:*val
             }
-        }).collect::Vec<_>()
+        }).collect::<Vec<_>>()
     );
     println!("{}", json_value.to_string())
 }
@@ -102,13 +105,13 @@ fn print_call_prices(
 ) { //void, prints to stdout
     let json_call_prices=json!(
         strikes.iter().zip(values.iter()).map(|(strike, price)|{
-            let iv=black_scholes::call_iv(price, asset, strike, rate, maturity, 0.3);
-            GraphElement {
-                atPoint:strike,
-                value:price,
+            let iv=black_scholes::call_iv(*price, asset, *strike, rate, maturity, 0.3);
+            GraphElementIV {
+                atPoint:*strike,
+                value:*price,
                 iv:iv
             }
-        }).collect::Vec<_>()
+        }).collect::<Vec<_>>()
     );
     println!("{}", json_call_prices.to_string())
 }
@@ -122,12 +125,13 @@ fn adjust_density<T>(
     std::marker::Sync+std::marker::Send
 {
     let num_x=128;
-    let x_range=compute_x_range(
+    let x_range=fang_oost::compute_x_range(
         num_x, -x_max, x_max
     );
-    print_density(&x_range, &fang_oost::get_density(
+    let option_range=fang_oost::get_density(
         num_u, &x_range, cf
-    ).collect())
+    ).collect();
+    print_density_and_greeks(&x_range, &option_range)
 }
 
 
@@ -139,9 +143,9 @@ fn get_vol_from_parameters(
         sigJ, T, ..
     }=parameters;
     get_jump_diffusion_vol(
-        sigma, lambda,
-        muJ, sigJ, 
-        T
+        *sigma, *lambda,
+        *muJ, *sigJ, 
+        *T
     )
 }
 
@@ -172,15 +176,21 @@ fn main()-> Result<(), io::Error> {
         quantile,
         numU:num_u_base
     }=parameters; //destructure
-    let num_u=2.pow(num_u_base);
-    let strikes=Vec::from_iter(k.iter());
+    let num_u=(2 as usize).pow(num_u_base as u32);
+    let strikes=Vec::from(k);
+
+    let inst_cf=cf_functions::merton_time_change_cf(
+        maturity, rate, lambda, mu_j, sig_j, sigma, v0,
+        speed, ada_v, rho
+    );
+
     match fn_choice {
         call_price => print_call_prices(
                 &strikes,
                 &option_pricing::fang_oost_call_price(
                     num_u, asset, 
                     &strikes, rate, 
-                    maturity, cf
+                    maturity, &inst_cf
                 ),
                 asset, rate, maturity
             ),
@@ -189,7 +199,7 @@ fn main()-> Result<(), io::Error> {
                 &option_pricing::fang_oost_put_price(
                     num_u, asset, 
                     &strikes, rate, 
-                    maturity, cf
+                    maturity, &inst_cf
                 )
             ),
         _ => println!("wow, nothing")

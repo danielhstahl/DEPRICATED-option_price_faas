@@ -17,6 +17,8 @@ serde_derive = "1.0"
 cf_dist_utils = "0.1.0"
 rayon = "1.0.1"
 black_scholes = "0.2.2"
+cf_functions = "0.2.0"
+num-complex = "0.2"
 
 [badges]
 travis-ci = { repository = "phillyfan1138/option_price_faas" }
