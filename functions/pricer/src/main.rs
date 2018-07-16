@@ -10,6 +10,8 @@ extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
 
+mod constraints;
+
 use fang_oost_option::option_pricing;
 use std::env;
 use std::collections::VecDeque;
@@ -33,30 +35,9 @@ const CALL_THETA:i32=7;
 const DENSITY:i32=8;
 const RISK_MEASURES:i32=9;
 
-#[derive(Serialize, Deserialize)]
-struct OptionParameters {
-    T: f64,
-    r:f64,
-    S0:f64,
-    lambda:f64,
-    muJ:f64,
-    sigJ:f64,
-    sigma:f64,
-    v0:f64,
-    speed:f64,
-    adaV:f64,
-    rho:f64,
-    k:VecDeque<f64>,
-    quantile:f64,
-    numU:usize
-}
 
-impl OptionParameters{
-    fn extend_k(&mut self, x_max:f64){
-        self.k.push_back((-x_max).exp()*self.S0);
-        self.k.push_front(x_max.exp()*self.S0);
-    }
-}
+
+
 #[derive(Serialize, Deserialize)]
 struct GraphElementIV {
     atPoint:f64,
@@ -90,8 +71,8 @@ fn print_risk_measures(
     let (VaR, ES)=risk_measure;
     let json_value=json!(
         RiskMeasures {
-            VaR:VaR,
-            ES:ES
+            VaR,
+            ES
         }
     );
     println!("{}", json_value.to_string())
@@ -145,7 +126,7 @@ fn print_call_prices(
                 GraphElementIV {
                     atPoint:*strike,
                     value:*price,
-                    iv:iv
+                    iv
                 }
             }).collect::<Vec<_>>()
     );
@@ -172,9 +153,9 @@ fn adjust_density<T>(
 
 
 fn get_vol_from_parameters(
-    parameters:&OptionParameters
+    parameters:&constraints::OptionParameters
 )->f64{
-    let OptionParameters {
+    let constraints::OptionParameters {
         sigma, lambda, muJ, 
         sigJ, T, ..
     }=parameters;
@@ -189,7 +170,7 @@ fn main()-> Result<(), io::Error> {
     let args: Vec<String> = env::args().collect();
     let fn_choice:i32=args[1].parse().unwrap();
     let mut parameters:OptionParameters=serde_json::from_str(&args[2])?;
-
+    check_constraints(&parameters, &constraints::get_constraints())?;
     let x_max_density=get_vol_from_parameters(&parameters)*5.0;
     let x_max_options=x_max_density*2.0;
     parameters.extend_k(x_max_options);
@@ -210,6 +191,8 @@ fn main()-> Result<(), io::Error> {
         quantile,
         numU:num_u_base
     }=parameters; //destructure
+    
+
     let num_u=(2 as usize).pow(num_u_base as u32);
     let strikes=Vec::from(k);
     //note...if pass by reference doesn't work 
