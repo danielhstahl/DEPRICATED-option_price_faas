@@ -4,12 +4,12 @@ extern crate rayon;
 extern crate black_scholes;
 extern crate cf_functions;
 extern crate num_complex;
+extern crate cf_dist_utils;
 #[macro_use]
 extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
 
-use serde_json::{to_value, Value, Error};
 use fang_oost_option::option_pricing;
 use std::env;
 use std::collections::VecDeque;
@@ -18,20 +18,20 @@ use rayon::prelude::*;
 use num_complex::Complex;
 
 
-const put_price:i32=0;
-const call_price:i32=1;
+const PUT_PRICE:i32=0;
+const CALL_PRICE:i32=1;
 
-const put_delta:i32=2;
-const call_delta:i32=3;
+const PUT_DELTA:i32=2;
+const CALL_DELTA:i32=3;
 
-const put_gamma:i32=4;
-const call_gamma:i32=5;
+const PUT_GAMMA:i32=4;
+const CALL_GAMMA:i32=5;
 
-const put_theta:i32=6;
-const call_theta:i32=7;
+const PUT_THETA:i32=6;
+const CALL_THETA:i32=7;
 
-const density:i32=8;
-const risk_measures:i32=9;
+const DENSITY:i32=8;
+const RISK_MEASURES:i32=9;
 
 #[derive(Serialize, Deserialize)]
 struct OptionParameters {
@@ -53,8 +53,8 @@ struct OptionParameters {
 
 impl OptionParameters{
     fn extend_k(&mut self, x_max:f64){
-        self.k.push_front((-x_max).exp()*self.S0);
-        self.k.push_back(x_max.exp()*self.S0);
+        self.k.push_back((-x_max).exp()*self.S0);
+        self.k.push_front(x_max.exp()*self.S0);
     }
 }
 #[derive(Serialize, Deserialize)]
@@ -68,6 +68,11 @@ struct GraphElement {
     atPoint:f64,
     value:f64
 }
+#[derive(Serialize, Deserialize)]
+struct RiskMeasures {
+    VaR:f64,
+    ES:f64
+}
 
 fn get_jump_diffusion_vol(
     sigma:f64,
@@ -79,9 +84,20 @@ fn get_jump_diffusion_vol(
     ((sigma.powi(2)+lambda*(mu_j.powi(2)+sig_j.powi(2)))*maturity).sqrt()
 }
 
+fn print_risk_measures(
+    risk_measure:(f64, f64)
+) {
+    let (VaR, ES)=risk_measure;
+    let json_value=json!(
+        RiskMeasures {
+            VaR:VaR,
+            ES:ES
+        }
+    );
+    println!("{}", json_value.to_string())
+}
 
-
-fn print_density_and_greeks(
+fn print_density(
     x_values:&[f64],
     values:&[f64]
 ) { //void, prints to stdout
@@ -95,6 +111,23 @@ fn print_density_and_greeks(
     );
     println!("{}", json_value.to_string())
 }
+fn print_greeks(
+    x_values:&[f64],
+    values:&[f64]
+) { //void, prints to stdout
+    let x_val_crit=x_values.len()-1;
+    let json_value=json!(
+        x_values.iter().zip(values.iter())
+            .enumerate().filter(|(index, _)|index>&0&&index<&x_val_crit)
+            .map(|(_, (x_val, val))|{
+                GraphElement {
+                    atPoint:*x_val,
+                    value:*val
+                }
+            }).collect::<Vec<_>>()
+    );
+    println!("{}", json_value.to_string())
+}
 
 fn print_call_prices(
     strikes:&[f64],
@@ -103,15 +136,18 @@ fn print_call_prices(
     rate:f64,
     maturity:f64
 ) { //void, prints to stdout
+    let x_val_crit=values.len()-1;
     let json_call_prices=json!(
-        strikes.iter().zip(values.iter()).map(|(strike, price)|{
-            let iv=black_scholes::call_iv(*price, asset, *strike, rate, maturity, 0.3);
-            GraphElementIV {
-                atPoint:*strike,
-                value:*price,
-                iv:iv
-            }
-        }).collect::<Vec<_>>()
+        strikes.iter().zip(values.iter())
+            .enumerate().filter(|(index, _)|index>&0&&index<&x_val_crit)
+            .map(|(_, (strike, price))|{
+                let iv=black_scholes::call_iv(*price, asset, *strike, rate, maturity, 0.3);
+                GraphElementIV {
+                    atPoint:*strike,
+                    value:*price,
+                    iv:iv
+                }
+            }).collect::<Vec<_>>()
     );
     println!("{}", json_call_prices.to_string())
 }
@@ -128,10 +164,10 @@ fn adjust_density<T>(
     let x_range=fang_oost::compute_x_range(
         num_x, -x_max, x_max
     );
-    let option_range=fang_oost::get_density(
+    let option_range:Vec<f64>=fang_oost::get_density(
         num_u, &x_range, cf
     ).collect();
-    print_density_and_greeks(&x_range, &option_range)
+    print_density(&x_range, &option_range)
 }
 
 
@@ -151,8 +187,6 @@ fn get_vol_from_parameters(
 
 fn main()-> Result<(), io::Error> {
     let args: Vec<String> = env::args().collect();
-    println!("{}", args[1]);
-    println!("{}", args[2]);
     let fn_choice:i32=args[1].parse().unwrap();
     let mut parameters:OptionParameters=serde_json::from_str(&args[2])?;
 
@@ -178,14 +212,18 @@ fn main()-> Result<(), io::Error> {
     }=parameters; //destructure
     let num_u=(2 as usize).pow(num_u_base as u32);
     let strikes=Vec::from(k);
-
+    //note...if pass by reference doesn't work 
+    //I can always move this value since I only
+    //use it once.  However, if I ever want 
+    //this binary to stay "live" for multiple
+    //calls I'll need to keep this reference around
     let inst_cf=cf_functions::merton_time_change_cf(
         maturity, rate, lambda, mu_j, sig_j, sigma, v0,
         speed, ada_v, rho
     );
 
     match fn_choice {
-        call_price => print_call_prices(
+        CALL_PRICE => print_call_prices(
                 &strikes,
                 &option_pricing::fang_oost_call_price(
                     num_u, asset, 
@@ -194,12 +232,68 @@ fn main()-> Result<(), io::Error> {
                 ),
                 asset, rate, maturity
             ),
-        put_price => print_density_and_greeks(
+        PUT_PRICE => print_greeks(
                 &strikes,
                 &option_pricing::fang_oost_put_price(
                     num_u, asset, 
                     &strikes, rate, 
                     maturity, &inst_cf
+                )
+            ),
+        CALL_DELTA => print_greeks(
+                &strikes,
+                &option_pricing::fang_oost_call_delta(
+                    num_u, asset, 
+                    &strikes, rate, 
+                    maturity, &inst_cf
+                )
+            ),
+        PUT_DELTA => print_greeks(
+                &strikes,
+                &option_pricing::fang_oost_put_delta(
+                    num_u, asset, 
+                    &strikes, rate, 
+                    maturity, &inst_cf
+                )
+            ),
+        CALL_GAMMA => print_greeks(
+                &strikes,
+                &option_pricing::fang_oost_call_gamma(
+                    num_u, asset, 
+                    &strikes, rate, 
+                    maturity, &inst_cf
+                )
+            ),
+        PUT_GAMMA => print_greeks(
+                &strikes,
+                &option_pricing::fang_oost_put_gamma(
+                    num_u, asset, 
+                    &strikes, rate, 
+                    maturity, &inst_cf
+                )
+            ),
+        CALL_THETA => print_greeks(
+                &strikes,
+                &option_pricing::fang_oost_call_theta(
+                    num_u, asset, 
+                    &strikes, rate, 
+                    maturity, &inst_cf
+                )
+            ),
+        PUT_THETA => print_greeks(
+                &strikes,
+                &option_pricing::fang_oost_put_theta(
+                    num_u, asset, 
+                    &strikes, rate, 
+                    maturity, &inst_cf
+                )
+            ),
+        DENSITY => adjust_density(
+                num_u, x_max_density, &inst_cf
+            ),
+        RISK_MEASURES => print_risk_measures(
+                cf_dist_utils::get_expected_shortfall_and_value_at_risk(
+                    quantile, num_u, -x_max_density, x_max_density, &inst_cf
                 )
             ),
         _ => println!("wow, nothing")
