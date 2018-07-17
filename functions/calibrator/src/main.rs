@@ -11,7 +11,7 @@ use std::io;
 use std::f64::consts::PI;
 use fang_oost_option::option_calibration;
 use std::env;
-
+use std::collections;
 #[derive(Serialize, Deserialize)]
 struct CurvePoint{
     logStrike:f64,
@@ -110,33 +110,97 @@ fn generic_call_calibrator_cuckoo<T>(
 
 const SPLINE_CHOICE:i32=0;
 const CALIBRATE_CHOICE:i32=1;
+const POSSIBLE_CALIBRATION_PARAMETERS: &[&str] = &["lambda", "muJ", "sigJ", "sigma", "v0", "speed", "adaV", "rho"];
 
 #[derive(Serialize, Deserialize)]
 struct CalibrationParameters{
     k:Vec<f64>,
     prices:Vec<f64>,
+    variable:Vec<String>,
     T:f64,//1,
     r:f64,//0.05,
-    S0:f64//178.46
+    S0:f64,//178.46,
+    #[serde(flatten)]
+    extra: collections::HashMap<String, serde_json::Value>
+
 }
+
+fn populate_variable_parameters(
+    variable_parameters_map:&collections::HashMap<String, serde_json::Value>
+)->Vec<&str>{
+    let mut variable_parameters_arr=vec![];
+    POSSIBLE_CALIBRATION_PARAMETERS.iter().for_each(|key|{
+        let &val=variable_parameters_map[key];
+        if val {
+            variable_parameters_arr.push(val)
+        }
+    });
+    variable_parameters_arr
+}
+
+
 fn main()-> Result<(), io::Error> {
     let args: Vec<String> = env::args().collect();
     let fn_choice:i32=args[1].parse().unwrap();
-    let cp: CalibrationParameters = serde_json::from_str(&args[2])?;
-
-
-    let strikes_prices:Vec<(f64, f64)>=cp.k.iter()
-        .zip(cp.prices.iter())
-        .map(|(strike, price)|(*strike, *price)).collect();
-    
-
     match fn_choice {
-        SPLINE_CHOICE => generate_spline_curves(
+        SPLINE_CHOICE => {
+            let cp: CalibrationParameters = serde_json::from_str(&args[2])?;
+            let strikes_prices:Vec<(f64, f64)>=cp.k.iter()
+                .zip(cp.prices.iter())
+                .map(|(strike, price)|(*strike, *price)).collect();
+            generate_spline_curves(
                 &strikes_prices,
                 cp.S0, cp.r, cp.T, 256
-            ),
+            )
+        },
         CALIBRATE_CHOICE => {
+            let cp: serde_json::Value = serde_json::from_str(&args[2])?;
+            let constraints=cp["constraints"];//hashmap
+            let parameters_to_calibrate=cp["variable"]; //hashmap
 
+
+            //let v: serde_json::Value = serde_json::from_str(data)?;
+            /**const auto& jsonVariable=parsedJson["variable"];
+                const auto mapKeyToIndexVariable=constructKeyToIndex(jsonVariable, possibleCalibrationParameters);
+                const auto mapStatic=constructStaticKeyToValue(parsedJson, possibleCalibrationParameters);
+                const auto mapKeyToExistsStatic=std::get<0>(mapStatic);
+                const auto mapKeyToValueStatic=std::get<1>(mapStatic); 
+                //const auto [mapKeyToExistsStatic, mapKeyToValueStatic]=constructStaticKeyToValue(parsedJson, possibleCalibrationParameters);
+                auto getArgOrConstantCurry=[&](const auto& key, const auto& args){
+                    return getArgOrConstant(key, args, mapKeyToIndexVariable, mapKeyToExistsStatic, mapKeyToValueStatic);
+                };
+                auto cfI=cfLogBase(T);
+                auto cfHOC=[
+                    getArgOrConstantCurry=std::move(getArgOrConstantCurry), 
+                    cfI=std::move(cfI)
+                ](const auto& args){
+                    auto getField=[&](const auto& key){
+                        return getArgOrConstantCurry(key, args);
+                    };
+                    return [
+                        lambda=getField("lambda"),
+                        muJ=getField("muJ"),
+                        sigJ=getField("sigJ"),
+                        sigma=getField("sigma"),
+                        v0=getField("v0"),
+                        speed=getField("speed"),
+                        adaV=getField("adaV"),
+                        rho=getField("rho"),
+                        cfI=std::move(cfI)
+                    ](const auto& u){
+                        return cfI(
+                            u,
+                            lambda, 
+                            muJ, 
+                            sigJ, 
+                            sigma, 
+                            v0, 
+                            speed, 
+                            adaV, 
+                            rho
+                        );
+                    };
+                };*/
         },
         _ => println!("wow, nothing")
 

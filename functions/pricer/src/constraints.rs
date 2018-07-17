@@ -28,7 +28,8 @@ impl OptionParameters{
     }
 }
 
-#[derive(Serialize, Deserialize)]
+
+#[derive(Serialize, Deserialize)] //can I only do this on structs?
 pub struct ParameterConstraints{
     pub lambda:cuckoo::UpperLower,
     pub muJ:cuckoo::UpperLower,
