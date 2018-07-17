@@ -1,12 +1,12 @@
 extern crate fang_oost_option;
 extern crate cuckoo;
 extern crate serde;
+extern crate num_complex;
+use self::num_complex::Complex;
 #[macro_use]
 extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
-#[macro_use]
-extern crate simple_error;
 use std::io;
 use std::f64::consts::PI;
 use fang_oost_option::option_calibration;
@@ -86,7 +86,9 @@ fn generic_call_calibrator_cuckoo<T>(
     asset:f64,
     rate:f64,
     maturity:f64
-)->(Vec<f64>, f64){
+)->(Vec<f64>, f64)
+    where T:Fn(&Complex<f64>, &[f64])->Complex<f64>
+{
     let (n, min_strike, max_strike)=generate_const_parameters(
         strikes_and_option_prices, asset
     );
@@ -103,9 +105,11 @@ fn generic_call_calibrator_cuckoo<T>(
     let nest_size=25;
     let total_mc=10000;
     let tol=0.000001;
-    cuckoo::optimize(obj_fn, ul, nest_size, total_mc, tol, ||cuckoo::get_rng_system_seed())
+    cuckoo::optimize(&obj_fn, &ul, nest_size, total_mc, tol, ||cuckoo::get_rng_system_seed())
 }
 
+const SPLINE_CHOICE:i32=0;
+const CALIBRATE_CHOICE:i32=1;
 
 #[derive(Serialize, Deserialize)]
 struct CalibrationParameters{
@@ -119,13 +123,24 @@ fn main()-> Result<(), io::Error> {
     let args: Vec<String> = env::args().collect();
     let fn_choice:i32=args[1].parse().unwrap();
     let cp: CalibrationParameters = serde_json::from_str(&args[2])?;
+
+
     let strikes_prices:Vec<(f64, f64)>=cp.k.iter()
         .zip(cp.prices.iter())
         .map(|(strike, price)|(*strike, *price)).collect();
-    generate_spline_curves(
-        &strikes_prices,
-        cp.S0, cp.r, cp.T, 256
-    );
+    
+
+    match fn_choice {
+        SPLINE_CHOICE => generate_spline_curves(
+                &strikes_prices,
+                cp.S0, cp.r, cp.T, 256
+            ),
+        CALIBRATE_CHOICE => {
+
+        },
+        _ => println!("wow, nothing")
+
+    }
 
     Ok(())
 }
