@@ -101,7 +101,7 @@ fn generic_call_calibrator_cuckoo<T>(
     let nest_size=25;
     let total_mc=10000;
     let tol=0.000001;
-    cuckoo::optimize()
+    cuckoo::optimize(obj_fn, ul, nest_size, total_mc, tol, ||cuckoo::get_rng_system_seed())
 }
 
 

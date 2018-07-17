@@ -1,13 +1,9 @@
 extern crate cuckoo;
-#[macro_use]
-extern crate simple_error;
-#[macro_use]
-extern crate serde_json;
-#[macro_use]
-extern crate serde_derive;
+
+use std::collections::VecDeque;
 
 #[derive(Serialize, Deserialize)]
-struct OptionParameters {
+pub struct OptionParameters {
     T: f64,
     r:f64,
     S0:f64,
@@ -24,14 +20,14 @@ struct OptionParameters {
     numU:usize
 }
 impl OptionParameters{
-    fn extend_k(&mut self, x_max:f64){
+    pub fn extend_k(&mut self, x_max:f64){
         self.k.push_back((-x_max).exp()*self.S0);
         self.k.push_front(x_max.exp()*self.S0);
     }
 }
 
 #[derive(Serialize, Deserialize)]
-struct ParameterConstraints{
+pub struct ParameterConstraints{
     lambda:cuckoo::UpperLower,
     muJ:cuckoo::UpperLower,
     sigJ:cuckoo::UpperLower,
@@ -43,11 +39,11 @@ struct ParameterConstraints{
     r:cuckoo::UpperLower,
     S0:cuckoo::UpperLower,
     T:cuckoo::UpperLower,
-    numU:UpperLower,
-    quantile:UpperLower
+    numU:cuckoo::UpperLower,
+    quantile:cuckoo::UpperLower
 }
 
-fn get_constraints()->ParameterConstraints {
+pub fn get_constraints()->ParameterConstraints {
     ParameterConstraints{
         lambda:cuckoo::UpperLower{lower:0.0, upper:2.0},
         muJ:cuckoo::UpperLower{lower:-1.0, upper:1.0},
@@ -60,26 +56,26 @@ fn get_constraints()->ParameterConstraints {
         r:cuckoo::UpperLower{lower:0.0, upper:0.4},
         S0:cuckoo::UpperLower{lower:0.0, upper:1000000.0},
         T:cuckoo::UpperLower{lower:0.0, upper:1000000.0},
-        numU:cuckoo::UpperLower{lower:5, upper:10},
+        numU:cuckoo::UpperLower{lower:5.0, upper:10.0},
         quantile:cuckoo::UpperLower{lower:0.0, upper:1.0}
     }
 }
-fn check_constraint(
+fn check_constraint<'a>(
     parameter:f64,
-    constraint:&UpperLower,
-    parameter_name:&str
-)->Result<(), &str>{
-    if parameter>constraints.lower&&parameter<constraints.upper{
+    constraint:&'a cuckoo::UpperLower,
+    parameter_name: &'a str
+)->Result<(), &'a str>{
+    if parameter>constraint.lower&&parameter<constraint.upper{
         Ok(())
     }
     else {
         Err("Parameter out of bounds".to_owned().push_str(parameter))
     }
 }
-fn check_constraints(
+pub fn check_constraints<'a>(
     parameters:&OptionParameters,
     constraints:&ParameterConstraints
-)->Result<(), &str> {
+)->Result<(), &'a str> {
     check_constraint(parameters.lambda, constraints.lambda, "lambda")?;
     check_constraint(parameters.muJ, constraints.muJ, "muJ")?;
     check_constraint(parameters.sigJ, constraints.sigJ, "sigJ")?;
