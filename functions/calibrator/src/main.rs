@@ -1,5 +1,5 @@
 extern crate fang_oost_option;
-//extern crate cuckoo;
+extern crate cuckoo;
 extern crate serde;
 #[macro_use]
 extern crate serde_json;
@@ -76,7 +76,7 @@ fn generate_spline_curves(
     });
     println!("{}", curves.to_string());
 }
-/*
+
 fn generic_call_calibrator_cuckoo<T>(
     log_cf:T,
     ul:&[cuckoo::UpperLower],
@@ -103,7 +103,7 @@ fn generic_call_calibrator_cuckoo<T>(
     let tol=0.000001;
     cuckoo::optimize()
 }
-*/
+
 
 #[derive(Serialize, Deserialize)]
 struct CalibrationParameters{
