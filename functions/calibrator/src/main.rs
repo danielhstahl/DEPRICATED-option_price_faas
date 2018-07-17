@@ -5,6 +5,8 @@ extern crate serde;
 extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
+#[macro_use]
+extern crate simple_error;
 use std::io;
 use std::f64::consts::PI;
 use fang_oost_option::option_calibration;

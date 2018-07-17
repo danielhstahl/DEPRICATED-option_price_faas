@@ -64,18 +64,18 @@ fn check_constraint<'a>(
     parameter:f64,
     constraint:&'a cuckoo::UpperLower,
     parameter_name: &'a str
-)->Result<(), &'a str>{
+)->Result<(), SimpleError>{
     if parameter>constraint.lower&&parameter<constraint.upper{
         Ok(())
     }
     else {
-        Err("Parameter out of bounds".to_owned().push_str(parameter))
+        SimpleError::new("Parameter out of bounds".to_owned().push_str(parameter))
     }
 }
 pub fn check_constraints<'a>(
     parameters:&OptionParameters,
     constraints:&ParameterConstraints
-)->Result<(), &'a str> {
+)->Result<(), SimpleError> {
     check_constraint(parameters.lambda, constraints.lambda, "lambda")?;
     check_constraint(parameters.muJ, constraints.muJ, "muJ")?;
     check_constraint(parameters.sigJ, constraints.sigJ, "sigJ")?;

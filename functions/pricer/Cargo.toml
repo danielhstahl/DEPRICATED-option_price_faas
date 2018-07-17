@@ -19,6 +19,7 @@ rayon = "1.0.1"
 black_scholes = "0.2.2"
 cf_functions = "0.2.0"
 num-complex = "0.2"
+simple-error = "0.1"
 cuckoo = "0.3.0"
 
 [badges]
