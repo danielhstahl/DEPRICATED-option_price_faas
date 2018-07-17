@@ -1,5 +1,4 @@
 extern crate cuckoo;
-extern crate simple_error;
 
 use std::collections::VecDeque;
 use std::io;
