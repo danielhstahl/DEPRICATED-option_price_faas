@@ -169,7 +169,10 @@ fn main()-> Result<(), io::Error> {
     let args: Vec<String> = env::args().collect();
     let fn_choice:i32=args[1].parse().unwrap();
     let mut parameters:constraints::OptionParameters=serde_json::from_str(&args[2])?;
-    constraints::check_constraints(&parameters, &constraints::get_constraints())?;
+    constraints::check_constraints(
+        &parameters, 
+        &constraints::get_constraints()
+    )?;
     let x_max_density=get_vol_from_parameters(&parameters)*5.0;
     let x_max_options=x_max_density*2.0;
     parameters.extend_k(x_max_options);

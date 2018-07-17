@@ -20,7 +20,7 @@ black_scholes = "0.2.2"
 cf_functions = "0.2.0"
 num-complex = "0.2"
 simple-error = "0.1"
-cuckoo = "0.3.0"
+cuckoo = "0.4.0"
 
 [badges]
 travis-ci = { repository = "phillyfan1138/option_price_faas" }
