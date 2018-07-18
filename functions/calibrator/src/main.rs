@@ -110,7 +110,7 @@ fn generic_call_calibrator_cuckoo<T>(
 
 const SPLINE_CHOICE:i32=0;
 const CALIBRATE_CHOICE:i32=1;
-const POSSIBLE_CALIBRATION_PARAMETERS: &[&str] = &["lambda", "muJ", "sigJ", "sigma", "v0", "speed", "adaV", "rho"];
+const POSSIBLE_CALIBRATION_PARAMETERS: &[&str] = &["lambda", "muJ", "sigJ", "sigma", "v0", "speed", "adaV", "rho"]; //order matters! same order as input into CF
 
 #[derive(Serialize, Deserialize)]
 struct CalibrationParameters{
@@ -120,43 +120,48 @@ struct CalibrationParameters{
     T:f64,//1,
     r:f64,//0.05,
     S0:f64,//178.46,
+    constraints:collections::HashMap<String, cuckoo::UpperLower>,
     #[serde(flatten)]
-    extra: collections::HashMap<String, serde_json::Value>
+    //extra: collections::HashMap<String, serde_json::Value>
+    extra: collections::HashMap<String, f64>
 
 }
+fn get_ul_and_index_of_array(
+    constraint_map:&collections::HashMap<String, cuckoo::UpperLower>
+)->(Vec<cuckoo::UpperLower>, collections::HashMap<String, usize>){
+    //let mut ul=vec![];
+    //let mut index_array=collections::HashMap<String, usize>;
+    let filtered_parameters=POSSIBLE_CALIBRATION_PARAMETERS
+        .iter().enumerate()
+        .filter(|(index, parameter_name)|{
+            constraint_map.contains_key(parameter_name)
+        });
+    let ul=filtered_parameters.map(|(index, parameter_name)|{
+        constraint_map.get(parameter_name)
+    }).collect();
 
-fn populate_variable_parameters(
-    variable_parameters_map:&collections::HashMap<String, serde_json::Value>
-)->Vec<&str>{
-    let mut variable_parameters_arr=vec![];
-    POSSIBLE_CALIBRATION_PARAMETERS.iter().for_each(|key|{
-        let &val=variable_parameters_map[key];
-        if val {
-            variable_parameters_arr.push(val)
-        }
-    });
-    variable_parameters_arr
+    let index_map:collections::HashMap<String, usize>=filtered_parameters.map(|(index, parameter_name)|{
+        (parameter_name, index)
+    }).collect();
+    (ul, index_map)
 }
-
 
 fn main()-> Result<(), io::Error> {
     let args: Vec<String> = env::args().collect();
     let fn_choice:i32=args[1].parse().unwrap();
+    let cp: CalibrationParameters = serde_json::from_str(&args[2])?;
+    let strikes_prices:Vec<(f64, f64)>=cp.k.iter()
+        .zip(cp.prices.iter())
+        .map(|(strike, price)|(*strike, *price)).collect(); 
     match fn_choice {
         SPLINE_CHOICE => {
-            let cp: CalibrationParameters = serde_json::from_str(&args[2])?;
-            let strikes_prices:Vec<(f64, f64)>=cp.k.iter()
-                .zip(cp.prices.iter())
-                .map(|(strike, price)|(*strike, *price)).collect();
             generate_spline_curves(
                 &strikes_prices,
                 cp.S0, cp.r, cp.T, 256
             )
         },
         CALIBRATE_CHOICE => {
-            let cp: serde_json::Value = serde_json::from_str(&args[2])?;
-            let constraints=cp["constraints"];//hashmap
-            let parameters_to_calibrate=cp["variable"]; //hashmap
+                      
 
 
             //let v: serde_json::Value = serde_json::from_str(data)?;

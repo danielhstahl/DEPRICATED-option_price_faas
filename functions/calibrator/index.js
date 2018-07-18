@@ -4,7 +4,7 @@ const model=spawn('./target/release/calibrator', [0, JSON.stringify({
     r:0.05,
     S0:178.46,
 
-    variable:{ //this should be array of strings
+    /*variable:{ //this should be array of strings
       sigma:0.4,
       v0:0.9,
       speed:0.5,
@@ -13,8 +13,8 @@ const model=spawn('./target/release/calibrator', [0, JSON.stringify({
       lambda:0.1,
       muJ:2.5,
       sigJ:0.3
-    },
-    constraints:{ //this should be array of {key:"sigma", constraints:{}}
+    },*/
+    constraints:{ //only include constraints for variables that will be calibrated
 
     },
     k:[95,130,150,160,165,170,175,185,190,195,200,210,240,250],
