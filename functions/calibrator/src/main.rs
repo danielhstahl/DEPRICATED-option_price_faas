@@ -127,22 +127,33 @@ struct CalibrationParameters{
     extra: collections::HashMap<String, f64>
 
 }
+
+fn get_filtered_parameter_iterator(
+    constraint_map:&collections::HashMap<String, cuckoo::UpperLower>
+)->impl Iterator<Item=(usize, &&str)>
+{
+    POSSIBLE_CALIBRATION_PARAMETERS
+        .iter().enumerate()
+        .filter(move |(_, parameter_name)|{
+            constraint_map.contains_key(&parameter_name.to_string())
+        })
+}
+
 fn get_ul_and_index_of_array(
     constraint_map:&collections::HashMap<String, cuckoo::UpperLower>
 )->(Vec<cuckoo::UpperLower>, collections::HashMap<String, usize>){
-    let mut filtered_parameters=POSSIBLE_CALIBRATION_PARAMETERS
-        .iter().enumerate()
-        .filter(|(_, parameter_name)|{
-            constraint_map.contains_key(&parameter_name.to_string())
-        });
 
-    let index_map:collections::HashMap<String, usize>=filtered_parameters.by_ref().map(|(index, parameter_name)|{
-        (parameter_name.to_string(), index)
-    }).collect();
+    let index_map:collections::HashMap<String, usize>=get_filtered_parameter_iterator(
+            constraint_map
+        ).map(|(index, parameter_name)|{
+            (parameter_name.to_string(), index)
+        }).collect();
 
-    let ul=filtered_parameters.map(|(_, parameter_name)|{
-        constraint_map.get(&parameter_name.to_string()).unwrap()
-    }).cloned().collect();
+    let ul=get_filtered_parameter_iterator(
+            constraint_map
+        ).map(|(_, parameter_name)|{
+            constraint_map.get(&parameter_name.to_string()).unwrap()
+        }).cloned().collect();
     (ul, index_map)
 }
 
@@ -207,4 +218,60 @@ fn main()-> Result<(), io::Error> {
     }
 
     Ok(())
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_get_array_or_field() {
+        let calibration_parameters=vec![1.0, 2.0, 3.0];
+        let mut index_map=collections::HashMap::new();
+        index_map.insert("value1".to_string(), 1 as usize);
+        index_map.insert("value2".to_string(), 2 as usize);
+        index_map.insert("value3".to_string(), 0 as usize);
+        let mut extra=collections::HashMap::new();
+        extra.insert("value4".to_string(), 4.0);
+        let get_item=get_array_or_field(
+            &calibration_parameters,
+            &index_map,
+            &extra
+        );
+        let mut actual=get_item("value2");
+        assert_eq!(actual, 3.0);
+        actual=get_item("value3");
+        assert_eq!(actual, 1.0);
+        actual=get_item("value1");
+        assert_eq!(actual, 2.0);
+        actual=get_item("value4");
+        assert_eq!(actual, 4.0);
+    }
+
+    #[test]
+    fn test_get_ul_and_index_of_array() {
+        let mut constraint_map=collections::HashMap::new();
+        constraint_map.insert(
+            "sigma".to_string(), 
+            cuckoo::UpperLower{lower:0.2, upper:0.4}
+        );
+        constraint_map.insert(
+            "adaV".to_string(), 
+            cuckoo::UpperLower{lower:0.3, upper:0.5}
+        );
+        
+        let (ul, index_map)=get_ul_and_index_of_array(&constraint_map);
+        let sigma_ul=&ul[0];
+        let adaV_ul=&ul[1];
+        assert_eq!(sigma_ul.lower, 0.2);
+        assert_eq!(sigma_ul.upper, 0.4);
+        assert_eq!(adaV_ul.lower, 0.3);
+        assert_eq!(adaV_ul.upper, 0.5);
+        let map_sigma=index_map.get(&"sigma".to_string()).unwrap();
+        let map_adaV=index_map.get(&"adaV".to_string()).unwrap();
+        assert_eq!(*map_sigma, 3 as usize);
+        assert_eq!(*map_adaV, 6 as usize);
+    }
+
 }
