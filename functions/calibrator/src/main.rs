@@ -2,6 +2,7 @@ extern crate fang_oost_option;
 extern crate cuckoo;
 extern crate serde;
 extern crate num_complex;
+extern crate cf_functions;
 use self::num_complex::Complex;
 #[macro_use]
 extern crate serde_json;
@@ -116,7 +117,7 @@ const POSSIBLE_CALIBRATION_PARAMETERS: &[&str] = &["lambda", "muJ", "sigJ", "sig
 struct CalibrationParameters{
     k:Vec<f64>,
     prices:Vec<f64>,
-    variable:Vec<String>,
+    //variable:Vec<String>,
     T:f64,//1,
     r:f64,//0.05,
     S0:f64,//178.46,
@@ -129,21 +130,36 @@ struct CalibrationParameters{
 fn get_ul_and_index_of_array(
     constraint_map:&collections::HashMap<String, cuckoo::UpperLower>
 )->(Vec<cuckoo::UpperLower>, collections::HashMap<String, usize>){
-    //let mut ul=vec![];
-    //let mut index_array=collections::HashMap<String, usize>;
-    let filtered_parameters=POSSIBLE_CALIBRATION_PARAMETERS
+    let mut filtered_parameters=POSSIBLE_CALIBRATION_PARAMETERS
         .iter().enumerate()
-        .filter(|(index, parameter_name)|{
-            constraint_map.contains_key(parameter_name)
+        .filter(|(_, parameter_name)|{
+            constraint_map.contains_key(&parameter_name.to_string())
         });
-    let ul=filtered_parameters.map(|(index, parameter_name)|{
-        constraint_map.get(parameter_name)
+
+    let index_map:collections::HashMap<String, usize>=filtered_parameters.by_ref().map(|(index, parameter_name)|{
+        (parameter_name.to_string(), index)
     }).collect();
 
-    let index_map:collections::HashMap<String, usize>=filtered_parameters.map(|(index, parameter_name)|{
-        (parameter_name, index)
-    }).collect();
+    let ul=filtered_parameters.map(|(_, parameter_name)|{
+        constraint_map.get(&parameter_name.to_string()).unwrap()
+    }).cloned().collect();
     (ul, index_map)
+}
+
+fn get_array_or_field<'a, 'b: 'a>(
+    calibration_parameters:&'b [f64],
+    index_map:&'b collections::HashMap<String, usize>,
+    extra:&'b collections::HashMap<String, f64>
+)->impl Fn(&str)->f64+'a {
+    move |field| {
+        if index_map.contains_key(field) {
+            let index:usize=*index_map.get(field).unwrap();
+            calibration_parameters[index]
+        }
+        else {
+            *extra.get(field).unwrap()
+        }
+    }
 }
 
 fn main()-> Result<(), io::Error> {
@@ -161,51 +177,30 @@ fn main()-> Result<(), io::Error> {
             )
         },
         CALIBRATE_CHOICE => {
-                      
-
-
-            //let v: serde_json::Value = serde_json::from_str(data)?;
-            /**const auto& jsonVariable=parsedJson["variable"];
-                const auto mapKeyToIndexVariable=constructKeyToIndex(jsonVariable, possibleCalibrationParameters);
-                const auto mapStatic=constructStaticKeyToValue(parsedJson, possibleCalibrationParameters);
-                const auto mapKeyToExistsStatic=std::get<0>(mapStatic);
-                const auto mapKeyToValueStatic=std::get<1>(mapStatic); 
-                //const auto [mapKeyToExistsStatic, mapKeyToValueStatic]=constructStaticKeyToValue(parsedJson, possibleCalibrationParameters);
-                auto getArgOrConstantCurry=[&](const auto& key, const auto& args){
-                    return getArgOrConstant(key, args, mapKeyToIndexVariable, mapKeyToExistsStatic, mapKeyToValueStatic);
-                };
-                auto cfI=cfLogBase(T);
-                auto cfHOC=[
-                    getArgOrConstantCurry=std::move(getArgOrConstantCurry), 
-                    cfI=std::move(cfI)
-                ](const auto& args){
-                    auto getField=[&](const auto& key){
-                        return getArgOrConstantCurry(key, args);
-                    };
-                    return [
-                        lambda=getField("lambda"),
-                        muJ=getField("muJ"),
-                        sigJ=getField("sigJ"),
-                        sigma=getField("sigma"),
-                        v0=getField("v0"),
-                        speed=getField("speed"),
-                        adaV=getField("adaV"),
-                        rho=getField("rho"),
-                        cfI=std::move(cfI)
-                    ](const auto& u){
-                        return cfI(
-                            u,
-                            lambda, 
-                            muJ, 
-                            sigJ, 
-                            sigma, 
-                            v0, 
-                            speed, 
-                            adaV, 
-                            rho
-                        );
-                    };
-                };*/
+            //slow, but only called once
+            let (ul, index_map)=get_ul_and_index_of_array(&cp.constraints);
+            
+            let cf_hoc=|calibration_parameters:&[f64]|{
+                let get_field=get_array_or_field(
+                    calibration_parameters,
+                    &index_map,
+                    &cp.extra
+                );
+                let maturity=cp.T;
+                let lambda=get_field(POSSIBLE_CALIBRATION_PARAMETERS[0]);
+                let muJ=get_field(POSSIBLE_CALIBRATION_PARAMETERS[1]);
+                let sigJ=get_field(POSSIBLE_CALIBRATION_PARAMETERS[2]);
+                let sigma=get_field(POSSIBLE_CALIBRATION_PARAMETERS[3]);
+                let v0=get_field(POSSIBLE_CALIBRATION_PARAMETERS[4]);
+                let speed=get_field(POSSIBLE_CALIBRATION_PARAMETERS[5]);
+                let adaV=get_field(POSSIBLE_CALIBRATION_PARAMETERS[6]);
+                let rho=get_field(POSSIBLE_CALIBRATION_PARAMETERS[7]);
+                move |u| cf_functions::merton_time_change_log_cf(
+                    u, 
+                    maturity, lambda, muJ, sigJ, 
+                    sigma, v0, speed, adaV, rho 
+                )
+            };
         },
         _ => println!("wow, nothing")
 
