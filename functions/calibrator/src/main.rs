@@ -190,28 +190,51 @@ fn main()-> Result<(), io::Error> {
         CALIBRATE_CHOICE => {
             //slow, but only called once
             let (ul, index_map)=get_ul_and_index_of_array(&cp.constraints);
-            
-            let cf_hoc=|calibration_parameters:&[f64]|{
-                let get_field=get_array_or_field(
-                    calibration_parameters,
-                    &index_map,
-                    &cp.extra
-                );
-                let maturity=cp.T;
-                let lambda=get_field(POSSIBLE_CALIBRATION_PARAMETERS[0]);
-                let muJ=get_field(POSSIBLE_CALIBRATION_PARAMETERS[1]);
-                let sigJ=get_field(POSSIBLE_CALIBRATION_PARAMETERS[2]);
-                let sigma=get_field(POSSIBLE_CALIBRATION_PARAMETERS[3]);
-                let v0=get_field(POSSIBLE_CALIBRATION_PARAMETERS[4]);
-                let speed=get_field(POSSIBLE_CALIBRATION_PARAMETERS[5]);
-                let adaV=get_field(POSSIBLE_CALIBRATION_PARAMETERS[6]);
-                let rho=get_field(POSSIBLE_CALIBRATION_PARAMETERS[7]);
-                move |u| cf_functions::merton_time_change_log_cf(
-                    u, 
-                    maturity, lambda, muJ, sigJ, 
-                    sigma, v0, speed, adaV, rho 
+            let (
+                optimal_parameters, 
+                fn_at_optimal_parameters
+            )={ //in brackets to show borrow of index_map
+                let cf_hoc=|u:&Complex<f64>, calibration_parameters:&[f64]|{
+                    let get_field=get_array_or_field(
+                        calibration_parameters,
+                        &index_map,
+                        &cp.extra
+                    );
+                    let maturity=cp.T;
+                    let lambda=get_field(POSSIBLE_CALIBRATION_PARAMETERS[0]);
+                    let muJ=get_field(POSSIBLE_CALIBRATION_PARAMETERS[1]);
+                    let sigJ=get_field(POSSIBLE_CALIBRATION_PARAMETERS[2]);
+                    let sigma=get_field(POSSIBLE_CALIBRATION_PARAMETERS[3]);
+                    let v0=get_field(POSSIBLE_CALIBRATION_PARAMETERS[4]);
+                    let speed=get_field(POSSIBLE_CALIBRATION_PARAMETERS[5]);
+                    let adaV=get_field(POSSIBLE_CALIBRATION_PARAMETERS[6]);
+                    let rho=get_field(POSSIBLE_CALIBRATION_PARAMETERS[7]);
+                    cf_functions::merton_time_change_log_cf(
+                        u, 
+                        maturity, lambda, muJ, sigJ, 
+                        sigma, v0, speed, adaV, rho 
+                    )
+                };
+                generic_call_calibrator_cuckoo(
+                    &cf_hoc,
+                    &ul, 
+                    &strikes_prices,
+                    cp.S0,
+                    cp.r, 
+                    cp.T
                 )
             };
+            let optimal_param_map:collections::HashMap<
+                String, f64
+            >=index_map.into_iter().map(|(key, value)|{
+                (key, optimal_parameters[value])
+            }).collect();
+
+            let json_results=json!({
+                "optimalParameters":optimal_param_map,
+                "fnResult":fn_at_optimal_parameters
+            });
+            println!("{}", json_results);
         },
         _ => println!("wow, nothing")
 

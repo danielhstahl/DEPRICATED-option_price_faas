@@ -1,5 +1,5 @@
 const {spawn} = require('child_process')
-const model=spawn('./target/release/calibrator', [0, JSON.stringify({
+const model=spawn('./target/release/calibrator', [1, JSON.stringify({
     T:1,
     r:0.05,
     S0:178.46,
