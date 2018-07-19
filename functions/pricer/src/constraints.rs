@@ -73,7 +73,7 @@ fn check_constraint<'a>(
     }
     else {
         Err(
-            Error::new(ErrorKind::Other, format!("Parameter out of bounds{}", parameter))
+            Error::new(ErrorKind::Other, format!("Parameter {} out of bounds", parameter_name))
         )
     }
 }

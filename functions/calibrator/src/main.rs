@@ -39,7 +39,7 @@ fn generate_const_parameters(
     let n=1024;
     let (strike_last, _)=strikes_and_option_prices.last().unwrap();
     let max_strike=strike_last*10.0;
-    let min_strike=asset/max_strike;
+    let min_strike=1.0/max_strike; //recipricol of max strike
     (n, min_strike, max_strike)
 }
 
@@ -58,10 +58,10 @@ fn generate_spline_curves(
         strikes_and_option_prices,
         asset, discount, min_strike,
         max_strike
-    );
-    let min_log_strike=min_strike.ln();
+    ); //s is a spline that takes normalized strike (strike/asset)
+    let min_log_strike=(min_strike*asset).ln(); //to make symmetric with max 
     let max_log_strike=(max_strike/asset).ln();
-    let dk_log=(max_log_strike-min_log_strike)/((n-1) as f64);
+    let dk_log=(max_log_strike-min_log_strike)/((num_nodes-1) as f64);
     let curves=json!(CurvePoints{
         curve:(0..num_nodes).map(|index|{
             let x=min_log_strike+dk_log*(index as f64);
@@ -95,14 +95,24 @@ fn generic_call_calibrator_cuckoo<T>(
     );
     let num_u=15;//seems reasonable in tests
     let u_array=get_u(num_u);
+    for (strike, price) in strikes_and_option_prices.iter(){
+        println!("strike {}, price {}", strike, price);
+    }
+    println!("min_strike {}", min_strike);
+    println!("max_strike {}", max_strike);
+    println!("uarray length {}", u_array.len());
     let estimate_of_phi=option_calibration::generate_fo_estimate(
         strikes_and_option_prices, asset, 
         rate, maturity, min_strike, max_strike
     );
+    println!("Got to 107");
+    
     let phis=estimate_of_phi(n, &u_array);
+    println!("Got to 110");
     let obj_fn=option_calibration::get_obj_fn_arr(
         phis, u_array, log_cf
     );
+    println!("Got to 114");
     let nest_size=25;
     let total_mc=10000;
     let tol=0.000001;
@@ -117,15 +127,12 @@ const POSSIBLE_CALIBRATION_PARAMETERS: &[&str] = &["lambda", "muJ", "sigJ", "sig
 struct CalibrationParameters{
     k:Vec<f64>,
     prices:Vec<f64>,
-    //variable:Vec<String>,
     T:f64,//1,
     r:f64,//0.05,
     S0:f64,//178.46,
     constraints:collections::HashMap<String, cuckoo::UpperLower>,
     #[serde(flatten)]
-    //extra: collections::HashMap<String, serde_json::Value>
-    extra: collections::HashMap<String, f64>
-
+    static_parameters: collections::HashMap<String, f64>
 }
 
 fn get_filtered_parameter_iterator(
@@ -160,15 +167,18 @@ fn get_ul_and_index_of_array(
 fn get_array_or_field<'a, 'b: 'a>(
     calibration_parameters:&'b [f64],
     index_map:&'b collections::HashMap<String, usize>,
-    extra:&'b collections::HashMap<String, f64>
+    static_parameters:&'b collections::HashMap<String, f64>
 )->impl Fn(&str)->f64+'a {
     move |field| {
         if index_map.contains_key(field) {
+            println!("Contains field {}", field);
             let index:usize=*index_map.get(field).unwrap();
+            println!("Index of field is {}", index);
             calibration_parameters[index]
         }
         else {
-            *extra.get(field).unwrap()
+            println!("Does not contain field {}", field);
+            *static_parameters.get(field).unwrap()
         }
     }
 }
@@ -177,6 +187,10 @@ fn main()-> Result<(), io::Error> {
     let args: Vec<String> = env::args().collect();
     let fn_choice:i32=args[1].parse().unwrap();
     let cp: CalibrationParameters = serde_json::from_str(&args[2])?;
+    for (key, val) in cp.static_parameters.iter() {
+        println!("{}: \"{}\"", *key, *val);
+    }
+
     let strikes_prices:Vec<(f64, f64)>=cp.k.iter()
         .zip(cp.prices.iter())
         .map(|(strike, price)|(*strike, *price)).collect(); 
@@ -189,17 +203,20 @@ fn main()-> Result<(), io::Error> {
         },
         CALIBRATE_CHOICE => {
             //slow, but only called once
+            println!("Got to line 197");
             let (ul, index_map)=get_ul_and_index_of_array(&cp.constraints);
             let (
                 optimal_parameters, 
                 fn_at_optimal_parameters
             )={ //in brackets to show borrow of index_map
                 let cf_hoc=|u:&Complex<f64>, calibration_parameters:&[f64]|{
+                    println!("Got to line 213");
                     let get_field=get_array_or_field(
                         calibration_parameters,
                         &index_map,
-                        &cp.extra
+                        &cp.static_parameters
                     );
+                    println!("Got to line 219");
                     let maturity=cp.T;
                     let lambda=get_field(POSSIBLE_CALIBRATION_PARAMETERS[0]);
                     let muJ=get_field(POSSIBLE_CALIBRATION_PARAMETERS[1]);
