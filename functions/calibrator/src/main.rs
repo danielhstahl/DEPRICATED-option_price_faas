@@ -194,9 +194,6 @@ fn main()-> Result<(), io::Error> {
         CALIBRATE_CHOICE => {
             //slow, but only called once
             let (ul, index_map)=get_ul_and_index_of_array(&cp.constraints);
-            for upper_lower in ul.iter(){
-                println!("upper: {}, lower: {}", upper_lower.upper, upper_lower.lower);
-            }
             let (
                 optimal_parameters, 
                 fn_at_optimal_parameters

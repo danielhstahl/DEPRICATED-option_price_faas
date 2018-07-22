@@ -1,5 +1,6 @@
 const {spawn} = require('child_process')
 let start=process.hrtime()
+const getMSSinceStart=hrTimeArray=>hrTimeArray[0]*1000+hrTimeArray[1]/1000000;
 const model=spawn('./target/release/calibrator', [1, JSON.stringify({
     T:1,
     r:0.003,
@@ -58,7 +59,7 @@ model.stdout.on('data', data=>{
   })
   model.on('close', code=>{
     console.log(modelOutput)
-    console.log(process.hrtime(start)[0])
+    console.log("Time to execute program:", getMSSinceStart(process.hrtime(start)))
     if(modelErr){
       return console.log(modelErr)
     }
