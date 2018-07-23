@@ -21,16 +21,16 @@ provider:
 
 package:
   include:
-   - bin/**
-   - lambda/handler.js
+   - functions/**
+   - lambda/**
    - node_modules/cubic-spline/**
-
+   - 
 functions:
   calculator:
     handler: lambda/calculatorLambda.calculator
     events:
       - http:
-          path: version/calculator/{optionType}/{sensitivity}/{algorithm}
+          path: version/calculator/{optionType}/{sensitivity}
           method: post
           cors: true
           request:
@@ -38,7 +38,6 @@ functions:
               paths:
                 optionType: true
                 sensitivity: true
-                algorithm: true
   density:
     handler: lambda/calculatorLambda.density
     events:
@@ -90,7 +89,6 @@ functions:
     memorySize: 3008 # optional, in MB, default is 1024
     timeout: 30 # optional, in seconds, default is 6
     handler: lambda/calibratorLambda.calibrator
-
     events:
       - http:
           path: version/calibrator/{calibration}
