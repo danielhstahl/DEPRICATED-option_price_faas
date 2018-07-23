@@ -1,8 +1,0 @@
-{
-  "name": "option_price_faas",
-  "description": "Option pricing and calibration using microservices",
-  "memory": 512,
-  "timeout": 5,
-  "role": "arn:aws:iam::029524284009:role/option_price_faas_lambda_function",
-  "environment": {}
-}

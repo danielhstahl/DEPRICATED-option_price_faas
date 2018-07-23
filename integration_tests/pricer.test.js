@@ -1,8 +1,4 @@
 const {spawn} = require('child_process')
-
-exports.handle=(e, ctx, cb)=>{
-  //e["key"] gets the data, cb:(err, body)
-}
 const model=spawn('./target/release/pricer', [1, JSON.stringify({
     k:[45.0, 50.0, 55.0],
     sigma:0.4,

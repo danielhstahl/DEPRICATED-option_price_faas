@@ -1,0 +1,106 @@
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+service: option_price_faas
+
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+
+
+package:
+  include:
+   - bin/**
+   - lambda/handler.js
+   - node_modules/cubic-spline/**
+
+functions:
+  calculator:
+    handler: lambda/calculatorLambda.calculator
+    events:
+      - http:
+          path: version/calculator/{optionType}/{sensitivity}/{algorithm}
+          method: post
+          cors: true
+          request:
+            parameters:
+              paths:
+                optionType: true
+                sensitivity: true
+                algorithm: true
+  density:
+    handler: lambda/calculatorLambda.density
+    events:
+      - http:
+          path: version/density/{densityType}
+          method: post
+          cors: true
+          request:
+            parameters:
+              paths:
+                densityType: true
+  defaultParameters:
+    handler: lambda/calculatorLambda.defaultParameters
+    events:
+      - http:
+          path: version/parameters/parameter_ranges
+          method: get
+          cors: true
+
+  getExpirationDates:
+    handler: lambda/optionLambda.getExpirationDates
+    events:
+      - http:
+          path: version/options/{ticker}/maturities
+          method: get
+          cors: true
+          request:
+            parameters:
+              paths:
+                ticker: true
+
+  getOptionPrices:
+    handler: lambda/optionLambda.getOptionPrices
+    events:
+      - http:
+          path: version/options/{ticker}/prices/{asOfDate}
+          method: get
+          cors: true
+          request:
+            parameters:
+              paths:
+                ticker: true
+                asOfDate: true
+              querystrings:
+                minOpenInterest: false
+                minRelativeBidAskSpread: false
+
+  calibrator:
+    memorySize: 3008 # optional, in MB, default is 1024
+    timeout: 30 # optional, in seconds, default is 6
+    handler: lambda/calibratorLambda.calibrator
+
+    events:
+      - http:
+          path: version/calibrator/{calibration}
+          method: post
+          cors: true
+          request:
+            parameters:
+              paths:
+                calibration: true
+          
+
+      
+
