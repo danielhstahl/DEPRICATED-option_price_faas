@@ -9,8 +9,8 @@ const calculatorKeys={
     calldelta:5,
     calltheta:6,
     callgamma:7,
-    densityvar:8,
-    densityraw:9
+    density:8,
+    riskmetric:9
 }
 
 const pricer=spawnBinary('pricer')
@@ -18,7 +18,7 @@ const defaultParameters=callback=>genericSpawn('defaultParameters', [], callback
 
 module.exports.calculator=(event, context, callback)=>{
     const {optionType, sensitivity}=event.pathParameters
-    const key=optionType+sensitivity+algorithm
+    const key=optionType+sensitivity
     const index=calculatorKeys[key]
     calculatorSpawn(index, event.body, transformCallback(callback))
 }

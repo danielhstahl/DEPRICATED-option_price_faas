@@ -23,3 +23,14 @@ cuckoo = "0.4.0"
 
 [badges]
 travis-ci = { repository = "phillyfan1138/option_price_faas" }
+
+[[bin]]
+name = "output_constraints"
+path = "src/bin/output_constraints.rs"
+[[bin]]
+name = "pricer"
+path = "src/bin/pricer.rs"
+
+[lib]
+name = "constraints"
+path = "src/lib/constraints.rs"

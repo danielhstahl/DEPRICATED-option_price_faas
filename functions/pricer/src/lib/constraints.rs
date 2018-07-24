@@ -1,4 +1,8 @@
 extern crate cuckoo;
+#[macro_use]
+extern crate serde_json;
+#[macro_use]
+extern crate serde_derive;
 
 use std::collections::VecDeque;
 use std::io;

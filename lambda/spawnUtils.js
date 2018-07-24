@@ -1,5 +1,5 @@
 const {spawn} = require('child_process')
-const 'release/calibrator'
+
 process.env['PATH']=`${process.env['PATH']}:${process.env['LAMBDA_TASK_ROOT']}`
 const genericSpawn=(binaryName, options, callback)=>{
     const binSubPath=`${binaryName}/release/${binaryName}`

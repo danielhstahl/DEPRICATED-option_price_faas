@@ -10,7 +10,7 @@ extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
 
-mod constraints;
+extern crate constraints;
 
 use fang_oost_option::option_pricing;
 use std::env;
