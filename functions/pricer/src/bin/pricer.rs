@@ -39,42 +39,42 @@ const RISK_MEASURES:i32=9;
 
 #[derive(Serialize, Deserialize)]
 struct GraphElementIV {
-    atPoint:f64,
+    at_point:f64,
     value:f64,
     iv:f64
 }
 #[derive(Serialize, Deserialize)]
 struct GraphElement {
-    atPoint:f64,
+    at_point:f64,
     value:f64
 }
 #[derive(Serialize, Deserialize)]
 struct RiskMeasures {
-    VaR:f64,
-    ES:f64
+    value_at_risk:f64,
+    expected_shortfall:f64
 }
 
 fn get_jump_diffusion_vol(
     sigma:f64,
     lambda:f64,
-    mu_j:f64,
-    sig_j:f64,
+    mu_l:f64,
+    sig_l:f64,
     maturity:f64
 )->f64 {
-    ((sigma.powi(2)+lambda*(mu_j.powi(2)+sig_j.powi(2)))*maturity).sqrt()
+    ((sigma.powi(2)+lambda*(mu_l.powi(2)+sig_l.powi(2)))*maturity).sqrt()
 }
 
 fn print_risk_measures(
     risk_measure:(f64, f64)
 ) {
-    let (ES, VaR)=risk_measure;
+    let (expected_shortfall, value_at_risk)=risk_measure;
     let json_value=json!(
         RiskMeasures {
-            VaR,
-            ES
+            value_at_risk,
+            expected_shortfall
         }
     );
-    println!("{}", json_value.to_string())
+    println!("{}", serde_json::to_string_pretty(&json_value).unwrap())
 }
 
 fn print_density(
@@ -84,12 +84,12 @@ fn print_density(
     let json_value=json!(
         x_values.iter().zip(values.iter()).map(|(x_val, val)|{
             GraphElement {
-                atPoint:*x_val,
+                at_point:*x_val,
                 value:*val
             }
         }).collect::<Vec<_>>()
     );
-    println!("{}", json_value.to_string())
+    println!("{}", serde_json::to_string_pretty(&json_value).unwrap())
 }
 fn print_greeks(
     x_values:&[f64],
@@ -101,12 +101,12 @@ fn print_greeks(
             .enumerate().filter(|(index, _)|index>&0&&index<&x_val_crit)
             .map(|(_, (x_val, val))|{
                 GraphElement {
-                    atPoint:*x_val,
+                    at_point:*x_val,
                     value:*val
                 }
             }).collect::<Vec<_>>()
     );
-    println!("{}", json_value.to_string())
+    println!("{}", serde_json::to_string_pretty(&json_value).unwrap())
 }
 
 fn print_call_prices(
@@ -123,13 +123,13 @@ fn print_call_prices(
             .map(|(_, (strike, price))|{
                 let iv=black_scholes::call_iv(*price, asset, *strike, rate, maturity, 0.3);
                 GraphElementIV {
-                    atPoint:*strike,
+                    at_point:*strike,
                     value:*price,
                     iv
                 }
             }).collect::<Vec<_>>()
     );
-    println!("{}", json_call_prices.to_string())
+    println!("{}", serde_json::to_string_pretty(&json_call_prices).unwrap())
 }
 
 fn adjust_density<T>(
@@ -155,13 +155,13 @@ fn get_vol_from_parameters(
     parameters:&constraints::OptionParameters
 )->f64{
     let constraints::OptionParameters {
-        sigma, lambda, muJ, 
-        sigJ, T, ..
+        sigma, lambda, mu_l, 
+        sig_l, maturity, ..
     }=parameters;
     get_jump_diffusion_vol(
         *sigma, *lambda,
-        *muJ, *sigJ, 
-        *T
+        *mu_l, *sig_l, 
+        *maturity
     )
 }
 
@@ -178,33 +178,32 @@ fn main()-> Result<(), io::Error> {
     parameters.extend_k(x_max_options);
     
     let constraints::OptionParameters {
-        T:maturity,
-        r:rate,
-        S0:asset,
+        maturity,
+        rate,
+        asset,
         lambda,
-        muJ:mu_j,
-        sigJ:sig_j,
+        mu_l,
+        sig_l,
         sigma,
         v0,
         speed,
-        adaV:ada_v,
+        eta_v,
         rho,
-        k,
+        strikes,
         quantile,
-        numU:num_u_base
+        num_u:num_u_base
     }=parameters; //destructure
     
-
     let num_u=(2 as usize).pow(num_u_base as u32);
-    let strikes=Vec::from(k);
+    let strikes=Vec::from(strikes);
     //note...if pass by reference doesn't work 
     //I can always move this value since I only
     //use it once.  However, if I ever want 
     //this binary to stay "live" for multiple
     //calls I'll need to keep this reference around
     let inst_cf=cf_functions::merton_time_change_cf(
-        maturity, rate, lambda, mu_j, sig_j, sigma, v0,
-        speed, ada_v, rho
+        maturity, rate, lambda, mu_l, sig_l, sigma, v0,
+        speed, eta_v, rho
     );
 
     match fn_choice {

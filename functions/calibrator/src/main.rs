@@ -16,8 +16,8 @@ use std::env;
 use std::collections;
 #[derive(Serialize, Deserialize)]
 struct CurvePoint{
-    logStrike:f64,
-    transformedOption:f64
+    log_strike:f64,
+    transformed_option:f64
 }
 #[derive(Serialize, Deserialize)]
 struct CurvePoints{
@@ -67,18 +67,18 @@ fn generate_spline_curves(
         curve:(0..num_nodes).map(|index|{
             let x=min_log_strike+dk_log*(index as f64);
             CurvePoint {
-                logStrike:x-rate*maturity,
-                transformedOption:option_calibration::max_zero_or_number(s(x.exp()))
+                log_strike:x-rate*maturity,
+                transformed_option:option_calibration::max_zero_or_number(s(x.exp()))
             }
         }).collect(),
         points:strikes_and_option_prices.iter().map(|(strike, price)|{
             CurvePoint {
-                logStrike:(strike/asset).ln()-rate*maturity,
-                transformedOption:price/asset-option_calibration::max_zero_or_number(1.0-strike*discount/asset)
+                log_strike:(strike/asset).ln()-rate*maturity,
+                transformed_option:price/asset-option_calibration::max_zero_or_number(1.0-strike*discount/asset)
             }
         }).collect()
     });
-    println!("{}", curves.to_string());
+    println!("{}", serde_json::to_string_pretty(&curves).unwrap());
 }
 
 fn generic_call_calibrator_cuckoo<T>(
@@ -118,15 +118,15 @@ fn generic_call_calibrator_cuckoo<T>(
 
 const SPLINE_CHOICE:i32=0;
 const CALIBRATE_CHOICE:i32=1;
-const POSSIBLE_CALIBRATION_PARAMETERS: &[&str] = &["lambda", "muJ", "sigJ", "sigma", "v0", "speed", "adaV", "rho"]; //order matters! same order as input into CF
+const POSSIBLE_CALIBRATION_PARAMETERS: &[&str] = &["lambda", "mu_l", "sig_l", "sigma", "v0", "speed", "eta_v", "rho"]; //order matters! same order as input into CF
 
 #[derive(Serialize, Deserialize)]
 struct CalibrationParameters{
-    k:Vec<f64>,
+    strikes:Vec<f64>,
     prices:Vec<f64>,
-    T:f64,//1,
-    r:f64,//0.05,
-    S0:f64,//178.46,
+    maturity:f64,
+    rate:f64,
+    asset:f64,
     constraints:collections::HashMap<String, cuckoo::UpperLower>,
     #[serde(flatten)]
     static_parameters: collections::HashMap<String, f64>
@@ -183,14 +183,14 @@ fn main()-> Result<(), io::Error> {
     let args: Vec<String> = env::args().collect();
     let fn_choice:i32=args[1].parse().unwrap();
     let cp: CalibrationParameters = serde_json::from_str(&args[2])?;
-    let strikes_prices:Vec<(f64, f64)>=cp.k.iter()
+    let strikes_prices:Vec<(f64, f64)>=cp.strikes.iter()
         .zip(cp.prices.iter())
         .map(|(strike, price)|(*strike, *price)).collect(); 
     match fn_choice {
         SPLINE_CHOICE => {
             generate_spline_curves(
                 &strikes_prices,
-                cp.S0, cp.r, cp.T, 256
+                cp.asset, cp.rate, cp.maturity, 256
             )
         },
         CALIBRATE_CHOICE => {
@@ -206,28 +206,28 @@ fn main()-> Result<(), io::Error> {
                         &index_map,
                         &cp.static_parameters
                     );
-                    let maturity=cp.T;
+                    let maturity=cp.maturity;
                     let lambda=get_field(POSSIBLE_CALIBRATION_PARAMETERS[0]);
-                    let muJ=get_field(POSSIBLE_CALIBRATION_PARAMETERS[1]);
-                    let sigJ=get_field(POSSIBLE_CALIBRATION_PARAMETERS[2]);
+                    let mu_l=get_field(POSSIBLE_CALIBRATION_PARAMETERS[1]);
+                    let sig_l=get_field(POSSIBLE_CALIBRATION_PARAMETERS[2]);
                     let sigma=get_field(POSSIBLE_CALIBRATION_PARAMETERS[3]);
                     let v0=get_field(POSSIBLE_CALIBRATION_PARAMETERS[4]);
                     let speed=get_field(POSSIBLE_CALIBRATION_PARAMETERS[5]);
-                    let adaV=get_field(POSSIBLE_CALIBRATION_PARAMETERS[6]);
+                    let eta_v=get_field(POSSIBLE_CALIBRATION_PARAMETERS[6]);
                     let rho=get_field(POSSIBLE_CALIBRATION_PARAMETERS[7]);
                     cf_functions::merton_time_change_log_cf(
                         u, 
-                        maturity, lambda, muJ, sigJ, 
-                        sigma, v0, speed, adaV, rho 
+                        maturity, lambda, mu_l, sig_l, 
+                        sigma, v0, speed, eta_v, rho 
                     )
                 };
                 generic_call_calibrator_cuckoo(
                     &cf_hoc,
                     &ul, 
                     &strikes_prices,
-                    cp.S0,
-                    cp.r, 
-                    cp.T
+                    cp.asset,
+                    cp.rate, 
+                    cp.maturity
                 )
             };
             let optimal_param_map:collections::HashMap<
@@ -240,7 +240,7 @@ fn main()-> Result<(), io::Error> {
                 "optimalParameters":optimal_param_map,
                 "fnResult":fn_at_optimal_parameters
             });
-            println!("{}", json_results);
+            println!("{}", serde_json::to_string_pretty(&json_results).unwrap());
         },
         _ => println!("wow, nothing")
 
@@ -286,21 +286,21 @@ mod tests {
             cuckoo::UpperLower{lower:0.2, upper:0.4}
         );
         constraint_map.insert(
-            "adaV".to_string(), 
+            "eta_v".to_string(), 
             cuckoo::UpperLower{lower:0.3, upper:0.5}
         );
         
         let (ul, index_map)=get_ul_and_index_of_array(&constraint_map);
         let sigma_ul=&ul[0];
-        let adaV_ul=&ul[1];
+        let ata_v_ul=&ul[1];
         assert_eq!(sigma_ul.lower, 0.2);
         assert_eq!(sigma_ul.upper, 0.4);
-        assert_eq!(adaV_ul.lower, 0.3);
-        assert_eq!(adaV_ul.upper, 0.5);
+        assert_eq!(ata_v_ul.lower, 0.3);
+        assert_eq!(ata_v_ul.upper, 0.5);
         let map_sigma=index_map.get(&"sigma".to_string()).unwrap();
-        let map_adaV=index_map.get(&"adaV".to_string()).unwrap();
+        let map_eta_v=index_map.get(&"eta_v".to_string()).unwrap();
         assert_eq!(*map_sigma, 0 as usize);
-        assert_eq!(*map_adaV, 1 as usize);
+        assert_eq!(*map_eta_v, 1 as usize);
     }
 
 }

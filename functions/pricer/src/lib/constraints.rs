@@ -1,5 +1,4 @@
 extern crate cuckoo;
-#[macro_use]
 extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
@@ -10,25 +9,25 @@ use std::io::{Error, ErrorKind};
 
 #[derive(Serialize, Deserialize)]
 pub struct OptionParameters {
-    pub T: f64,
-    pub r:f64,
-    pub S0:f64,
+    pub maturity: f64,
+    pub rate:f64,
+    pub asset:f64,
     pub lambda:f64,
-    pub muJ:f64,
-    pub sigJ:f64,
+    pub mu_l:f64,
+    pub sig_l:f64,
     pub sigma:f64,
     pub v0:f64,
     pub speed:f64,
-    pub adaV:f64,
+    pub eta_v:f64,
     pub rho:f64,
-    pub k:VecDeque<f64>,
+    pub strikes:VecDeque<f64>,
     pub quantile:f64,
-    pub numU:usize
+    pub num_u:usize
 }
 impl OptionParameters{
     pub fn extend_k(&mut self, x_max:f64){
-        self.k.push_back((-x_max).exp()*self.S0);
-        self.k.push_front(x_max.exp()*self.S0);
+        self.strikes.push_back((-x_max).exp()*self.asset);
+        self.strikes.push_front(x_max.exp()*self.asset);
     }
 }
 
@@ -36,34 +35,34 @@ impl OptionParameters{
 #[derive(Serialize, Deserialize)] //can I only do this on structs?
 pub struct ParameterConstraints{
     pub lambda:cuckoo::UpperLower,
-    pub muJ:cuckoo::UpperLower,
-    pub sigJ:cuckoo::UpperLower,
+    pub mu_l:cuckoo::UpperLower,
+    pub sig_l:cuckoo::UpperLower,
     pub sigma:cuckoo::UpperLower,
     pub v0:cuckoo::UpperLower,
     pub speed:cuckoo::UpperLower,
-    pub adaV:cuckoo::UpperLower,
+    pub eta_v:cuckoo::UpperLower,
     pub rho:cuckoo::UpperLower,
-    pub r:cuckoo::UpperLower,
-    pub S0:cuckoo::UpperLower,
-    pub T:cuckoo::UpperLower,
-    pub numU:cuckoo::UpperLower,
+    pub rate:cuckoo::UpperLower,
+    pub asset:cuckoo::UpperLower,
+    pub maturity:cuckoo::UpperLower,
+    pub num_u:cuckoo::UpperLower,
     pub quantile:cuckoo::UpperLower
 }
 
 pub fn get_constraints()->ParameterConstraints {
     ParameterConstraints{
         lambda:cuckoo::UpperLower{lower:0.0, upper:2.0},
-        muJ:cuckoo::UpperLower{lower:-1.0, upper:1.0},
-        sigJ:cuckoo::UpperLower{lower:0.0, upper:2.0},
+        mu_l:cuckoo::UpperLower{lower:-1.0, upper:1.0},
+        sig_l:cuckoo::UpperLower{lower:0.0, upper:2.0},
         sigma:cuckoo::UpperLower{lower:0.0, upper:1.0},
         v0:cuckoo::UpperLower{lower:0.2, upper:1.8},
         speed:cuckoo::UpperLower{lower:0.0, upper:3.0},
-        adaV:cuckoo::UpperLower{lower:0.0, upper:3.0},
+        eta_v:cuckoo::UpperLower{lower:0.0, upper:3.0},
         rho:cuckoo::UpperLower{lower:-1.0, upper:1.0},
-        r:cuckoo::UpperLower{lower:0.0, upper:0.4},
-        S0:cuckoo::UpperLower{lower:0.0, upper:1000000.0},
-        T:cuckoo::UpperLower{lower:0.0, upper:1000000.0},
-        numU:cuckoo::UpperLower{lower:5.0, upper:10.0},
+        rate:cuckoo::UpperLower{lower:0.0, upper:0.4},
+        asset:cuckoo::UpperLower{lower:0.0, upper:1000000.0},
+        maturity:cuckoo::UpperLower{lower:0.0, upper:1000000.0},
+        num_u:cuckoo::UpperLower{lower:5.0, upper:10.0},
         quantile:cuckoo::UpperLower{lower:0.0, upper:1.0}
     }
 }
@@ -86,17 +85,17 @@ pub fn check_constraints<'a>(
     constraints:&ParameterConstraints
 )->Result<(), io::Error> {
     check_constraint(parameters.lambda, &constraints.lambda, "lambda")?;
-    check_constraint(parameters.muJ, &constraints.muJ, "muJ")?;
-    check_constraint(parameters.sigJ, &constraints.sigJ, "sigJ")?;
+    check_constraint(parameters.mu_l, &constraints.mu_l, "mu_l")?;
+    check_constraint(parameters.sig_l, &constraints.sig_l, "sig_l")?;
     check_constraint(parameters.sigma, &constraints.sigma, "sigma")?;
     check_constraint(parameters.v0, &constraints.v0, "v0")?;
     check_constraint(parameters.speed, &constraints.speed, "speed")?;
-    check_constraint(parameters.adaV, &constraints.adaV, "adaV")?;
+    check_constraint(parameters.eta_v, &constraints.eta_v, "eta_v")?;
     check_constraint(parameters.rho, &constraints.rho, "rho")?;
-    check_constraint(parameters.r, &constraints.r, "r")?;
-    check_constraint(parameters.S0, &constraints.S0, "S0")?;
-    check_constraint(parameters.T, &constraints.T, "T")?;
-    check_constraint(parameters.numU as f64, &constraints.numU, "numU")?;
+    check_constraint(parameters.rate, &constraints.rate, "rate")?;
+    check_constraint(parameters.asset, &constraints.asset, "asset")?;
+    check_constraint(parameters.maturity, &constraints.maturity, "maturity")?;
+    check_constraint(parameters.num_u as f64, &constraints.num_u, "num_u")?;
     check_constraint(parameters.quantile, &constraints.quantile, "quantile")?;
     Ok(())
 }

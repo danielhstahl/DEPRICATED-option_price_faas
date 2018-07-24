@@ -6,5 +6,5 @@ fn main(){
     let constraints=json!(
         constraints::get_constraints()
     );
-    println!("{}", constraints.to_string())
+    println!("{}", serde_json::to_string_pretty(&constraints).unwrap())
 }
