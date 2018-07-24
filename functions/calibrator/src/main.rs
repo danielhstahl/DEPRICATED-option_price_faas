@@ -134,11 +134,11 @@ struct CalibrationParameters{
 
 fn get_filtered_parameter_iterator(
     constraint_map:&collections::HashMap<String, cuckoo::UpperLower>
-)->impl Iterator<Item=(usize, &&str)>
+)->impl Iterator<Item=&&str>
 {
     POSSIBLE_CALIBRATION_PARAMETERS
-        .iter().enumerate()
-        .filter(move |(_, parameter_name)|{
+        .iter()
+        .filter(move |parameter_name|{
             constraint_map.contains_key(&parameter_name.to_string())
         })
 }
@@ -149,13 +149,15 @@ fn get_ul_and_index_of_array(
 
     let index_map:collections::HashMap<String, usize>=get_filtered_parameter_iterator(
             constraint_map
-        ).map(|(index, parameter_name)|{
+        )
+        .enumerate()
+        .map(|(index, parameter_name)|{
             (parameter_name.to_string(), index)
         }).collect();
 
     let ul=get_filtered_parameter_iterator(
             constraint_map
-        ).map(|(_, parameter_name)|{
+        ).map(|parameter_name|{
             constraint_map.get(&parameter_name.to_string()).unwrap()
         }).cloned().collect();
     (ul, index_map)
@@ -297,8 +299,8 @@ mod tests {
         assert_eq!(adaV_ul.upper, 0.5);
         let map_sigma=index_map.get(&"sigma".to_string()).unwrap();
         let map_adaV=index_map.get(&"adaV".to_string()).unwrap();
-        assert_eq!(*map_sigma, 3 as usize);
-        assert_eq!(*map_adaV, 6 as usize);
+        assert_eq!(*map_sigma, 0 as usize);
+        assert_eq!(*map_adaV, 1 as usize);
     }
 
 }

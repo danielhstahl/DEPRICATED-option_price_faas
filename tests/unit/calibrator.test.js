@@ -43,7 +43,7 @@ it('correctly calls calibrator handler for full model', (done)=>{
     const event=createEvent(calibratorParams, {calibration:'calibrate'})
     handler.calibrator(event, {}, (err, val)=>{
         console.log(val.body)
-        const parsedVal=JSON.parse(val.body)
+        const parsedVal=JSON.parse(val.body).optimalParameters
         expect(parsedVal.sigma).toBeDefined()
         expect(parsedVal.speed).toBeDefined()
         expect(parsedVal.adaV).toBeDefined()
