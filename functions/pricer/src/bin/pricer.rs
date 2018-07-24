@@ -67,7 +67,7 @@ fn get_jump_diffusion_vol(
 fn print_risk_measures(
     risk_measure:(f64, f64)
 ) {
-    let (VaR, ES)=risk_measure;
+    let (ES, VaR)=risk_measure;
     let json_value=json!(
         RiskMeasures {
             VaR,

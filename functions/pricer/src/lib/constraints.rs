@@ -72,7 +72,7 @@ fn check_constraint<'a>(
     constraint:&'a cuckoo::UpperLower,
     parameter_name: &'a str
 )->Result<(), io::Error>{
-    if parameter>constraint.lower&&parameter<constraint.upper{
+    if parameter>=constraint.lower&&parameter<=constraint.upper{
         Ok(())
     }
     else {
