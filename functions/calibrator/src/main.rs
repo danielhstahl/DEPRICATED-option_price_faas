@@ -14,6 +14,7 @@ use std::f64::consts::PI;
 use fang_oost_option::option_calibration;
 use std::env;
 use std::collections;
+
 #[derive(Serialize, Deserialize)]
 struct CurvePoint{
     log_strike:f64,
@@ -121,6 +122,7 @@ const CALIBRATE_CHOICE:i32=1;
 const POSSIBLE_CALIBRATION_PARAMETERS: &[&str] = &["lambda", "mu_l", "sig_l", "sigma", "v0", "speed", "eta_v", "rho"]; //order matters! same order as input into CF
 
 #[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct CalibrationParameters{
     strikes:Vec<f64>,
     prices:Vec<f64>,

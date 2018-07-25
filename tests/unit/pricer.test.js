@@ -7,19 +7,19 @@ const createEvent=(data, parameters, queryStringParameters)=>({
 })
 it('correctly calls calculator handlers', (done)=>{
     const event=createEvent({
-        k:[40, 50, 60],
+        strikes:[40, 50, 60],
         sigma:0.4,
-        T:5,
-        r:0.05,
-        S0:50.0,
+        maturity:5,
+        rate:0.05,
+        asset:50.0,
         lambda:1.5,
-        muJ:0.05,
-        sigJ:0.2,
+        mu_l:0.05,
+        sig_l:0.2,
         v0:0.5,
         speed:0.5,
-        adaV:0.3,
+        eta_v:0.3,
         rho:0.4,
-        numU:8,
+        num_u:8,
         quantile:0.01
     }, {
         optionType:'call',
@@ -35,17 +35,17 @@ it('correctly calls constraints', (done)=>{
     const event=createEvent({
         k:[40, 50, 60],
         sigma:0.4,
-        T:5,
-        r:0.05,
-        S0:50.0,
+        maturity:5,
+        rate:0.05,
+        asset:50.0,
         lambda:1.5,
-        muJ:0.05,
-        sigJ:0.2,
+        mu_l:0.05,
+        sig_l:0.2,
         v0:0.5,
         speed:0.5,
-        adaV:0.3,
+        eta_v:0.3,
         rho:0.4,
-        numU:8,
+        num_u:8,
         quantile:0.01
     }, {
         optionType:'call',
@@ -55,7 +55,7 @@ it('correctly calls constraints', (done)=>{
         const parsedVal=JSON.parse(val.body)
         expect(parsedVal.sigma).toBeDefined()
         expect(parsedVal.speed).toBeDefined()
-        expect(parsedVal.adaV).toBeDefined()
+        expect(parsedVal.eta_v).toBeDefined()
         expect(parsedVal.rho).toBeDefined()
         done()
     })
@@ -65,19 +65,19 @@ it('correctly calls VaR', (done)=>{
 
 
     const event=createEvent({
-        k:[40, 50, 60],
+        strikes:[40, 50, 60],
         sigma:0.4,
-        T:5,
-        r:0.05,
-        S0:50.0,
+        maturity:5,
+        rate:0.05,
+        asset:50.0,
         lambda:1.5,
-        muJ:0.05,
-        sigJ:0.2,
+        mu_l:0.05,
+        sig_l:0.2,
         v0:0.5,
         speed:0.5,
-        adaV:0.3,
+        eta_v:0.3,
         rho:0.4,
-        numU:8,
+        num_u:8,
         quantile:0.01
     }, {
         densityType:'riskmetric'
@@ -85,8 +85,8 @@ it('correctly calls VaR', (done)=>{
     handler.density(event, {}, (err, val)=>{
         console.log(val.body)
         const parsedVal=JSON.parse(val.body)
-        expect(parsedVal.VaR).toBeDefined()
-        expect(parsedVal.ES).toBeDefined()
+        expect(parsedVal.value_at_risk).toBeDefined()
+        expect(parsedVal.expected_shortfall).toBeDefined()
         done()
     })
 })
