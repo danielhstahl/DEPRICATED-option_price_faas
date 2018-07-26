@@ -75,7 +75,10 @@ fn generate_spline_curves(
         points:strikes_and_option_prices.iter().map(|(strike, price)|{
             CurvePoint {
                 log_strike:option_calibration::transform_price(strike, asset).ln()-rate*maturity,
-                transformed_option:option_calibration::transform_price(price, asset)-option_calibration::adjust_domain(option_calibration::transform_price(strike, asset), discount)
+                transformed_option:option_calibration::transform_price(price, asset)-option_calibration::adjust_domain(
+                    option_calibration::transform_price(strike, asset), 
+                    discount
+                )
             }
         }).collect()
     });
