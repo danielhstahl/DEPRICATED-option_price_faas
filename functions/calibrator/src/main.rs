@@ -62,7 +62,7 @@ fn generate_spline_curves(
         max_strike
     ); //s is a spline that takes normalized strike (strike/asset)
     let min_log_strike=(min_strike).ln(); //no division by "asset" since  multiplied by "asset" size in "generate_const_parameters".  min_log_strike and max_log_strike are symmetric around 1.
-    let max_log_strike=(max_strike/asset).ln();
+    let max_log_strike=option_calibration::transform_price(max_strike, asset).ln();
     let dk_log=(max_log_strike-min_log_strike)/((num_nodes-1) as f64);
     let curves=json!(CurvePoints{
         curve:(0..num_nodes).map(|index|{
@@ -74,8 +74,8 @@ fn generate_spline_curves(
         }).collect(),
         points:strikes_and_option_prices.iter().map(|(strike, price)|{
             CurvePoint {
-                log_strike:(strike/asset).ln()-rate*maturity,
-                transformed_option:price/asset-option_calibration::max_zero_or_number(1.0-strike*discount/asset)
+                log_strike:option_calibration::transform_price(strike, asset).ln()-rate*maturity,
+                transformed_option:option_calibration::transform_price(price, asset)-option_calibration::adjust_domain(option_calibration::transform_price(strike, asset), discount)
             }
         }).collect()
     });
