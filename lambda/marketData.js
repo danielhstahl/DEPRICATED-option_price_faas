@@ -30,29 +30,32 @@ const liquidOptionPrices=(minOpenInterest, minRelativeBidAskSpread)=>
 
 const getPriceFromBidAsk=({bid, ask})=>(bid+ask)*.5
 
-const getRelevantData=yahooData=>yahooData.optionChain.result[0]
+const getRelevantData=yahooData=>
+    yahooData.optionChain.result[0]
 
 const getExpirationDates=relevantData=>({
-  S0:getPriceFromBidAsk(relevantData.quote), 
-  expirationDates:relevantData.expirationDates.map(v=>v*ratioForUnixAndJSTimeStamp)
+    asset:getPriceFromBidAsk(relevantData.quote), 
+    expirationDates:relevantData.expirationDates.map(v=>v*ratioForUnixAndJSTimeStamp)
 })
 
-const filterSingleMaturityData=filterLiquidFn=>relevantData=>{
-  const S0=getPriceFromBidAsk(relevantData.quote)
-  const options=relevantData.options[0].calls
-    .filter(filterLiquidFn)
-    .map(
-        ({strike, bid, ask})=>({
-            strike,
-            price:getPriceFromBidAsk({bid, ask})
-        })
-    )
-    .reduce((aggr, {strike, price})=>({
-        k:[...aggr.k, strike],
-        prices:[...aggr.prices, price]
-    }), {k:[], prices:[]})
-  return Object.assign({S0}, options)
-}
+const filterSingleMaturityData=filterLiquidFn=>
+    relevantData=>{
+        const asset=getPriceFromBidAsk(relevantData.quote)
+        const options=relevantData.options[0].calls
+            .filter(filterLiquidFn)
+            .map(
+                ({strike, bid, ask})=>({
+                    strike,
+                    price:getPriceFromBidAsk({bid, ask})
+                })
+            )
+            .reduce((aggr, {strike, price})=>({
+                strikes:[...aggr.strikes, strike],
+                prices:[...aggr.prices, price]
+            }), {strikes:[], prices:[]})
+        return Object.assign({asset}, options)
+    }
+
 const getDateQuery=date=>date?`?date=${date}`:''
 
 const getQuery=ticker=>
@@ -80,7 +83,7 @@ const getZeroCurve=maturityInYears=>{
         .then(instantiateSpline(maturityInYears))
         .then(convertPercentToNumber)
 }
-module.exports.getExpirationDates=(event, context, callback)=>{
+module.exports.getExpirationDates=(event, _context, callback)=>{
     const {ticker}=event.pathParameters
     httpGet(getQuery(ticker)())
         .then(getRelevantData)
@@ -91,7 +94,7 @@ module.exports.getExpirationDates=(event, context, callback)=>{
 const defaultMinOpenInterest=25
 const defaultMinRelativeBidAskSpread=.1
 
-module.exports.getOptionPrices=(event, context, callback)=>{
+module.exports.getOptionPrices=(event, _context, callback)=>{
   const {ticker, asOfDate}=event.pathParameters
   const {minOpenInterest, minRelativeBidAskSpread}=event.queryStringParameters
   const filterOptions=liquidOptionPrices(
@@ -100,15 +103,15 @@ module.exports.getOptionPrices=(event, context, callback)=>{
   )
   const filterSingleMaturityDataInst=filterSingleMaturityData(filterOptions)
   const yahooT=asOfDate/ratioForUnixAndJSTimeStamp
-  const T=yearsBetweenNowAndTimestamp(yahooT)
+  const maturity=yearsBetweenNowAndTimestamp(yahooT)
   Promise.all([
     httpGet(getQuery(ticker)(yahooT))
       .then(getRelevantData)
       .then(filterSingleMaturityDataInst),
-    getZeroCurve(T)
+    getZeroCurve(maturity)
   ])
-  .then(([optionData, r])=>{
-    const data={...optionData, r, T}
+  .then(([optionData, rate])=>{
+    const data={...optionData, rate, maturity}
     calibratorSpawn(calibratorKeys.spline, JSON.stringify(data), (err, spline)=>{
       if(err){
         return callback(null, errMsg(err))

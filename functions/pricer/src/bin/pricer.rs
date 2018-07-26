@@ -35,8 +35,6 @@ const DENSITY:i32=8;
 const RISK_MEASURES:i32=9;
 
 
-
-
 #[derive(Serialize, Deserialize)]
 struct GraphElementIV {
     at_point:f64,

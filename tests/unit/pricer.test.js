@@ -33,7 +33,7 @@ it('correctly calls calculator handlers', (done)=>{
 })
 it('correctly calls constraints', (done)=>{
     const event=createEvent({
-        k:[40, 50, 60],
+        strikes:[40, 50, 60],
         sigma:0.4,
         maturity:5,
         rate:0.05,
@@ -51,7 +51,7 @@ it('correctly calls constraints', (done)=>{
         optionType:'call',
         sensitivity:'price'
     })
-    handler.constraints(event, {}, (err, val)=>{
+    handler.constraints(event, {}, (_err, val)=>{
         const parsedVal=JSON.parse(val.body)
         expect(parsedVal.sigma).toBeDefined()
         expect(parsedVal.speed).toBeDefined()
@@ -82,7 +82,7 @@ it('correctly calls VaR', (done)=>{
     }, {
         densityType:'riskmetric'
     })
-    handler.density(event, {}, (err, val)=>{
+    handler.density(event, {}, (_err, val)=>{
         console.log(val.body)
         const parsedVal=JSON.parse(val.body)
         expect(parsedVal.value_at_risk).toBeDefined()

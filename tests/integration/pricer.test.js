@@ -40,7 +40,7 @@ it('correctly returns heston price', (done)=>{
         optionType:'call',
         sensitivity:'price'
     })
-    return handler.calculator(event, {}, (err, val)=>{
+    return handler.calculator(event, {}, (_err, val)=>{
         console.log(val.body)
         const parsedVal=JSON.parse(val.body)
         expect(parsedVal[0].value).toBeCloseTo(5.78515545, 3)
@@ -79,7 +79,7 @@ it('correctly returns merton price', (done)=>{
         sensitivity:'price',
         algorithm:'fangoost'
     })
-    return handler.calculator(event, {}, (err, val)=>{
+    return handler.calculator(event, {}, (_err, val)=>{
         console.log(val.body)
         const parsedVal=JSON.parse(val.body)
         expect(parsedVal[0].value).toBeCloseTo(5.9713, 3)
@@ -119,7 +119,7 @@ it('correctly returns VaR', (done)=>{
     const event=createEvent(parameters, {
         densityType:'riskmetric'
     })
-    return handler.density(event, {}, (err, val)=>{
+    return handler.density(event, {}, (_err, val)=>{
         console.log(val.body)
         const parsedVal=JSON.parse(val.body)
         expect(parsedVal.value_at_risk).toBeCloseTo(.261503, 3)

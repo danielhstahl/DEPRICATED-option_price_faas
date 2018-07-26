@@ -52,7 +52,7 @@ it('calls calibrator handler and finishes in under 20 seconds', (done)=>{
     console.time("calibrator")
     let start=process.hrtime()
     const event=createEvent(parameters, {calibration:'calibrate'})
-    handler.calibrator(event, {}, (err, val)=>{
+    handler.calibrator(event, {}, (_err, val)=>{
         console.log(val.body)
         const twentySeconds=20000
         expect(getMSSinceStart(process.hrtime(start))).toBeLessThan(twentySeconds)
@@ -93,7 +93,7 @@ it('correctly calls calibrator handler and matches call prices with fake data', 
         algorithm:'fangoost'
     })
     /**Finds the prices */
-    return handlerCalc.calculator(event, {}, (err, val)=>{
+    return handlerCalc.calculator(event, {}, (_err, val)=>{
         //console.log(val.body)
         const parsedVal=JSON.parse(val.body).map(({value})=>value)
         
@@ -137,7 +137,7 @@ it('correctly calls calibrator handler and matches call prices with fake data', 
         }
         const event=createEvent(calParameters, {calibration:'calibrate'})
         /**calibrates the prices */
-        handler.calibrator(event, {}, (err, val)=>{
+        handler.calibrator(event, {}, (_err, val)=>{
             const calibrateVal=JSON.parse(val.body)
             const calculatorParameters={
                 ...constParams,
@@ -150,7 +150,7 @@ it('correctly calls calibrator handler and matches call prices with fake data', 
             })
             console.log(calculatorEvent)
             /**recomputes the prices to compare with the original */
-            return handlerCalc.calculator(calculatorEvent, {}, (err, val)=>{
+            return handlerCalc.calculator(calculatorEvent, {}, (_err, val)=>{
                 const calcVal=JSON.parse(val.body)
                 const criteriaDiff=1 //less than a dollar off
                 const prices=calculatorParameters.prices
