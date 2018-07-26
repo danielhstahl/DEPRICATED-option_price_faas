@@ -1,49 +1,44 @@
 language: rust
-
 sudo: required
-
 rust:
-  - stable
-  - beta
-  - nightly
-
+- stable
+- beta
+- nightly
 matrix:
   allow_failures:
-    - rust: nightly
+  - rust: nightly
   include:
-    - language: rust
-      sudo: required
-      rust:
-        - stable
-        - beta
-        - nightly
-      script:
-        - cd functions
-        - cd calibrator
-        - cargo build --release
-        - cd ..
-        - cd pricer
-        - cargo build --release
-        - cd ..
-        - cd ..
-    - language: node_js
-      node_js:
-        - "8"
-      script:
-        - npm install
-        - npm test
-
+  - language: rust
+    sudo: required
+    rust:
+    - stable
+    - beta
+    - nightly
+    script:
+    - cd functions
+    - cd calibrator
+    - cargo build --release
+    - cd ..
+    - cd pricer
+    - cargo build --release
+    - cd ..
+    - cd ..
+  - language: node_js
+    node_js:
+    - '8'
+    script:
+    - npm install
+    - npm test
 addons:
   apt:
     packages:
-      - libcurl4-openssl-dev
-      - libelf-dev
-      - libdw-dev
-      - cmake
-      - gcc
-      - binutils-dev
-      - libiberty-dev
-
-###TODO!  Add deployment on release
-###TODO!  after_success: |
-  
+    - libcurl4-openssl-dev
+    - libelf-dev
+    - libdw-dev
+    - cmake
+    - gcc
+    - binutils-dev
+    - libiberty-dev
+env:
+  matrix:
+    secure: KGHSrpMDZ9OJ3X9tN+7Sbs7OeDnbkimvMwqR8Rj/sYqYDishyEan7pzGdPpjKw2K7sxLyqoiQ8wKO17yd8I4G0IFxGpQkg/UvqkrqU4rQ19mdMwY467jew6pm9rioQ9nc3d8vMDk5CSd4QyK4TfRhaRhGRyCZNsGC1884z5shVDLXNvSM+8EKOrQ+SMoXdEDLWxb+hpvAfRoqVNtX7bb53wRGr4c+TMYrx7kGVSvOgZpVdSc9qeBMziHW/W6dxbyyRHPq9SwyReGZcUodjGZ54cTO43F4ygIpMdY17bnRXEbi5D/crihghiaIH9a626PPUjCkrsmihHr+xzD9VxvdrNe0KL7Yt2QfjqUxt+3KlYJ/aXCPzp+7udCJurSQMs2z5l/hUntP42WSBBlFSWF1HOpRZWXcKVWmsIpRIF+gJvPagcjB+0D+xi3ynD8TSfd2bncerkm/KIP2dsAoCXNA7K7qcMthahVwny8ydJEaGoPVjeGRy8oF1XOaPCv1GaokROMqddjBK8F2PQELicUrGdORRfm9Kvyj5OdLNRbFNWaVyyYn44OL4fGEgfOAM49J0YTKQjwB3ZvLx0pYGAZnThH5mTG4XBOkXdfGlpmdfe2VDqjt7Wp3IRjzRWEhxmD/i2BqB9aKcG5CDMuORLe97PI4p54LCdBrm17s6AANQk=
