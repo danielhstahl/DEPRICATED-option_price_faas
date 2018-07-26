@@ -133,7 +133,6 @@ const CALIBRATE_CHOICE:i32=1;
 const POSSIBLE_CALIBRATION_PARAMETERS: &[&str] = &["lambda", "mu_l", "sig_l", "sigma", "v0", "speed", "eta_v", "rho"]; //order matters! same order as input into CF
 
 #[derive(Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 struct CalibrationParameters{
     strikes:Vec<f64>,
     prices:Vec<f64>,

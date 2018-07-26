@@ -17,12 +17,10 @@ it('correctly handles expiration dates', done=>{
 it('correctly handles optionPrices', done=>{
     const event=createEvent({}, {ticker:'AAPL'}, {})
     handler.getExpirationDates(event, {}, (_err, val)=>{
-        console.log(val.body)
         const parsedVal=JSON.parse(val.body)
         expect(parsedVal.asset).toBeDefined()
         expect(parsedVal.expirationDates).toBeDefined()
         const nM=parsedVal.expirationDates.length-1
-       // console.log(parsedVal)
         const event=createEvent(
             {}, 
             {
@@ -32,7 +30,6 @@ it('correctly handles optionPrices', done=>{
             {}
         )
         handler.getOptionPrices(event, {}, (_err, val)=>{
-            console.log(val.body)
             const parsedVal=JSON.parse(val.body)
             expect(parsedVal.asset).toBeDefined()
             expect(parsedVal.strikes).toBeDefined()
@@ -45,7 +42,6 @@ it('correctly handles optionPrices', done=>{
 it('correctly handles optionPrices with new query params', done=>{
     const event=createEvent({}, {ticker:'AAPL'}, {})
     handler.getExpirationDates(event, {}, (_err, val)=>{
-        console.log(val.body)
         const parsedVal=JSON.parse(val.body)
         expect(parsedVal.asset).toBeDefined()
         expect(parsedVal.expirationDates).toBeDefined()
@@ -61,7 +57,6 @@ it('correctly handles optionPrices with new query params', done=>{
             }
         )
         handler.getOptionPrices(event, {}, (_err, val)=>{
-            console.log(val.body)
             const parsedVal=JSON.parse(val.body)
             expect(parsedVal.asset).toBeDefined()
             expect(parsedVal.strikes).toBeDefined()

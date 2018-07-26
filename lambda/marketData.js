@@ -111,7 +111,7 @@ module.exports.getOptionPrices=(event, _context, callback)=>{
     getZeroCurve(maturity)
   ])
   .then(([optionData, rate])=>{
-    const data={...optionData, rate, maturity}
+    const data={...optionData, rate, maturity, constraints:{}} //constraints are dummy
     calibratorSpawn(calibratorKeys.spline, JSON.stringify(data), (err, spline)=>{
       if(err){
         return callback(null, errMsg(err))
