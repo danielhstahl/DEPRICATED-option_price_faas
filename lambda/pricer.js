@@ -3,8 +3,8 @@ const {spawnBinary, genericSpawn} = require('./utils/spawnUtils')
 const {transformCallback}=require('./utils/httpUtils')
 const {calculatorKeys} =require('./constants/keys')
 
-const pricer=spawnBinary('pricer', 'pricer')
-const constraints=callback=>genericSpawn('pricer', 'output_constraints', [], callback)
+const pricer=spawnBinary('pricer')
+const constraints=callback=>genericSpawn('output_constraints', [], callback)
 
 module.exports.calculator=(event, _context, callback)=>{
     const {optionType, sensitivity}=event.pathParameters

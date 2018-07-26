@@ -1,8 +1,8 @@
 'use strict'
 const {spawn} = require('child_process')
 process.env['PATH']=`${process.env['PATH']}:${process.env['LAMBDA_TASK_ROOT']}`
-const genericSpawn=(filePath, binaryName, options, callback)=>{
-    const binSubPath=`${filePath}/target/release/${binaryName}`
+const genericSpawn=(binaryName, options, callback)=>{
+    const binSubPath=`target/release/${binaryName}`
     const binaryPath=process.env['LAMBDA_TASK_ROOT']?
       `${__dirname}/${binSubPath}`:
       `./functions/${binSubPath}`
@@ -23,7 +23,14 @@ const genericSpawn=(filePath, binaryName, options, callback)=>{
     })
   }
   const getParametersOrObject=parameters=>parameters||"{}"
-  module.exports.spawnBinary=(filePath, binaryName)=>(functionalityIndicator, parms, callback)=>{
-    genericSpawn(filePath, binaryName, [functionalityIndicator,getParametersOrObject(parms)], callback)
+  module.exports.spawnBinary=binaryName=>(
+    functionalityIndicator, 
+    parms, callback
+  )=>{
+    genericSpawn(
+      binaryName, 
+      [functionalityIndicator, getParametersOrObject(parms)], 
+      callback
+    )
   }
   module.exports.genericSpawn=genericSpawn

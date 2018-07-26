@@ -9,7 +9,7 @@ license = "MIT"
 description = "Option pricer"
 
 [dependencies]
-fang_oost_option = "0.19.0"
+fang_oost_option = "0.20.0"
 fang_oost = "0.7.0"
 serde_json = "1.0"
 serde = "1.0"
@@ -19,7 +19,7 @@ rayon = "1.0.1"
 black_scholes = "0.2.2"
 cf_functions = "0.2.0"
 num-complex = "0.2"
-cuckoo = "0.4.0"
+cuckoo = "0.7.0"
 
 [badges]
 travis-ci = { repository = "phillyfan1138/option_price_faas" }
@@ -30,6 +30,9 @@ path = "src/bin/output_constraints.rs"
 [[bin]]
 name = "pricer"
 path = "src/bin/pricer.rs"
+[[bin]]
+name = "calibrator"
+path = "src/bin/calibrator.rs"
 
 [lib]
 name = "constraints"
