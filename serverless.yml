@@ -27,7 +27,7 @@ package:
    - 
 functions:
   calculator:
-    handler: lambda/calculatorLambda.calculator
+    handler: lambda/pricer.calculator
     events:
       - http:
           path: version/calculator/{optionType}/{sensitivity}
@@ -39,7 +39,7 @@ functions:
                 optionType: true
                 sensitivity: true
   density:
-    handler: lambda/calculatorLambda.density
+    handler: lambda/pricer.density
     events:
       - http:
           path: version/density/{densityType}
@@ -50,7 +50,7 @@ functions:
               paths:
                 densityType: true
   defaultParameters:
-    handler: lambda/calculatorLambda.defaultParameters
+    handler: lambda/calibrator.defaultParameters
     events:
       - http:
           path: version/parameters/parameter_ranges
@@ -58,7 +58,7 @@ functions:
           cors: true
 
   getExpirationDates:
-    handler: lambda/optionLambda.getExpirationDates
+    handler: lambda/marketData.getExpirationDates
     events:
       - http:
           path: version/options/{ticker}/maturities
@@ -70,7 +70,7 @@ functions:
                 ticker: true
 
   getOptionPrices:
-    handler: lambda/optionLambda.getOptionPrices
+    handler: lambda/marketData.getOptionPrices
     events:
       - http:
           path: version/options/{ticker}/prices/{asOfDate}
@@ -88,7 +88,7 @@ functions:
   calibrator:
     memorySize: 3008 # optional, in MB, default is 1024
     timeout: 30 # optional, in seconds, default is 6
-    handler: lambda/calibratorLambda.calibrator
+    handler: lambda/calibrator.calibrator
     events:
       - http:
           path: version/calibrator/{calibration}
