@@ -20,6 +20,17 @@ provider:
 
 
 package:
+  exclude:
+    - functions/**
+    - node_modules
+    - tests/**
+    - tests
+    - .gitignore
+    - package-lock.json
+    - package.json
+    - README.md
+    - serverless.yml
+    - .travis.yml
   include:
    - functions/target/release/calibrator
    - functions/target/release/output_constraints
