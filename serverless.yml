@@ -24,13 +24,12 @@ package:
    - functions/**
    - lambda/**
    - node_modules/cubic-spline/**
-   - 
 functions:
   calculator:
     handler: lambda/pricer.calculator
     events:
       - http:
-          path: version/calculator/{optionType}/{sensitivity}
+          path: calculator/{optionType}/{sensitivity}
           method: post
           cors: true
           request:
@@ -42,7 +41,7 @@ functions:
     handler: lambda/pricer.density
     events:
       - http:
-          path: version/density/{densityType}
+          path: density/{densityType}
           method: post
           cors: true
           request:
@@ -53,7 +52,7 @@ functions:
     handler: lambda/calibrator.defaultParameters
     events:
       - http:
-          path: version/parameters/parameter_ranges
+          path: parameters/parameter_ranges
           method: get
           cors: true
 
@@ -61,7 +60,7 @@ functions:
     handler: lambda/marketData.getExpirationDates
     events:
       - http:
-          path: version/options/{ticker}/maturities
+          path: options/{ticker}/maturities
           method: get
           cors: true
           request:
@@ -73,7 +72,7 @@ functions:
     handler: lambda/marketData.getOptionPrices
     events:
       - http:
-          path: version/options/{ticker}/prices/{asOfDate}
+          path: options/{ticker}/prices/{asOfDate}
           method: get
           cors: true
           request:
@@ -91,7 +90,7 @@ functions:
     handler: lambda/calibrator.calibrator
     events:
       - http:
-          path: version/calibrator/{calibration}
+          path: calibrator/{calibration}
           method: post
           cors: true
           request:

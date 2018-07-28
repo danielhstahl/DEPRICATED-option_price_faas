@@ -15,6 +15,9 @@ script:
     - npm install
     - npm test
 
+before_deploy:
+  - npm install -g serverless
+  - sls deploy
 addons:
   apt:
     packages:
@@ -37,9 +40,10 @@ deploy:
   - "./functions/target/release/output_constraints"
   - "./functions/target/release/calibrator"
   - "./functions/target/release/pricer"
-  - "./lambda/*"
+  - "./lambda/**"
   - "./serverless.yml"
   skip_cleanup: true
   on:
     repo: phillyfan1138/option_price_faas
     tags: true
+    rust: 'stable'
