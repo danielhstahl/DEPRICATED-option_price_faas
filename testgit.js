@@ -7,4 +7,4 @@ exec('git commit -m "release v1"', (err, stdout, stderr)=>{
     else{
         console.log(stdout)
     }
-})
+}) 
