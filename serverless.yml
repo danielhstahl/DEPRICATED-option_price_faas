@@ -21,7 +21,9 @@ provider:
 
 package:
   include:
-   - functions/**
+   - functions/target/release/calibrator
+   - functions/target/release/output_constraints
+   - functions/target/release/pricer
    - lambda/**
    - node_modules/cubic-spline/**
 functions:
@@ -49,7 +51,7 @@ functions:
               paths:
                 densityType: true
   defaultParameters:
-    handler: lambda/calibrator.defaultParameters
+    handler: lambda/pricer.constraints
     events:
       - http:
           path: parameters/parameter_ranges
