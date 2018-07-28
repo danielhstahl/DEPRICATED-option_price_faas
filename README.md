@@ -7,4 +7,4 @@ These are a set of lambda functions for pricing options when assets follow an ex
 Calibration of Levy processes can be tricky due to the highly non-linear aspects of calibration.  To get around this, I employ a method pioneered by [Belomestny and Reis](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.90.8837&rep=rep1&type=pdf).  Essentially, instead of calibrating prices I calibrate characteristic functions by taking the market prices and deriving an empirical characteristic function.
 
 ### More documentation/design evidence
-Additional documentation is available at the [fang_oost_charts](https://github.com/phillyfan1138/fang_oost_cal_charts).   
+Additional documentation is available at the [fang_oost_charts](https://github.com/phillyfan1138/fang_oost_cal_charts).
