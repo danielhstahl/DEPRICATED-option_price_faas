@@ -249,8 +249,8 @@ fn main()-> Result<(), io::Error> {
             }).collect();
 
             let json_results=json!({
-                "optimalParameters":optimal_param_map,
-                "fnResult":fn_at_optimal_parameters
+                "optimal_parameters":optimal_param_map,
+                "fn_result":fn_at_optimal_parameters
             });
             println!("{}", serde_json::to_string_pretty(&json_results).unwrap());
         },

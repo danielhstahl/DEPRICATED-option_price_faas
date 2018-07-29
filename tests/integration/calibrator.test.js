@@ -56,7 +56,7 @@ it('calls calibrator handler and finishes in under 20 seconds', (done)=>{
         console.log(val.body)
         const twentySeconds=20000
         expect(getMSSinceStart(process.hrtime(start))).toBeLessThan(twentySeconds)
-        const parsedVal=JSON.parse(val.body).optimalParameters
+        const parsedVal=JSON.parse(val.body).optimal_parameters
         expect(parsedVal.sigma).toBeDefined()
         expect(parsedVal.speed).toBeDefined()
         expect(parsedVal.eta_v).toBeDefined()
@@ -141,7 +141,7 @@ it('correctly calls calibrator handler and matches call prices with fake data', 
             const calibrateVal=JSON.parse(val.body)
             const calculatorParameters={
                 ...constParams,
-                ...calibrateVal.optimalParameters,
+                ...calibrateVal.optimal_parameters,
                 prices:parsedVal
             }
             const calculatorEvent=createEvent(calculatorParameters, {
