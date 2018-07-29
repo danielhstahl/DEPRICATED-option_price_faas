@@ -32,9 +32,9 @@ package:
     - serverless.yml
     - .travis.yml
   include:
-   - functions/target/release/calibrator
-   - functions/target/release/output_constraints
-   - functions/target/release/pricer
+   - functions/target/x86_64-unknown-linux-musl/release/calibrator
+   - functions/target/x86_64-unknown-linux-musl/release/output_constraints
+   - functions/target/x86_64-unknown-linux-musl/release/pricer
    - lambda/**
    - node_modules/cubic-spline/**
 functions:
