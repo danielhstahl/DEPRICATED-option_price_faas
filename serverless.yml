@@ -96,7 +96,13 @@ functions:
               querystrings:
                 minOpenInterest: false
                 minRelativeBidAskSpread: false
-
+  getFortune500:
+    handler: lambda/marketData.getFortune500
+    events:
+      - http:
+        path: options/tickers
+        method: get
+        cors: true
   calibrator:
     memorySize: 3008 # optional, in MB, default is 1024
     timeout: 30 # optional, in seconds, default is 6

@@ -7,6 +7,8 @@ const {calibratorKeys} =require('./constants/keys')
 
 const yahooUrl='https://query1.finance.yahoo.com/v7/finance/options'
 const quandlUrl='https://www.quandl.com/api/v3/datasets/FED/SVENY.json'
+const f500='https://pkgstore.datahub.io/core/s-and-p-500-companies/constituents_json/data/64dd3e9582b936b0352fdd826ecd3c95/constituents_json.json'
+
 const ratioForUnixAndJSTimeStamp=1000
 
 const numMSInYears=24*60*60*365*ratioForUnixAndJSTimeStamp
@@ -119,4 +121,10 @@ module.exports.getOptionPrices=(event, _context, callback)=>{
       return callback(null, msg(JSON.stringify(Object.assign({}, data, JSON.parse(spline)))))
     })
   }).catch(err=>callback(null, errMsg(err.message)))
+}
+
+module.exports.getFortune500=(_event, _context, callback)=>{
+    httpGet(f500)
+        .then(result=>callback(null, msg(JSON.stringify(result))))
+        .catch(err=>callback(null, errMsg(err.message)))
 }
