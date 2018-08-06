@@ -116,7 +116,3 @@ functions:
             parameters:
               paths:
                 calibration: true
-          
-
-      
-
