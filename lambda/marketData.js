@@ -55,7 +55,7 @@ const filterSingleMaturityData=filterLiquidFn=>
                 strikes:[...aggr.strikes, strike],
                 prices:[...aggr.prices, price]
             }), {strikes:[], prices:[]})
-        return Object.assign({asset}, options)
+        return {asset, ...options}
     }
 
 const getDateQuery=date=>date?`?date=${date}`:''
@@ -98,7 +98,7 @@ const defaultMinRelativeBidAskSpread=.1
 
 module.exports.getOptionPrices=(event, _context, callback)=>{
   const {ticker, asOfDate}=event.pathParameters
-  const {minOpenInterest, minRelativeBidAskSpread}=event.queryStringParameters
+  const {minOpenInterest, minRelativeBidAskSpread}=(event.queryStringParameters||{})
   const filterOptions=liquidOptionPrices(
       minOpenInterest||defaultMinOpenInterest, 
       minRelativeBidAskSpread||defaultMinRelativeBidAskSpread
@@ -113,12 +113,12 @@ module.exports.getOptionPrices=(event, _context, callback)=>{
     getZeroCurve(maturity)
   ])
   .then(([optionData, rate])=>{
-    const data={...optionData, rate, maturity, constraints:{}} //constraints are dummy
-    calibratorSpawn(calibratorKeys.spline, JSON.stringify(data), (err, spline)=>{
+    const data={...optionData, rate, maturity}
+    calibratorSpawn(calibratorKeys.spline, JSON.stringify({...data, constraints:{}}), (err, spline)=>{//constraints are dummy
       if(err){
         return callback(null, errMsg(err))
       }
-      return callback(null, msg(JSON.stringify(Object.assign({}, data, JSON.parse(spline)))))
+      return callback(null, msg(JSON.stringify({...data, ...JSON.parse(spline)})))
     })
   }).catch(err=>callback(null, errMsg(err.message)))
 }
