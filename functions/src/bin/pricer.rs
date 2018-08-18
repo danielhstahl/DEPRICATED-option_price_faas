@@ -376,7 +376,7 @@ mod tests {
             );
             
             for option_price in opt_prices.iter(){
-                if option_price.is_nan(){
+                if option_price.is_nan()||option_price.is_infinite(){
                     println!("lambda: {}", lambda_sim);
                     println!("mu_l: {}", mu_l_sim);
                     println!("sig_l: {}", sig_l_sim);
