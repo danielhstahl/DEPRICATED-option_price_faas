@@ -7,6 +7,8 @@ const {calibratorKeys} =require('./constants/keys')
 
 const yahooUrl='https://query1.finance.yahoo.com/v7/finance/options'
 const quandlUrl='https://www.quandl.com/api/v3/datasets/FED/SVENY.json'
+const f500='https://pkgstore.datahub.io/core/s-and-p-500-companies/constituents_json/data/64dd3e9582b936b0352fdd826ecd3c95/constituents_json.json'
+
 const ratioForUnixAndJSTimeStamp=1000
 
 const numMSInYears=24*60*60*365*ratioForUnixAndJSTimeStamp
@@ -53,7 +55,7 @@ const filterSingleMaturityData=filterLiquidFn=>
                 strikes:[...aggr.strikes, strike],
                 prices:[...aggr.prices, price]
             }), {strikes:[], prices:[]})
-        return Object.assign({asset}, options)
+        return {asset, ...options}
     }
 
 const getDateQuery=date=>date?`?date=${date}`:''
@@ -96,7 +98,7 @@ const defaultMinRelativeBidAskSpread=.1
 
 module.exports.getOptionPrices=(event, _context, callback)=>{
   const {ticker, asOfDate}=event.pathParameters
-  const {minOpenInterest, minRelativeBidAskSpread}=event.queryStringParameters
+  const {minOpenInterest, minRelativeBidAskSpread}=(event.queryStringParameters||{})
   const filterOptions=liquidOptionPrices(
       minOpenInterest||defaultMinOpenInterest, 
       minRelativeBidAskSpread||defaultMinRelativeBidAskSpread
@@ -111,12 +113,18 @@ module.exports.getOptionPrices=(event, _context, callback)=>{
     getZeroCurve(maturity)
   ])
   .then(([optionData, rate])=>{
-    const data={...optionData, rate, maturity, constraints:{}} //constraints are dummy
-    calibratorSpawn(calibratorKeys.spline, JSON.stringify(data), (err, spline)=>{
+    const data={...optionData, rate, maturity}
+    calibratorSpawn(calibratorKeys.spline, JSON.stringify({...data, constraints:{}}), (err, spline)=>{//constraints are dummy
       if(err){
         return callback(null, errMsg(err))
       }
-      return callback(null, msg(JSON.stringify(Object.assign({}, data, JSON.parse(spline)))))
+      return callback(null, msg(JSON.stringify({...data, ...JSON.parse(spline)})))
     })
   }).catch(err=>callback(null, errMsg(err.message)))
+}
+
+module.exports.getFortune500=(_event, _context, callback)=>{
+    httpGet(f500)
+        .then(result=>callback(null, msg(JSON.stringify(result))))
+        .catch(err=>callback(null, errMsg(err.message)))
 }

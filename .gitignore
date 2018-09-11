@@ -2,3 +2,4 @@
 **/*.rs.bk
 *.lock
 node_modules
+quandlkey.txt

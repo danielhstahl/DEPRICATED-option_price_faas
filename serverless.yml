@@ -11,7 +11,7 @@
 #
 # Happy Coding!
 
-service: option_price_faas
+service: option-price-faas
 
 
 provider:
@@ -20,17 +20,29 @@ provider:
 
 
 package:
+  exclude:
+    - functions/**
+    - node_modules
+    - tests/**
+    - tests
+    - .gitignore
+    - package-lock.json
+    - package.json
+    - README.md
+    - serverless.yml
+    - .travis.yml
   include:
-   - functions/**
+   - functions/target/x86_64-unknown-linux-musl/release/calibrator
+   - functions/target/x86_64-unknown-linux-musl/release/output_constraints
+   - functions/target/x86_64-unknown-linux-musl/release/pricer
    - lambda/**
    - node_modules/cubic-spline/**
-   - 
 functions:
   calculator:
     handler: lambda/pricer.calculator
     events:
       - http:
-          path: version/calculator/{optionType}/{sensitivity}
+          path: calculator/{optionType}/{sensitivity}
           method: post
           cors: true
           request:
@@ -42,7 +54,7 @@ functions:
     handler: lambda/pricer.density
     events:
       - http:
-          path: version/density/{densityType}
+          path: density/{densityType}
           method: post
           cors: true
           request:
@@ -50,10 +62,10 @@ functions:
               paths:
                 densityType: true
   defaultParameters:
-    handler: lambda/calibrator.defaultParameters
+    handler: lambda/pricer.constraints
     events:
       - http:
-          path: version/parameters/parameter_ranges
+          path: parameters/parameter_ranges
           method: get
           cors: true
 
@@ -61,7 +73,7 @@ functions:
     handler: lambda/marketData.getExpirationDates
     events:
       - http:
-          path: version/options/{ticker}/maturities
+          path: options/{ticker}/maturities
           method: get
           cors: true
           request:
@@ -73,7 +85,7 @@ functions:
     handler: lambda/marketData.getOptionPrices
     events:
       - http:
-          path: version/options/{ticker}/prices/{asOfDate}
+          path: options/{ticker}/prices/{asOfDate}
           method: get
           cors: true
           request:
@@ -84,21 +96,23 @@ functions:
               querystrings:
                 minOpenInterest: false
                 minRelativeBidAskSpread: false
-
+  getFortune500:
+    handler: lambda/marketData.getFortune500
+    events:
+      - http:
+          path: options/tickers
+          method: get
+          cors: true
   calibrator:
     memorySize: 3008 # optional, in MB, default is 1024
     timeout: 30 # optional, in seconds, default is 6
     handler: lambda/calibrator.calibrator
     events:
       - http:
-          path: version/calibrator/{calibration}
+          path: calibrator/{calibration}
           method: post
           cors: true
           request:
             parameters:
               paths:
                 calibration: true
-          
-
-      
-

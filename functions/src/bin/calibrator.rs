@@ -61,7 +61,7 @@ fn generate_spline_curves(
         asset, discount, min_strike,
         max_strike
     ); //s is a spline that takes normalized strike (strike/asset)
-    let min_log_strike=(min_strike).ln(); //no division by "asset" since  multiplied by "asset" size in "generate_const_parameters".  min_log_strike and max_log_strike are symmetric around 1.
+    let min_log_strike=(min_strike).ln(); //no division by "asset" since  multiplied by "asset" size in "generate_const_parameters".  min_log_strike and max_log_strike are symmetric around 0.
     let max_log_strike=option_calibration::transform_price(max_strike, asset).ln();
     let dk_log=(max_log_strike-min_log_strike)/((num_nodes-1) as f64);
     let curves=json!(CurvePoints{
@@ -249,8 +249,8 @@ fn main()-> Result<(), io::Error> {
             }).collect();
 
             let json_results=json!({
-                "optimalParameters":optimal_param_map,
-                "fnResult":fn_at_optimal_parameters
+                "optimal_parameters":optimal_param_map,
+                "fn_result":fn_at_optimal_parameters
             });
             println!("{}", serde_json::to_string_pretty(&json_results).unwrap());
         },

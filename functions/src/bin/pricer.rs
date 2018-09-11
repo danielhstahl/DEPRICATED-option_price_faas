@@ -12,6 +12,16 @@ extern crate serde_derive;
 
 extern crate constraints;
 
+#[cfg(test)]
+extern crate rand;
+#[cfg(test)]
+use rand::{SeedableRng, StdRng};
+#[cfg(test)]
+use rand::distributions::Uniform;
+#[cfg(test)]
+use rand::distributions::{Distribution};
+
+
 use fang_oost_option::option_pricing;
 use std::env;
 use std::io;
@@ -206,7 +216,7 @@ fn main()-> Result<(), io::Error> {
     //note...if pass by reference doesn't work 
     //I can always move this value since I only
     //use it once.  However, if I ever want 
-    //this binary to stay "live" for multiple
+    //the binary to stay "live" for multiple
     //calls I'll need to keep this reference around
     let inst_cf=cf_functions::merton_time_change_cf(
         maturity, rate, lambda, mu_l, sig_l, sigma, v0,
@@ -291,4 +301,109 @@ fn main()-> Result<(), io::Error> {
         _ => println!("wow, nothing")
     }
     Ok(())
+}
+
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    fn get_rng_seed(seed:[u8; 32])->StdRng{
+        SeedableRng::from_seed(seed) 
+    }
+    fn get_over_region(lower:f64, upper:f64, rand:f64)->f64{
+        lower+(upper-lower)*rand
+    }
+    #[test]
+    fn test_many_inputs(){
+        let seed:[u8; 32]=[2; 32];
+        let mut rng_seed=get_rng_seed(seed);
+        let uniform=Uniform::new(0.0f64, 1.0);
+        let constr=constraints::get_constraints();
+        let asset=178.46;
+        let num_u=256;
+        let strikes=vec![
+            95.0,130.0,150.0,160.0,
+            165.0,170.0,175.0,185.0,
+            190.0,195.0,200.0,210.0,240.0,250.0
+        ];
+        let maturity=0.86;
+        let rate=0.02;
+        let num_total:usize=10000;
+        let mut num_bad:usize=0;
+        (0..num_total).for_each(|index|{
+            let lambda_sim=get_over_region(
+                constr.lambda.lower,
+                constr.lambda.upper,
+                uniform.sample(&mut rng_seed)
+            );
+            let mu_l_sim=get_over_region(
+                constr.mu_l.lower,
+                constr.mu_l.upper,
+                uniform.sample(&mut rng_seed)
+            );
+            let sig_l_sim=get_over_region(
+                constr.sig_l.lower,
+                constr.sig_l.upper,
+                uniform.sample(&mut rng_seed)
+            );
+            let sigma_sim=get_over_region(
+                constr.sigma.lower,
+                constr.sigma.upper,
+                uniform.sample(&mut rng_seed)
+            );
+            let v0_sim=get_over_region(
+                constr.v0.lower,
+                constr.v0.upper,
+                uniform.sample(&mut rng_seed)
+            );
+            let speed_sim=get_over_region(
+                constr.speed.lower,
+                constr.speed.upper,
+                uniform.sample(&mut rng_seed)
+            );
+            let eta_v_sim=get_over_region(
+                constr.eta_v.lower,
+                constr.eta_v.upper,
+                uniform.sample(&mut rng_seed)
+            );
+            let rho_sim=get_over_region(
+                constr.rho.lower,
+                constr.rho.upper,
+                uniform.sample(&mut rng_seed)
+            );
+
+            let inst_cf=cf_functions::merton_time_change_cf(
+                maturity, rate, lambda_sim, 
+                mu_l_sim, sig_l_sim, 
+                sigma_sim, v0_sim,
+                speed_sim, eta_v_sim, rho_sim
+            );
+            let opt_prices=option_pricing::fang_oost_call_price(
+                num_u, asset, 
+                &strikes, rate, 
+                maturity, &inst_cf
+            );
+            
+            for option_price in opt_prices.iter(){
+                if option_price.is_nan()||option_price.is_infinite(){
+                    println!("lambda: {}", lambda_sim);
+                    println!("mu_l: {}", mu_l_sim);
+                    println!("sig_l: {}", sig_l_sim);
+                    println!("sigma: {}", sigma_sim);
+                    println!("v0: {}", v0_sim);
+                    println!("speed: {}", speed_sim);
+                    println!("eta_v: {}", eta_v_sim);
+                    println!("rho: {}", rho_sim);
+                    num_bad=num_bad+1;
+                    break;
+                }
+                //assert_eq!(!option_price.is_nan());
+            }
+        });
+        let bad_rate=(num_bad as f64)/(num_total as f64);
+        println!("Bad rate: {}", bad_rate);
+        assert_eq!(bad_rate, 0.0);
+    }
+
 }
