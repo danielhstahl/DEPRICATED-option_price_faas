@@ -139,13 +139,21 @@ fn adjust_density<T>(
     std::marker::Sync+std::marker::Send
 {
     let num_x=128;
-    let x_range=fang_oost::compute_x_range(
-        num_x, -x_max, x_max
+    let x_min=-x_max;
+    let x_domain=fang_oost::get_x_domain(
+        num_x, x_min, x_max
+    ).collect::<Vec<_>>();
+    let discrete_cf=fang_oost::get_discrete_cf(
+        num_u, x_min, x_max, &cf
     );
     let option_range:Vec<f64>=fang_oost::get_density(
-        num_u, &x_range, cf
+        x_min, x_max, 
+        fang_oost::get_x_domain(
+            num_x, x_min, x_max
+        ), 
+        &discrete_cf
     ).collect();
-    print_density(&x_range, &option_range)
+    print_density(&x_domain, &option_range)
 }
 
 
@@ -162,7 +170,8 @@ fn get_vol_from_parameters(
         *maturity
     )
 }
-
+const MAX_SIMS:usize=100;
+const PRECISION:f64=0.0000001;
 fn main()-> Result<(), io::Error> {
     let args: Vec<String> = env::args().collect();
     let fn_choice:i32=args[1].parse().unwrap();
@@ -275,7 +284,8 @@ fn main()-> Result<(), io::Error> {
             ),
         RISK_MEASURES => print_risk_measures(
                 cf_dist_utils::get_expected_shortfall_and_value_at_risk(
-                    quantile, num_u, -x_max_density, x_max_density, &inst_cf
+                    quantile, num_u, -x_max_density, 
+                    x_max_density, MAX_SIMS, PRECISION, &inst_cf
                 )
             ),
         _ => println!("wow, nothing")
