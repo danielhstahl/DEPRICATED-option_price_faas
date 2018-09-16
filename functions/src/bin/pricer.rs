@@ -44,6 +44,7 @@ const CALL_THETA:i32=7;
 const DENSITY:i32=8;
 const RISK_MEASURES:i32=9;
 
+const STARTING_VOL:f64=1.0; //high, but necessary for initial vol on low strikes
 
 #[derive(Serialize, Deserialize)]
 struct GraphElementIV {
@@ -125,11 +126,14 @@ fn print_call_prices(
     maturity:f64
 ) { //void, prints to stdout
     let x_val_crit=values.len()-1;
+    let mut iv=STARTING_VOL;
     let json_call_prices=json!(
         strikes.iter().zip(values.iter())
             .enumerate().filter(|(index, _)|index>&0&&index<&x_val_crit)
             .map(|(_, (strike, price))|{
-                let iv=black_scholes::call_iv(*price, asset, *strike, rate, maturity, 0.3);
+                println!("strike: {}, price: {}", strike, price);
+                //should be more efficient to use previous iv since iv should be a smooth curve
+                iv=black_scholes::call_iv(*price, asset, *strike, rate, maturity, iv);
                 GraphElementIV {
                     at_point:*strike,
                     value:*price,
@@ -405,5 +409,66 @@ mod tests {
         println!("Bad rate: {}", bad_rate);
         assert_eq!(bad_rate, 0.0);
     }
+   /* #[test]
+    fn bad_attempt(){
+        let asset=223.4000;
+        let rate=0.0247;
+        let maturity=0.7599;
+        let eta_v=1.3689;
+        let lambda=0.0327;
+        let mu_l=-0.3571;
+        let rho=-0.0936;
+        let sig_l=0.5876;
+        let sigma=0.2072;
+        let speed=0.87;
+        let v0=1.2104;
+        
+        let x_max=get_jump_diffusion_vol(
+            sigma, lambda,
+            mu_l, sig_l, 
+            maturity
+        )*10.0;
+        let strikes=vec![
+            asset*(x_max.exp()),
+            85.0,90.0,100.0,110.0,120.0,125.0,130.0,135.0,140.0,
+            145.0,150.0,155.0,160.0,165.0,170.0,175.0,180.0,
+            185.0,190.0,195.0,200.0,205.0,210.0,215.0,220.0,
+            225.0,230.0,235.0,240.0,245.0,250.0,255.0,260.0,
+            265.0,270.0,275.0,280.0,285.0,290.0,295.0,300.0,
+            310.0,320.0,330.0,340.0,
+            asset*((-x_max).exp())
+        ];
+        let inst_cf=cf_functions::merton_time_change_cf(
+            maturity, rate, lambda, mu_l, sig_l, sigma, v0,
+            speed, eta_v, rho
+        );
+        let num_u=256;
+        let prices=option_pricing::fang_oost_call_price(
+            num_u, asset, 
+            &strikes, rate, 
+            maturity, &inst_cf
+        );
+        print_call_prices(
+            &strikes, &prices,
+            asset, rate, maturity
+        );
+    }*/
+    /*#[test]
+    fn test_bs(){
+        let price=140.08812902651113;
+        let strike=85.0;
+        let asset=223.4000;
+        let rate=0.0247;
+        let maturity=0.7599;
+        //let test_sigma=0.5;
+        let bs_test=|sigma|black_scholes::call(asset, strike, rate, sigma, maturity);
+        //let bs_price=black_scholes::call(asset, strike, rate, test_sigma, maturity);
+        println!("bs price: {}", bs_test(0.5));
+        println!("bs price: {}", bs_test(0.1));
+        println!("bs price: {}", bs_test(0.45));
+        println!("bs price: {}", bs_test(0.46));
+        //black_scholes::call_iv(price, s, k, rate, maturity, initial_guess)
+        let iv=black_scholes::call_iv(price, asset, strike, rate, maturity, 0.9);
+    }*/
 
 }
