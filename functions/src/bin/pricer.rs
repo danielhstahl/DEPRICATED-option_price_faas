@@ -44,8 +44,6 @@ const CALL_THETA:i32=7;
 const DENSITY:i32=8;
 const RISK_MEASURES:i32=9;
 
-const STARTING_VOL:f64=1.0; //high, but necessary for initial vol on low strikes
-
 #[derive(Serialize, Deserialize)]
 struct GraphElementIV {
     at_point:f64,
@@ -126,14 +124,12 @@ fn print_call_prices(
     maturity:f64
 ) { //void, prints to stdout
     let x_val_crit=values.len()-1;
-    let mut iv=STARTING_VOL;
+    //let mut iv=STARTING_VOL;
     let json_call_prices=json!(
         strikes.iter().zip(values.iter())
             .enumerate().filter(|(index, _)|index>&0&&index<&x_val_crit)
             .map(|(_, (strike, price))|{
-                println!("strike: {}, price: {}", strike, price);
-                //should be more efficient to use previous iv since iv should be a smooth curve
-                iv=black_scholes::call_iv(*price, asset, *strike, rate, maturity, iv);
+                let iv=black_scholes::call_iv(*price, asset, *strike, rate, maturity);
                 GraphElementIV {
                     at_point:*strike,
                     value:*price,
@@ -335,7 +331,7 @@ mod tests {
         let rate=0.02;
         let num_total:usize=10000;
         let mut num_bad:usize=0;
-        (0..num_total).for_each(|index|{
+        (0..num_total).for_each(|_|{
             let lambda_sim=get_over_region(
                 constr.lambda.lower,
                 constr.lambda.upper,
@@ -409,8 +405,8 @@ mod tests {
         println!("Bad rate: {}", bad_rate);
         assert_eq!(bad_rate, 0.0);
     }
-   /* #[test]
-    fn bad_attempt(){
+   #[test]
+    fn replicate_error(){
         let asset=223.4000;
         let rate=0.0247;
         let maturity=0.7599;
@@ -452,23 +448,6 @@ mod tests {
             &strikes, &prices,
             asset, rate, maturity
         );
-    }*/
-    /*#[test]
-    fn test_bs(){
-        let price=140.08812902651113;
-        let strike=85.0;
-        let asset=223.4000;
-        let rate=0.0247;
-        let maturity=0.7599;
-        //let test_sigma=0.5;
-        let bs_test=|sigma|black_scholes::call(asset, strike, rate, sigma, maturity);
-        //let bs_price=black_scholes::call(asset, strike, rate, test_sigma, maturity);
-        println!("bs price: {}", bs_test(0.5));
-        println!("bs price: {}", bs_test(0.1));
-        println!("bs price: {}", bs_test(0.45));
-        println!("bs price: {}", bs_test(0.46));
-        //black_scholes::call_iv(price, s, k, rate, maturity, initial_guess)
-        let iv=black_scholes::call_iv(price, asset, strike, rate, maturity, 0.9);
-    }*/
+    }
 
 }
