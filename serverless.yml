@@ -42,7 +42,7 @@ functions:
     handler: lambda/pricer.calculator
     events:
       - http:
-          path: calculator/{optionType}/{sensitivity}
+          path: v1/calculator/{optionType}/{sensitivity}
           method: post
           cors: true
           request:
@@ -50,11 +50,13 @@ functions:
               paths:
                 optionType: true
                 sensitivity: true
+              querystrings:
+                includeImpliedVolatility: false
   density:
     handler: lambda/pricer.density
     events:
       - http:
-          path: density/{densityType}
+          path: v1/density/{densityType}
           method: post
           cors: true
           request:
@@ -65,10 +67,23 @@ functions:
     handler: lambda/pricer.constraints
     events:
       - http:
-          path: parameters/parameter_ranges
+          path: v1/parameters/parameter_ranges
           method: get
           cors: true
-
+  calibrator:
+    memorySize: 3008 # optional, in MB, default is 1024
+    timeout: 30 # optional, in seconds, default is 6
+    handler: lambda/calibrator.calibrator
+    events:
+      - http:
+          path: v1/calibrator/{calibration}
+          method: post
+          cors: true
+          request:
+            parameters:
+              paths:
+                calibration: true
+  ## no need for "v1" on the APIs since this will be for internal use only
   getExpirationDates:
     handler: lambda/marketData.getExpirationDates
     events:
@@ -103,16 +118,4 @@ functions:
           path: options/tickers
           method: get
           cors: true
-  calibrator:
-    memorySize: 3008 # optional, in MB, default is 1024
-    timeout: 30 # optional, in seconds, default is 6
-    handler: lambda/calibrator.calibrator
-    events:
-      - http:
-          path: calibrator/{calibration}
-          method: post
-          cors: true
-          request:
-            parameters:
-              paths:
-                calibration: true
+  

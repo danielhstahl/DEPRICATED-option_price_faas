@@ -116,20 +116,20 @@ fn print_greeks(
     println!("{}", serde_json::to_string_pretty(&json_value).unwrap())
 }
 
-fn print_call_prices(
+fn print_generic_price_and_iv(
     strikes:&[f64],
     values:&[f64],
     asset:f64,
     rate:f64,
-    maturity:f64
+    maturity:f64,
+    iv_fn:Fn(f64, f64, f64, f64, f64)->f64,
 ) { //void, prints to stdout
     let x_val_crit=values.len()-1;
-    //let mut iv=STARTING_VOL;
-    let json_call_prices=json!(
+    let json_prices=json!(
         strikes.iter().zip(values.iter())
             .enumerate().filter(|(index, _)|index>&0&&index<&x_val_crit)
             .map(|(_, (strike, price))|{
-                let iv=black_scholes::call_iv(*price, asset, *strike, rate, maturity);
+                let iv=iv_fn(*price, asset, *strike, rate, maturity);
                 GraphElementIV {
                     at_point:*strike,
                     value:*price,
@@ -137,7 +137,39 @@ fn print_call_prices(
                 }
             }).collect::<Vec<_>>()
     );
-    println!("{}", serde_json::to_string_pretty(&json_call_prices).unwrap())
+    println!("{}", serde_json::to_string_pretty(&json_prices).unwrap())
+}
+fn print_call_prices(
+    strikes:&[f64],
+    values:&[f64],
+    asset:f64,
+    rate:f64,
+    maturity:f64
+) { //void, prints to stdout
+    print_generic_price_and_iv(
+        strikes,
+        values,
+        asset,
+        rate,
+        maturity,
+        &black_scholes::call_iv
+    )
+}
+fn print_put_prices(
+    strikes:&[f64],
+    values:&[f64],
+    asset:f64,
+    rate:f64,
+    maturity:f64
+) { //void, prints to stdout
+    print_generic_price_and_iv(
+        strikes,
+        values,
+        asset,
+        rate,
+        maturity,
+        &black_scholes::put_iv
+    )
 }
 
 fn adjust_density<T>(
@@ -185,13 +217,16 @@ const PRECISION:f64=0.0000001;
 fn main()-> Result<(), io::Error> {
     let args: Vec<String> = env::args().collect();
     let fn_choice:i32=args[1].parse().unwrap();
+    let include_iv:bool=args[3].parse().unwrap(); //0 or 1
     let mut parameters:constraints::OptionParameters=serde_json::from_str(&args[2])?;
     constraints::check_constraints(
         &parameters, 
         &constraints::get_constraints()
     )?;
-    let x_max_density=get_vol_from_parameters(&parameters)*5.0;
-    let x_max_options=x_max_density*2.0;
+    let density_scale=5.0;
+    let option_scale_over_density=2.0;
+    let x_max_density=get_vol_from_parameters(&parameters)*density_scale;
+    let x_max_options=x_max_density*option_scale_over_density;
     parameters.extend_k(x_max_options);
     
     let constraints::OptionParameters {
@@ -213,18 +248,15 @@ fn main()-> Result<(), io::Error> {
     
     let num_u=(2 as usize).pow(num_u_base as u32);
     let strikes=Vec::from(strikes);
-    //note...if pass by reference doesn't work 
-    //I can always move this value since I only
-    //use it once.  However, if I ever want 
-    //the binary to stay "live" for multiple
-    //calls I'll need to keep this reference around
+
     let inst_cf=cf_functions::merton_time_change_cf(
         maturity, rate, lambda, mu_l, sig_l, sigma, v0,
         speed, eta_v, rho
     );
 
     match fn_choice {
-        CALL_PRICE => print_call_prices(
+        CALL_PRICE => if iv {
+            print_call_prices(
                 &strikes,
                 &option_pricing::fang_oost_call_price(
                     num_u, asset, 
@@ -232,15 +264,37 @@ fn main()-> Result<(), io::Error> {
                     maturity, &inst_cf
                 ),
                 asset, rate, maturity
-            ),
-        PUT_PRICE => print_greeks(
+            )
+        } else {
+            print_greeks(
+                &strikes,
+                &option_pricing::fang_oost_call_price(
+                    num_u, asset, 
+                    &strikes, rate, 
+                    maturity, &inst_cf
+                )
+            )
+        },
+        PUT_PRICE => if iv {
+            print_put_prices(
+                &strikes,
+                &option_pricing::fang_oost_put_price(
+                    num_u, asset, 
+                    &strikes, rate, 
+                    maturity, &inst_cf
+                ),
+                asset, rate, maturity
+            )
+        } else {
+            print_greeks(
                 &strikes,
                 &option_pricing::fang_oost_put_price(
                     num_u, asset, 
                     &strikes, rate, 
                     maturity, &inst_cf
                 )
-            ),
+            )
+        },
         CALL_DELTA => print_greeks(
                 &strikes,
                 &option_pricing::fang_oost_call_delta(

@@ -15,6 +15,12 @@ use fang_oost_option::option_calibration;
 use std::env;
 use std::collections;
 
+const STRIKE_RATIO:f64=10.0;
+const NUM_U_FOR_CALIBRATION:usize=15; //seems reasonable in tests
+const SPLINE_CHOICE:i32=0;
+const CALIBRATE_CHOICE:i32=1;
+const POSSIBLE_CALIBRATION_PARAMETERS: &[&str] = &["lambda", "mu_l", "sig_l", "sigma", "v0", "speed", "eta_v", "rho"]; //order matters! same order as input into CF
+
 #[derive(Serialize, Deserialize)]
 struct CurvePoint{
     log_strike:f64,
@@ -34,15 +40,48 @@ fn get_u(
     (1..n).map(|index|index as f64*du).collect()
 }
 
+
+
 fn generate_const_parameters(
     strikes_and_option_prices:&[(f64, f64)],
     asset:f64
 )->(usize, f64, f64){
     let n=1024;
     let (strike_last, _)=strikes_and_option_prices.last().expect("require at least one strike");
-    let max_strike=strike_last*10.0;
-    let min_strike=asset/max_strike; //recipricol of max strike, but multiplied by asset to ensure that the range stays appropriate regardless of the asset size. Note that this implies we have to "undo" this later if we want symmetry
+    let max_strike=strike_last*STRIKE_RATIO;
+    /**
+        reciprocal of max strike, but multiplied 
+        by asset to ensure that the range stays 
+        appropriate regardless of the asset size. 
+        Note that this implies we have to "undo" 
+        this later if we want symmetry
+    */
+    let min_strike=asset/max_strike;
     (n, min_strike, max_strike)
+}
+
+fn get_log_strike(
+    x:f64,
+    rate:f64,
+    maturity:f64
+)->f64{
+    x-rate*maturity
+}
+
+fn get_raw_transformed_price(
+    min_log_strike:f64,
+    log_strike_increment:f64,
+    index:usize
+)->f64{
+    min_log_strike+log_strike_increment*(index as f64)
+}
+
+fn get_log_strike_increment(
+    min_log_strike:f64,
+    max_log_strike:f64,
+    n:usize
+)->f64 {
+    (max_log_strike-min_log_strike)/((n-1) as f64)
 }
 
 fn generate_spline_curves(
@@ -56,33 +95,45 @@ fn generate_spline_curves(
     let (_, min_strike, max_strike)=generate_const_parameters(
         strikes_and_option_prices, asset
     );
+    //s is a spline that takes normalized strike (strike/asset)
     let s=option_calibration::get_option_spline(
         strikes_and_option_prices,
         asset, discount, min_strike,
         max_strike
-    ); //s is a spline that takes normalized strike (strike/asset)
-    let min_log_strike=(min_strike).ln(); //no division by "asset" since  multiplied by "asset" size in "generate_const_parameters".  min_log_strike and max_log_strike are symmetric around 0.
+    ); 
+
+    /** no division by "asset" since  
+        multiplied by "asset" size in 
+        "generate_const_parameters".  
+        min_log_strike and max_log_strike 
+        are symmetric around 0.
+    */
+    let min_log_strike=(min_strike).ln(); 
     let max_log_strike=option_calibration::transform_price(max_strike, asset).ln();
-    let dk_log=(max_log_strike-min_log_strike)/((num_nodes-1) as f64);
+    let dk_log=get_log_strike_increment(min_log_strike, max_log_strike, num_nodes);
     let curves=json!(CurvePoints{
         curve:(0..num_nodes).map(|index|{
-            let x=min_log_strike+dk_log*(index as f64);
+            let x=get_raw_transformed_price(min_log_strike, dk_log, index);
             CurvePoint {
-                log_strike:x-rate*maturity,
+                log_strike:get_log_strike(x, rate, maturity),
                 transformed_option:option_calibration::max_zero_or_number(s(x.exp()))
             }
         }).collect(),
-        points:strikes_and_option_prices.iter().map(|(strike, price)|{
+        points:strikes_and_option_prices.iter().map(|(&strike, &price)|{
             CurvePoint {
-                log_strike:option_calibration::transform_price(
-                        *strike, asset
-                    ).ln()-rate*maturity,
+                log_strike:get_log_strike(
+                    option_calibration::transform_price(
+                        strike, asset
+                    ).ln(),
+                    rate,
+                    maturity
+                ),
                 transformed_option:option_calibration::transform_price(
-                        *price, 
+                        price, 
                         asset
                     )-option_calibration::adjust_domain(
                         option_calibration::transform_price(
-                            *strike, 
+                            strike, 
                             asset
                         ), 
                         discount
@@ -106,9 +157,16 @@ fn generic_call_calibrator_cuckoo<T>(
     let (n, min_strike, max_strike)=generate_const_parameters(
         strikes_and_option_prices, asset
     );
-    let num_u=15;//seems reasonable in tests
-    let u_array=get_u(num_u);
-    //Note!  min_strike is NOT adjusted here.  There is nothing requiring symmetry around 1
+    
+    let u_array=get_u(NUM_U_FOR_CALIBRATION);
+    /**
+        Note!  min_strike is NOT adjusted here.  
+        There is nothing requiring symmetry around 
+        1 from generate_fo_estimate.  We do keep 
+        symmetry, as shown in the 
+        "generate_spline_curves" function but this 
+        is not a requirement of generate_fo_estimate
+    */
     let estimate_of_phi=option_calibration::generate_fo_estimate(
         strikes_and_option_prices, asset, 
         rate, maturity, min_strike, max_strike
@@ -127,10 +185,6 @@ fn generic_call_calibrator_cuckoo<T>(
         ||cuckoo::get_rng_system_seed()
     )
 }
-
-const SPLINE_CHOICE:i32=0;
-const CALIBRATE_CHOICE:i32=1;
-const POSSIBLE_CALIBRATION_PARAMETERS: &[&str] = &["lambda", "mu_l", "sig_l", "sigma", "v0", "speed", "eta_v", "rho"]; //order matters! same order as input into CF
 
 #[derive(Serialize, Deserialize)]
 struct CalibrationParameters{
@@ -181,11 +235,11 @@ fn get_array_or_field<'a, 'b: 'a>(
     static_parameters:&'b collections::HashMap<String, f64>
 )->impl Fn(&str)->f64+'a {
     move |field| {
-        if index_map.contains_key(field) {
+        if index_map.contains_key(field) { //then its calibrated, so return calibrated parameter
             let index:usize=*index_map.get(field).unwrap();
             calibration_parameters[index]
         }
-        else {
+        else { //not calibrated, return parameter supplied when executing the program
             *static_parameters.get(field).unwrap()
         }
     }
@@ -196,13 +250,15 @@ fn main()-> Result<(), io::Error> {
     let fn_choice:i32=args[1].parse().unwrap();
     let cp: CalibrationParameters = serde_json::from_str(&args[2])?;
     let strikes_prices:Vec<(f64, f64)>=cp.strikes.iter()
-        .zip(cp.prices.iter())
-        .map(|(strike, price)|(*strike, *price)).collect(); 
+        .zip(cp.prices.iter()).collect(); 
+        //.map(|(strike, price)|(*strike, *price))
+    let num_nodes_in_spline=256;
     match fn_choice {
         SPLINE_CHOICE => {
             generate_spline_curves(
                 &strikes_prices,
-                cp.asset, cp.rate, cp.maturity, 256
+                cp.asset, cp.rate, cp.maturity, 
+                num_nodes_in_spline
             )
         },
         CALIBRATE_CHOICE => {

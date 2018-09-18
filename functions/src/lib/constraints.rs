@@ -22,7 +22,7 @@ pub struct OptionParameters {
     pub rho:f64,
     pub strikes:VecDeque<f64>,
     pub quantile:f64,
-    pub num_u:usize
+    pub num_u:usize //raised to the power of two.  if this is 8, then there will be 2^8=256 discrete "u"
 }
 impl OptionParameters{
     pub fn extend_k(&mut self, x_max:f64){
