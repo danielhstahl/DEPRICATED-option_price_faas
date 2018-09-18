@@ -111,7 +111,6 @@ it('correctly calls VaR', (done)=>{
         densityType:'riskmetric'
     })
     handler.density(event, {}, (_err, val)=>{
-        console.log(val.body)
         const parsedVal=JSON.parse(val.body)
         expect(parsedVal.value_at_risk).toBeDefined()
         expect(parsedVal.expected_shortfall).toBeDefined()

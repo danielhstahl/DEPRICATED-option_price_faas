@@ -1,7 +1,8 @@
 const handler=require('../../lambda/pricer')
-const createEvent=(data, parameters)=>({
+const createEvent=(data, parameters, queryStringParameters)=>({
     body:JSON.stringify(data),
-    pathParameters:parameters
+    pathParameters:parameters,
+    queryStringParameters
 })
 it('correctly returns heston price', (done)=>{
     //http://ta.twi.tudelft.nl/mf/users/oosterle/oosterlee/COS.pdf pg 15
@@ -127,7 +128,6 @@ it('correctly returns merton price', (done)=>{
         algorithm:'fangoost'
     })
     return handler.calculator(event, {}, (_err, val)=>{
-        console.log(val.body)
         const parsedVal=JSON.parse(val.body)
         expect(parsedVal[0].value).toBeCloseTo(5.9713, 3)
         done()
@@ -167,7 +167,6 @@ it('correctly returns VaR', (done)=>{
         densityType:'riskmetric'
     })
     return handler.density(event, {}, (_err, val)=>{
-        console.log(val.body)
         const parsedVal=JSON.parse(val.body)
         expect(parsedVal.value_at_risk).toBeCloseTo(.261503, 3)
         done()

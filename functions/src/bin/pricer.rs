@@ -217,8 +217,9 @@ const PRECISION:f64=0.0000001;
 fn main()-> Result<(), io::Error> {
     let args: Vec<String> = env::args().collect();
     let fn_choice:i32=args[1].parse().unwrap();
-    let include_iv:bool=args[3].parse().unwrap(); //0 or 1
-    let mut parameters:constraints::OptionParameters=serde_json::from_str(&args[2])?;
+    let iv_choice:i32=args[2].parse().unwrap();
+    let include_iv:bool=if iv_choice==1 {true} else {false};
+    let mut parameters:constraints::OptionParameters=serde_json::from_str(&args[3])?;
     constraints::check_constraints(
         &parameters, 
         &constraints::get_constraints()
