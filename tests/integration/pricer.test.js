@@ -47,6 +47,53 @@ it('correctly returns heston price', (done)=>{
         done()
     })
 })
+it('correctly returns heston price and iv', (done)=>{
+    //http://ta.twi.tudelft.nl/mf/users/oosterle/oosterlee/COS.pdf pg 15
+    const rate=0.0
+    const maturity=1.0
+    const asset=100
+    const b=.0398
+    const a=1.5768
+    const c=.5751
+    const rho=-.5711
+    const v0=.0175
+
+    //convert parameters
+    const sigma=Math.sqrt(b)
+    const speed=a
+    const v0Hat=v0/b
+    const eta_v=c/Math.sqrt(b)
+
+    const parameters={
+        num_u:8,
+        rate,
+        maturity,
+        asset,
+        sigma, 
+        lambda:0,
+        mu_l:0,
+        sig_l:0,
+        speed,
+        v0:v0Hat,
+        eta_v,
+        rho,
+        strikes:[100],
+        quantile:0.01
+    }
+    const event=createEvent(parameters, {
+        optionType:'call',
+        sensitivity:'price'
+    }, {
+        includeImpliedVolatility:true
+    })
+    return handler.calculator(event, {}, (_err, val)=>{
+        console.log(val.body)
+        const parsedVal=JSON.parse(val.body)
+        expect(parsedVal[0].value).toBeCloseTo(5.78515545, 3)
+        expect(parsedVal[0].iv).toBeDefined()
+        done()
+    })
+})
 it('correctly returns merton price', (done)=>{
     //https://www.upo.es/personal/jfernav/papers/Jumps_JOD_.pdf pg 8
     const rate=.1
