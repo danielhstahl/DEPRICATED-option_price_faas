@@ -255,7 +255,7 @@ fn main()-> Result<(), io::Error> {
     );
 
     match fn_choice {
-        CALL_PRICE => if iv {
+        CALL_PRICE => if include_iv {
             print_call_prices(
                 &strikes,
                 &option_pricing::fang_oost_call_price(
@@ -275,7 +275,7 @@ fn main()-> Result<(), io::Error> {
                 )
             )
         },
-        PUT_PRICE => if iv {
+        PUT_PRICE => if include_iv {
             print_put_prices(
                 &strikes,
                 &option_pricing::fang_oost_put_price(
