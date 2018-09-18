@@ -53,7 +53,7 @@ it('correctly handles optionPrices with new query params', done=>{
                 asOfDate:parsedVal.expirationDates[nM]
             }, 
             {
-                minOpenInterest:30
+                minOpenInterest:20
             }
         )
         handler.getOptionPrices(event, {}, (_err, val)=>{
