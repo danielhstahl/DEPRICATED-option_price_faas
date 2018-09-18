@@ -122,7 +122,7 @@ fn print_generic_price_and_iv(
     asset:f64,
     rate:f64,
     maturity:f64,
-    iv_fn:Fn(f64, f64, f64, f64, f64)->f64,
+    iv_fn:&Fn(f64, f64, f64, f64, f64)->f64,
 ) { //void, prints to stdout
     let x_val_crit=values.len()-1;
     let json_prices=json!(

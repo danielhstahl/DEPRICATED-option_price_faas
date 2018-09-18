@@ -119,21 +119,21 @@ fn generate_spline_curves(
                 transformed_option:option_calibration::max_zero_or_number(s(x.exp()))
             }
         }).collect(),
-        points:strikes_and_option_prices.iter().map(|(&strike, &price)|{
+        points:strikes_and_option_prices.iter().map(|(strike, price)|{
             CurvePoint {
                 log_strike:get_log_strike(
                     option_calibration::transform_price(
-                        strike, asset
+                        *strike, asset
                     ).ln(),
                     rate,
                     maturity
                 ),
                 transformed_option:option_calibration::transform_price(
-                        price, 
+                        *price, 
                         asset
                     )-option_calibration::adjust_domain(
                         option_calibration::transform_price(
-                            strike, 
+                            *strike, 
                             asset
                         ), 
                         discount
@@ -250,8 +250,9 @@ fn main()-> Result<(), io::Error> {
     let fn_choice:i32=args[1].parse().unwrap();
     let cp: CalibrationParameters = serde_json::from_str(&args[2])?;
     let strikes_prices:Vec<(f64, f64)>=cp.strikes.iter()
-        .zip(cp.prices.iter()).collect(); 
-        //.map(|(strike, price)|(*strike, *price))
+        .zip(cp.prices.iter())
+        .map(|(strike, price)|(*strike, *price))
+        .collect();
     let num_nodes_in_spline=256;
     match fn_choice {
         SPLINE_CHOICE => {
