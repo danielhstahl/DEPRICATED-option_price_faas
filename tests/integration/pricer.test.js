@@ -148,6 +148,7 @@ it('correctly returns monte carlo price', (done)=>{
     const eta_v=0.2
     const v0=0.9
     const delta=0.1
+    const rho=-0.5
     
     const parameters={
         num_u:8,
