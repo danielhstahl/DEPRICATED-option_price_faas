@@ -17,7 +17,7 @@ use std::collections;
 
 const STRIKE_RATIO:f64=10.0;
 const NUM_U_FOR_CALIBRATION:usize=15; //seems reasonable in tests
-const SPLINE_CHOICE:i32=0;
+//const SPLINE_CHOICE:i32=0;
 const CALIBRATE_CHOICE:i32=1;
 const POSSIBLE_CALIBRATION_PARAMETERS: &[&str] = &["lambda", "mu_l", "sig_l", "sigma", "v0", "speed", "eta_v", "rho"]; //order matters! same order as input into CF
 
@@ -30,6 +30,13 @@ struct CurvePoint{
 struct CurvePoints{
     curve:Vec<CurvePoint>,
     points:Vec<CurvePoint>
+}
+#[derive(Serialize, Deserialize)]
+struct OptionStats{
+    price:f64,
+    strike:f64,
+    maturity:f64,
+    rate:f64
 }
 
 
@@ -147,16 +154,15 @@ fn generate_spline_curves(
 fn generic_call_calibrator_cuckoo<T>(
     log_cf:T,
     ul:&[cuckoo::UpperLower],
-    strikes_and_option_prices:&[(f64, f64)],
+    strikes_and_option_prices:&[(f64, f64, f64)],
+    maturities:&[f64],
     asset:f64,
     rate:f64,
-    maturity:f64
+    //maturity:f64
 )->(Vec<f64>, f64)
     where T:Fn(&Complex<f64>, &[f64])->Complex<f64>
 {
-    let (n, min_strike, max_strike)=generate_const_parameters(
-        strikes_and_option_prices, asset
-    );
+    
     
     let u_array=get_u(NUM_U_FOR_CALIBRATION);
     /**
@@ -167,15 +173,22 @@ fn generic_call_calibrator_cuckoo<T>(
         "generate_spline_curves" function but this 
         is not a requirement of generate_fo_estimate
     */
-    let estimate_of_phi=option_calibration::generate_fo_estimate(
-        strikes_and_option_prices, asset, 
-        rate, maturity, min_strike, max_strike
-    );
+    let obj_fn=|params|{
+        let (n, min_strike, max_strike)=generate_const_parameters(
+            strikes_and_option_prices, asset
+        );
+        maturities.map(|maturity|{
+            let estimate_of_phi=option_calibration::generate_fo_estimate(
+                strikes_and_option_prices, asset, 
+                rate, maturity, min_strike, max_strike
+            );
+            let phis=estimate_of_phi(n, &u_array);
+            option_calibration::get_obj_fn_arr(
+                phis, u_array, log_cf
+            )(params)
+        }).sum()
+    };
     
-    let phis=estimate_of_phi(n, &u_array);
-    let obj_fn=option_calibration::get_obj_fn_arr(
-        phis, u_array, log_cf
-    );
     let nest_size=25;
     let total_mc=10000;
     let tol=0.000001;
@@ -188,10 +201,7 @@ fn generic_call_calibrator_cuckoo<T>(
 
 #[derive(Serialize, Deserialize)]
 struct CalibrationParameters{
-    strikes:Vec<f64>,
-    prices:Vec<f64>,
-    maturity:f64,
-    rate:f64,
+    options:Vec<OptionStats>,
     asset:f64,
     constraints:collections::HashMap<String, cuckoo::UpperLower>,
     #[serde(flatten)]
@@ -249,22 +259,22 @@ fn main()-> Result<(), io::Error> {
     let args: Vec<String> = env::args().collect();
     let fn_choice:i32=args[1].parse().unwrap();
     let cp: CalibrationParameters = serde_json::from_str(&args[2])?;
-    let strikes_prices:Vec<(f64, f64)>=cp.strikes.iter()
-        .zip(cp.prices.iter())
-        .map(|(strike, price)|(*strike, *price))
-        .collect();
+    //let strikes_prices:Vec<(f64, f64)>=cp.strikes.iter()
+    //    .zip(cp.prices.iter())
+    //    .map(|(strike, price)|(*strike, *price))
+    //    .collect();
     let num_nodes_in_spline=256;
     match fn_choice {
-        SPLINE_CHOICE => {
+        /*SPLINE_CHOICE => {
             generate_spline_curves(
                 &strikes_prices,
                 cp.asset, cp.rate, cp.maturity, 
                 num_nodes_in_spline
             )
-        },
+        },*/
         CALIBRATE_CHOICE => {
             //slow, but only called once
-            let (ul, index_map)=get_ul_and_index_of_array(&cp.constraints);
+            //let (ul, index_map)=get_ul_and_index_of_array(&cp.constraints);
             let (
                 optimal_parameters, 
                 fn_at_optimal_parameters
