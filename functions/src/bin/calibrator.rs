@@ -19,7 +19,7 @@ const STRIKE_RATIO:f64=10.0;
 const NUM_U_FOR_CALIBRATION:usize=15; //seems reasonable in tests
 //const SPLINE_CHOICE:i32=0;
 const CALIBRATE_CHOICE:i32=1;
-const POSSIBLE_CALIBRATION_PARAMETERS: &[&str] = &["lambda", "mu_l", "sig_l", "sigma", "v0", "speed", "eta_v", "rho"]; //order matters! same order as input into CF
+//const POSSIBLE_CALIBRATION_PARAMETERS: &[&str] = &["lambda", "mu_l", "sig_l", "sigma", "v0", "speed", "eta_v", "rho"]; //order matters! same order as input into CF
 
 #[derive(Serialize, Deserialize)]
 struct CurvePoint{
@@ -257,22 +257,18 @@ fn get_array_or_field<'a, 'b: 'a>(
 
 fn main()-> Result<(), io::Error> {
     let args: Vec<String> = env::args().collect();
-    let fn_choice:i32=args[1].parse().unwrap();
+    let fn_choice:i32=args[1].parse()?;
+    let fn_enhancement:i32=args[2].parse()?;
     let cp: CalibrationParameters = serde_json::from_str(&args[2])?;
-    //let strikes_prices:Vec<(f64, f64)>=cp.strikes.iter()
-    //    .zip(cp.prices.iter())
-    //    .map(|(strike, price)|(*strike, *price))
-    //    .collect();
     let num_nodes_in_spline=256;
+    let cf_result=match fn_enhancement {
+        constraints::VANILLA=>{
+            |
+        }
+    }
     match fn_choice {
-        /*SPLINE_CHOICE => {
-            generate_spline_curves(
-                &strikes_prices,
-                cp.asset, cp.rate, cp.maturity, 
-                num_nodes_in_spline
-            )
-        },*/
-        CALIBRATE_CHOICE => {
+        CGMY => {
+
             //slow, but only called once
             //let (ul, index_map)=get_ul_and_index_of_array(&cp.constraints);
             let (

@@ -7,6 +7,17 @@ use std::collections::VecDeque;
 use std::io;
 use std::io::{Error, ErrorKind};
 
+//base
+pub const CGMY:i32=0;
+pub const MERTON:i32=1;
+pub const HESTON:i32=2;
+//enhancements to base
+pub const VANILLA:i32=0;
+pub const STOCHASTIC_VOL:i32=1;
+pub const DIFFUSION:i32=2;
+pub const LEVERAGE:i32=3;//leverage will include diffusion to generate correlation
+
+
 #[derive(Serialize, Deserialize)]
 pub struct OptionParameters {
     pub maturity: f64,
