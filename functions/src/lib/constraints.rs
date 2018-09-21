@@ -8,15 +8,15 @@ use std::io;
 use std::io::{Error, ErrorKind};
 
 //base
-pub const CGMY:i32=0;
-pub const MERTON:i32=1;
+pub const CGMY_VANILLA:i32=0;
+pub const MERTON_VANILLA:i32=1;
 pub const HESTON:i32=2;
-//enhancements to base
-pub const VANILLA:i32=0;
-pub const STOCHASTIC_VOL:i32=1;
-pub const DIFFUSION:i32=2;
-pub const LEVERAGE:i32=3;//leverage will include diffusion to generate correlation
-
+pub const CGMY_DIFFUSION:i32=3;
+pub const MERTON_DIFFUSION:i32=4;
+pub const CGMY_STOCHASTIC_VOL:i32=5;
+pub const MERTON_STOCHASTIC_VOL:i32=6;
+pub const CGMY_LEVERAGE:i32=7;
+pub const MERTON_LEVERAGE:i32=8;
 
 #[derive(Serialize, Deserialize)]
 pub struct OptionParameters {

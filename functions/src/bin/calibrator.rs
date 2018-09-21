@@ -31,13 +31,6 @@ struct CurvePoints{
     curve:Vec<CurvePoint>,
     points:Vec<CurvePoint>
 }
-#[derive(Serialize, Deserialize)]
-struct OptionStats{
-    price:f64,
-    strike:f64,
-    maturity:f64,
-    rate:f64
-}
 
 
 fn get_u(
@@ -50,11 +43,11 @@ fn get_u(
 
 
 fn generate_const_parameters(
-    strikes_and_option_prices:&[(f64, f64)],
+    strikes_and_option_prices:&[option_calibration::OptionStats],
     asset:f64
 )->(usize, f64, f64){
     let n=1024;
-    let (strike_last, _)=strikes_and_option_prices.last().expect("require at least one strike");
+    let option_calibration::OptionStats{strike:strike_last, ..}=strikes_and_option_prices.last().expect("require at least one strike");
     let max_strike=strike_last*STRIKE_RATIO;
     /**
         reciprocal of max strike, but multiplied 
@@ -91,71 +84,11 @@ fn get_log_strike_increment(
     (max_log_strike-min_log_strike)/((n-1) as f64)
 }
 
-fn generate_spline_curves(
-    strikes_and_option_prices:&[(f64, f64)],
-    asset:f64,
-    rate:f64,
-    maturity:f64,
-    num_nodes:usize
-) { //void, prints to stdout
-    let discount=(-rate*maturity).exp();
-    let (_, min_strike, max_strike)=generate_const_parameters(
-        strikes_and_option_prices, asset
-    );
-    //s is a spline that takes normalized strike (strike/asset)
-    let s=option_calibration::get_option_spline(
-        strikes_and_option_prices,
-        asset, discount, min_strike,
-        max_strike
-    ); 
-
-    /** no division by "asset" since  
-        multiplied by "asset" size in 
-        "generate_const_parameters".  
-        min_log_strike and max_log_strike 
-        are symmetric around 0.
-    */
-    let min_log_strike=(min_strike).ln(); 
-    let max_log_strike=option_calibration::transform_price(max_strike, asset).ln();
-    let dk_log=get_log_strike_increment(min_log_strike, max_log_strike, num_nodes);
-    let curves=json!(CurvePoints{
-        curve:(0..num_nodes).map(|index|{
-            let x=get_raw_transformed_price(min_log_strike, dk_log, index);
-            CurvePoint {
-                log_strike:get_log_strike(x, rate, maturity),
-                transformed_option:option_calibration::max_zero_or_number(s(x.exp()))
-            }
-        }).collect(),
-        points:strikes_and_option_prices.iter().map(|(strike, price)|{
-            CurvePoint {
-                log_strike:get_log_strike(
-                    option_calibration::transform_price(
-                        *strike, asset
-                    ).ln(),
-                    rate,
-                    maturity
-                ),
-                transformed_option:option_calibration::transform_price(
-                        *price, 
-                        asset
-                    )-option_calibration::adjust_domain(
-                        option_calibration::transform_price(
-                            *strike, 
-                            asset
-                        ), 
-                        discount
-                    )
-            }
-        }).collect()
-    });
-    println!("{}", serde_json::to_string_pretty(&curves).unwrap());
-}
-
 fn generic_call_calibrator_cuckoo<T>(
     log_cf:T,
     ul:&[cuckoo::UpperLower],
-    strikes_and_option_prices:&[(f64, f64, f64)],
-    maturities:&[f64],
+    strikes_and_option_prices:&[option_calibration::OptionStats],
+    //maturities:&[f64],
     asset:f64,
     rate:f64,
     //maturity:f64
@@ -201,11 +134,9 @@ fn generic_call_calibrator_cuckoo<T>(
 
 #[derive(Serialize, Deserialize)]
 struct CalibrationParameters{
-    options:Vec<OptionStats>,
+    options:Vec<option_calibration::OptionStats>,
     asset:f64,
-    constraints:collections::HashMap<String, cuckoo::UpperLower>,
-    #[serde(flatten)]
-    static_parameters: collections::HashMap<String, f64>
+    constraints:collections::HashMap<String, cuckoo::UpperLower>
 }
 
 fn get_filtered_parameter_iterator(
@@ -259,13 +190,35 @@ fn main()-> Result<(), io::Error> {
     let args: Vec<String> = env::args().collect();
     let fn_choice:i32=args[1].parse()?;
     let fn_enhancement:i32=args[2].parse()?;
-    let cp: CalibrationParameters = serde_json::from_str(&args[2])?;
+    let mut cp: CalibrationParameters = serde_json::from_str(&args[2])?;
+    cp.options.sort_unstable_by(|option_calibration::OptionStats{maturity:a,..}, option_calibration::OptionStats{maturity:b,..}|a.cmp(b));
     let num_nodes_in_spline=256;
-    let cf_result=match fn_enhancement {
-        constraints::VANILLA=>{
-            |
-        }
-    }
+    let u_array=get_u(NUM_U_FOR_CALIBRATION);
+    let empirical_cf:Vec<Complex<f64>>=cp.options.clone()
+        .dedup_by(|option_calibration::OptionStats{maturity:a,..}, option_calibration::OptionStats{maturity:b,..}|a==b)
+        .iter()
+        .flat_map(|option_calibration::OptionStats{maturity,rate, ..}|{
+            let filtered_options=cp.options.filter(
+                |option_calibration::OptionStats{
+                        maturity:option_maturity,
+                        ..
+                    }
+                |maturity==option_maturity
+            ).collect();
+            let (n, min_strike, max_strike)=generate_const_parameters(
+                &filtered_options, asset
+            );
+            let results=option_calibration::generate_fo_estimate(
+                &filtered_options,
+                &u_array,
+                n,
+                stock, 
+                rate,
+                maturity,
+                min_strike,
+                max_strike
+            )
+        }).collect();
     match fn_choice {
         CGMY => {
 
