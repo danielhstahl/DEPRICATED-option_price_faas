@@ -1,6 +1,7 @@
 extern crate fang_oost_option;
 extern crate cuckoo;
 extern crate serde;
+extern crate rayon;
 extern crate num_complex;
 extern crate cf_functions;
 extern crate constraints;
@@ -14,6 +15,7 @@ use std::f64::consts::PI;
 use fang_oost_option::option_calibration;
 use std::env;
 use std::collections;
+use rayon::prelude::*;
 
 const STRIKE_RATIO:f64=10.0;
 const NUM_U_FOR_CALIBRATION:usize=15; //seems reasonable in tests
@@ -27,6 +29,13 @@ struct CurvePoint{
 struct CurvePoints{
     curve:Vec<CurvePoint>,
     points:Vec<CurvePoint>
+}
+
+#[derive(Serialize, Deserialize)]
+struct OptionRate{
+    rate:f64,
+    maturity:f64,
+    options:Vec<option_calibration::OptionStats>
 }
 
 
@@ -46,168 +55,80 @@ fn generate_const_parameters(
     let n=1024;
     let option_calibration::OptionStats{strike:strike_last, ..}=strikes_and_option_prices.last().expect("require at least one strike");
     let max_strike=strike_last*STRIKE_RATIO;
-    /**
-        reciprocal of max strike, but multiplied 
-        by asset to ensure that the range stays 
-        appropriate regardless of the asset size. 
-        Note that this implies we have to "undo" 
-        this later if we want symmetry
-    */
+    // reciprocal of max strike, but multiplied 
+    // by asset to ensure that the range stays 
+    // appropriate regardless of the asset size. 
+    // Note that this implies we have to "undo" 
+    // this later if we want symmetry
     let min_strike=asset/max_strike;
     (n, min_strike, max_strike)
 }
 
-fn get_log_strike(
-    x:f64,
-    rate:f64,
-    maturity:f64
-)->f64{
-    x-rate*maturity
-}
-
-fn get_raw_transformed_price(
-    min_log_strike:f64,
-    log_strike_increment:f64,
-    index:usize
-)->f64{
-    min_log_strike+log_strike_increment*(index as f64)
-}
-
-fn get_log_strike_increment(
-    min_log_strike:f64,
-    max_log_strike:f64,
-    n:usize
-)->f64 {
-    (max_log_strike-min_log_strike)/((n-1) as f64)
-}
 const LARGE_NUMBER:f64=500000.0;
 
 #[derive(Serialize, Deserialize)]
 struct CalibrationParameters{
-    options:Vec<option_calibration::OptionStats>,
+    options_and_rate:Vec<OptionRate>,
     asset:f64,
     constraints:collections::HashMap<String, cuckoo::UpperLower>
 }
-/*
-fn get_filtered_parameter_iterator(
-    constraint_map:&collections::HashMap<String, cuckoo::UpperLower>
-)->impl Iterator<Item=&&str>
-{
-    POSSIBLE_CALIBRATION_PARAMETERS
-        .iter()
-        .filter(move |parameter_name|{
-            constraint_map.contains_key(&parameter_name.to_string())
-        })
-}*/
-/*
-fn get_ul_and_index_of_array(
-    constraint_map:&collections::HashMap<String, cuckoo::UpperLower>
-)->(Vec<cuckoo::UpperLower>, collections::HashMap<String, usize>){
 
-    let index_map:collections::HashMap<String, usize>=get_filtered_parameter_iterator(
-            constraint_map
-        )
-        .enumerate()
-        .map(|(index, parameter_name)|{
-            (parameter_name.to_string(), index)
-        }).collect();
-
-    let ul=get_filtered_parameter_iterator(
-            constraint_map
-        ).map(|parameter_name|{
-            constraint_map.get(&parameter_name.to_string()).unwrap()
-        }).cloned().collect();
-    (ul, index_map)
-}*/
-/*
-fn get_array_or_field<'a, 'b: 'a>(
-    calibration_parameters:&'b [f64],
-    index_map:&'b collections::HashMap<String, usize>,
-    static_parameters:&'b collections::HashMap<String, f64>
-)->impl Fn(&str)->f64+'a {
-    move |field| {
-        if index_map.contains_key(field) { //then its calibrated, so return calibrated parameter
-            let index:usize=*index_map.get(field).unwrap();
-            calibration_parameters[index]
-        }
-        else { //not calibrated, return parameter supplied when executing the program
-            *static_parameters.get(field).unwrap()
-        }
-    }
-}*/
-fn get_obj_fn<T>(
-    phi_hat:Vec<(Complex<f64>, f64)>, //do we really want to borrow/move this??
-    distinct_maturities:Vec<option_calibration::OptionStats>,
+fn get_obj_fn<'a, 'b:'a, T>(
+    phi_hat:&'b [(f64, Vec<Complex<f64>>)], //do we really want to borrow/move this??
+    u_array:&'b [f64],
     cf_fn:T
-)->impl Fn(&[f64])->f64
-where T:Fn(&Complex<f64>, f64, &[f64])->Complex<f64>
+)->impl Fn(&[f64])->f64+'a
+where T:Fn(&Complex<f64>, f64, &[f64])->Complex<f64>+'a
 {
     move |params|{
-        distinct_maturities.iter().fold(0.0, |
-                accumulate,
-                option_calibration::OptionStats{maturity,..}
-            |{
-                accumulate+phi_hat.iter()
-                    .fold(0.0, |accumulate, (phi, u)|{
-                        let result=cf_fn(
-                            &Complex::new(1.0, *u), 
-                            *maturity, params
-                        );
-                        accumulate+if result.re.is_nan()||result.im.is_nan() {
-                            LARGE_NUMBER
-                        }
-                        else {
-                            (phi-result).norm_sqr()
-                        }            
-                    })
-            }
-        )/((phi_hat.len()*distinct_maturities.len()) as f64)        
+        phi_hat.iter().fold(0.0, |accum, (maturity, empirical_cf)|{
+            accum+empirical_cf.iter().zip(u_array)
+                .fold(0.0, |accum_per_mat, (emp_cf, u)|{
+                    let result=cf_fn(
+                        &Complex::new(1.0, *u), 
+                        *maturity, params
+                    );
+                    accum_per_mat+if result.re.is_nan()||result.im.is_nan() {
+                        LARGE_NUMBER
+                    }
+                    else {
+                        (emp_cf-result).norm_sqr()
+                    }         
+                })
+        })/((u_array.len()*phi_hat.len()) as f64)        
     }
 }
-
 
 fn main()-> Result<(), io::Error> {
     let args: Vec<String> = env::args().collect();
     let fn_choice:i32=args[1].parse().unwrap();
-    let fn_enhancement:i32=args[2].parse().unwrap();
     let p_constraints=constraints::get_constraints();
-    let mut cp: CalibrationParameters = serde_json::from_str(&args[2])?;
-    cp.options.sort_unstable_by(|option_calibration::OptionStats{maturity:a,..}, option_calibration::OptionStats{maturity:b,..}|a.partial_cmp(b));
-    let num_nodes_in_spline=256;
+    let cp: CalibrationParameters = serde_json::from_str(&args[2])?;
     let u_array=get_u(NUM_U_FOR_CALIBRATION);
-    let distinct_maturities=cp.options.copy()
-        .dedup_by(
-            |
-                option_calibration::OptionStats{maturity:a,..},
-                option_calibration::OptionStats{maturity:b,..}
-            |a==b
-        );
-    let empirical_cf:Vec<(Complex<f64>, f64)>=distinct_maturities
+    let empirical_cf:Vec<(f64, Vec<Complex<f64>>)> = cp.options_and_rate
         .iter()
-        .flat_map(|option_calibration::OptionStats{maturity,rate, ..}|{
-            let filtered_options=cp.options.iter().filter(
-                |option_calibration::OptionStats{
-                        maturity:option_maturity,
-                        ..
-                    }
-                |maturity==option_maturity
-            ).collect();
+        .map(|OptionRate{maturity, rate, options}|{
             let (n, min_strike, max_strike)=generate_const_parameters(
-                &filtered_options, cp.asset
+                &options, cp.asset
             );
-            option_calibration::generate_fo_estimate(
-                &filtered_options,
-                &u_array,
-                n,
-                cp.asset, 
-                rate,
-                maturity,
-                min_strike,
-                max_strike
-            ).zip(u_array)
+            (
+                *maturity, 
+                option_calibration::generate_fo_estimate(
+                    &options,
+                    &u_array,
+                    n,
+                    cp.asset, 
+                    *rate,
+                    *maturity,
+                    min_strike,
+                    max_strike
+                ).collect()
+            )
         }).collect();
+
     match fn_choice {
         constraints::MERTON_LEVERAGE => {
+
             let ul=vec![
                 p_constraints.lambda,
                 p_constraints.mu_l,
@@ -218,7 +139,7 @@ fn main()-> Result<(), io::Error> {
                 p_constraints.eta_v,
                 p_constraints.rho,
             ];
-            let cf_fn=|u, t, params|{
+            let cf_fn=|u:&Complex<f64>, t, params:&[f64]|{
                 cf_functions::merton_time_change_log_cf(
                     u, t, 
                     params[0],
@@ -232,8 +153,8 @@ fn main()-> Result<(), io::Error> {
                 )
             };
             let fn_to_calibrate=get_obj_fn(
-                empirical_cf,
-                distinct_maturities,
+                &empirical_cf,
+                &u_array,
                 cf_fn
             );
             let nest_size=25;
