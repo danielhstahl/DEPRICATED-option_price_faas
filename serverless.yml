@@ -49,7 +49,7 @@ functions:
               paths:
                 densityType: true
                 model: true
-  defaultParameters:
+  constraints:
     handler: lambda/pricer.constraints
     events:
       - http:

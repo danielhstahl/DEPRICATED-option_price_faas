@@ -4,6 +4,7 @@ const createEvent=(data, parameters, queryStringParameters)=>({
     pathParameters:parameters,
     queryStringParameters
 })
+//TODO!! Add CGMY tests
 it('correctly returns heston price', (done)=>{
     //http://ta.twi.tudelft.nl/mf/users/oosterle/oosterlee/COS.pdf pg 15
     const rate=0.0
@@ -15,37 +16,58 @@ it('correctly returns heston price', (done)=>{
     const rho=-.5711
     const v0=.0175
 
-    //convert parameters
-    const sigma=Math.sqrt(b)
-    const speed=a
-    const v0Hat=v0/b
-    const eta_v=c/Math.sqrt(b)
-
     const parameters={
         num_u:8,
         rate,
         maturity,
         asset,
-        sigma, 
-        lambda:0,
-        mu_l:0,
-        sig_l:0,
-        speed,
-        v0:v0Hat,
-        eta_v,
-        rho,
+        cf_parameters:{
+            sigma:Math.sqrt(b), 
+            speed:a,
+            v0,
+            eta_v:c,
+            rho
+        },
         strikes:[100],
         quantile:0.01
     }
     const event=createEvent(parameters, {
         optionType:'call',
-        sensitivity:'price'
+        sensitivity:'price',
+        model:'heston'
+    })
+    //heston is a subset of merton, with some variable changes
+    const eventMerton=createEvent({
+        num_u:8,
+        rate,
+        maturity,
+        asset,
+        cf_parameters:{
+            sigma:Math.sqrt(b), 
+            speed:a,
+            v0:v0/b,
+            eta_v:c/Math.sqrt(b),
+            rho,
+            sig_l:0.0,
+            mu_l:0.0,
+            lambda:0.0
+        },
+        strikes:[100],
+        quantile:0.01
+    }, {
+        optionType:'call',
+        sensitivity:'price',
+        model:'merton'
     })
     return handler.calculator(event, {}, (_err, val)=>{
-        console.log(val.body)
         const parsedVal=JSON.parse(val.body)
         expect(parsedVal[0].value).toBeCloseTo(5.78515545, 3)
-        done()
+        const hestonResult=parsedVal[0].value
+        handler.calculator(eventMerton, {}, (_err, val)=>{
+            const parsedVal=JSON.parse(val.body)
+            expect(parsedVal[0].value).toEqual(hestonResult)
+            done()
+        })
     })
 })
 it('correctly returns heston price and iv', (done)=>{
@@ -60,38 +82,32 @@ it('correctly returns heston price and iv', (done)=>{
     const v0=.0175
 
     //convert parameters
-    const sigma=Math.sqrt(b)
-    const speed=a
-    const v0Hat=v0/b
-    const eta_v=c/Math.sqrt(b)
-
+    
     const parameters={
         num_u:8,
         rate,
         maturity,
         asset,
-        sigma, 
-        lambda:0,
-        mu_l:0,
-        sig_l:0,
-        speed,
-        v0:v0Hat,
-        eta_v,
-        rho,
+        cf_parameters:{
+            sigma:Math.sqrt(b), 
+            speed:a,
+            v0,
+            eta_v:c,
+            rho
+        },
         strikes:[100],
         quantile:0.01
     }
     const event=createEvent(parameters, {
         optionType:'call',
-        sensitivity:'price'
+        sensitivity:'price',
+        model:'heston'
     }, {
         includeImpliedVolatility:true
     })
     return handler.calculator(event, {}, (_err, val)=>{
-        console.log(val.body)
         const parsedVal=JSON.parse(val.body)
         expect(parsedVal[0].value).toBeCloseTo(5.78515545, 3)
-        expect(parsedVal[0].iv).toBeDefined()
         done()
     })
 })
@@ -111,21 +127,23 @@ it('correctly returns merton price', (done)=>{
         rate,
         maturity,
         asset,
-        sigma, 
-        lambda,
-        mu_l,
-        sig_l,
-        speed:0,
-        v0:1,
-        eta_v:0,
-        rho:0,
+        cf_parameters:{
+            sigma, 
+            lambda,
+            mu_l,
+            sig_l,
+            speed:0,
+            v0:1,
+            eta_v:0,
+            rho:0
+        },        
         strikes:[strike],
         quantile:0.01
     }
     const event=createEvent(parameters, {
         optionType:'call',
         sensitivity:'price',
-        algorithm:'fangoost'
+        model:'merton'
     })
     return handler.calculator(event, {}, (_err, val)=>{
         const parsedVal=JSON.parse(val.body)
@@ -155,21 +173,23 @@ it('correctly returns monte carlo price', (done)=>{
         rate,
         maturity,
         asset,
-        sigma, 
-        lambda,
-        mu_l,
-        sig_l,
-        speed,
-        v0,
-        eta_v,
-        rho,
+        cf_parameters:{
+            sigma, 
+            lambda,
+            mu_l,
+            sig_l,
+            speed,
+            v0,
+            eta_v,
+            rho,
+        },        
         strikes:[strike],
         quantile:0.01
     }
     const event=createEvent(parameters, {
         optionType:'call',
         sensitivity:'price',
-        algorithm:'fangoost'
+        model:'merton'
     })
     return handler.calculator(event, {}, (_err, val)=>{
         const parsedVal=JSON.parse(val.body)
@@ -198,19 +218,22 @@ it('correctly returns VaR', (done)=>{
         rate,
         maturity,
         asset,
-        sigma, 
-        lambda,
-        mu_l,
-        sig_l,
-        speed,
-        v0,
-        eta_v,
-        rho,
+        cf_parameters:{
+            sigma, 
+            lambda,
+            mu_l,
+            sig_l,
+            speed,
+            v0,
+            eta_v,
+            rho
+        },
         quantile:.01,
         strikes:[]
     }
     const event=createEvent(parameters, {
-        densityType:'riskmetric'
+        densityType:'riskmetric',
+        model:'merton'
     })
     return handler.density(event, {}, (_err, val)=>{
         const parsedVal=JSON.parse(val.body)

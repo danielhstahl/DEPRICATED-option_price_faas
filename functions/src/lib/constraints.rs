@@ -237,18 +237,6 @@ pub fn check_parameters<'a>(
     
     Ok(())
 }
-/*
-pub fn convert_result_to_error<T>(
-    option:&std::option::Option<T>,
-    argument_name:&str
-)->Result<T, io::Error>{
-    match option {
-        Some(x)=>Ok(x),
-        None=>Err(
-            Error::new(ErrorKind::Other, format!("argument {} does not exist", argument_name))
-        )
-    }
-}*/
 
 pub fn throw_no_existing(
     message:&str

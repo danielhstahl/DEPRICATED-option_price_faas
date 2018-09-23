@@ -338,9 +338,12 @@ fn main()-> Result<(), io::Error> {
     let fn_choice:i32=args[1].parse().unwrap();
     let iv_choice:i32=args[2].parse().unwrap();
     let cf_choice:i32=args[3].parse().unwrap();
+
     let include_iv:bool=if iv_choice==1 {true} else {false};
+
     let parameters:constraints::OptionParameters=
         serde_json::from_str(&args[4])?;
+
     constraints::check_parameters(
         &parameters, 
         &constraints::get_constraints()
