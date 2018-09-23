@@ -1,3 +1,6 @@
+//Todo: consider writing a macro to iterate over structs
+//structs will allow for static typing and possibly speed
+//optimizations vs hashmaps
 extern crate cuckoo;
 extern crate serde_json;
 #[macro_use]
@@ -234,6 +237,18 @@ pub fn check_parameters<'a>(
     
     Ok(())
 }
+/*
+pub fn convert_result_to_error<T>(
+    option:&std::option::Option<T>,
+    argument_name:&str
+)->Result<T, io::Error>{
+    match option {
+        Some(x)=>Ok(x),
+        None=>Err(
+            Error::new(ErrorKind::Other, format!("argument {} does not exist", argument_name))
+        )
+    }
+}*/
 
 pub fn throw_no_existing(
     message:&str
