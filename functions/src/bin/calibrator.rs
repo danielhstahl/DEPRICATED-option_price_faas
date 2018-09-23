@@ -64,7 +64,6 @@ fn generate_const_parameters(
     (n, min_strike, max_strike)
 }
 
-//const LARGE_NUMBER:f64=500000.0;
 
 #[derive(Serialize, Deserialize)]
 struct CalibrationParameters{
@@ -84,21 +83,9 @@ where T:Fn(&Complex<f64>, f64, &[f64])->Complex<f64>+'b
         phi_hat.iter().fold(0.0, |accum, (maturity, empirical_cf)|{
             accum+option_calibration::obj_fn_arr(
                 &empirical_cf, &u_array, &params, 
-                maturity, 
+                *maturity, 
                 &cf_fn
-            )/*empirical_cf.iter().zip(u_array)
-                .fold(0.0, |accum_per_mat, (emp_cf, u)|{
-                    let result=cf_fn(
-                        &Complex::new(1.0, *u), 
-                        *maturity, params
-                    );
-                    accum_per_mat+if result.re.is_nan()||result.im.is_nan() {
-                        LARGE_NUMBER
-                    }
-                    else {
-                        (emp_cf-result).norm_sqr()
-                    }         
-                })*/
+            )
         })/((u_array.len()*phi_hat.len()) as f64)        
     }
 }
@@ -185,6 +172,54 @@ fn main()-> Result<(), io::Error> {
             });
             println!("{}", serde_json::to_string_pretty(&json_results).unwrap());*/
         },
+        constraints::CGMY_VANILLA => {
+
+            let ul=vec![
+                p_constraints.C,
+                p_constraints.G,
+                p_constraints.M,
+                p_constraints.Y,
+            ];
+            let cf_fn=|u:&Complex<f64>, t, params:&[f64]|{
+                cf_functions::cgmy_log_risk_neutral_cf(
+                    u, 
+                    params[0],
+                    params[1],
+                    params[2],
+                    params[3],
+                    0.0, 
+                    0.0
+                )*t
+            };
+            let fn_to_calibrate=get_obj_fn(
+                &empirical_cf,
+                &u_array,
+                &cf_fn
+            );
+            let nest_size=25;
+            let total_mc=5000;
+            let tol=0.000001;
+            let (optim, fn_val)=cuckoo::optimize(
+                &fn_to_calibrate, &ul, nest_size, 
+                total_mc, tol, 
+                ||cuckoo::get_rng_system_seed()
+            );
+            for p in optim.iter(){
+                println!("p: {}", p);
+            }
+            println!("fn val: {}", fn_val);
+            /*let optimal_param_map:collections::HashMap<
+                String, f64
+            >=index_map.into_iter().map(|(key, value)|{
+                (key, optimal_parameters[value])
+            }).collect();*/
+
+            /*let json_results=json!({
+                "optimal_parameters":optimal_param_map,
+                "fn_result":fn_at_optimal_parameters
+            });
+            println!("{}", serde_json::to_string_pretty(&json_results).unwrap());*/
+        }
         _ => println!("wow, nothing")
 
     }

@@ -1,7 +1,46 @@
 const handler=require('../../lambda/calibrator')
-const calibratorParams={"asset":217.885,"options_and_rate":[{"maturity":0.01397681858828006,"rate":0.02468880176938642,"options":[{"strike":187.5,"price":36.475},{"strike":192.5,"price":25.424999999999997},{"strike":195,"price":22.925},{"strike":200,"price":18.1},{"strike":202.5,"price":15.625},{"strike":205,"price":13.175},{"strike":207.5,"price":10.775},{"strike":210,"price":8.5},{"strike":212.5,"price":6.375},{"strike":215,"price":4.475},{"strike":217.5,"price":2.875},{"strike":220,"price":1.705},{"strike":222.5,"price":0.9199999999999999},{"strike":225,"price":0.49},{"strike":227.5,"price":0.245},{"strike":230,"price":0.13},{"strike":232.5,"price":0.07500000000000001},{"strike":235,"price":0.045},{"strike":237.5,"price":0.04},{"strike":240,"price":0.02},{"strike":242.5,"price":0.02},{"strike":245,"price":0.02},{"strike":247.5,"price":0.01},{"strike":250,"price":0.005},{"strike":252.5,"price":0.005},{"strike":255,"price":0.005},{"strike":257.5,"price":0.030000000000000002},{"strike":260,"price":0.01},{"strike":265,"price":0.015},{"strike":270,"price":0.005},{"strike":280,"price":0.005}]},{"maturity":0.033154900780060885,"rate":0.024689753032976262,"options":[{"strike":200,"price":18.375},{"strike":202.5,"price":15.925},{"strike":205,"price":13.625},{"strike":207.5,"price":11.425},{"strike":210,"price":9.225000000000001},{"strike":212.5,"price":7.275},{"strike":215,"price":5.449999999999999},{"strike":217.5,"price":3.95},{"strike":220,"price":2.775},{"strike":222.5,"price":1.8050000000000002},{"strike":225,"price":1.16},{"strike":227.5,"price":0.7150000000000001},{"strike":230,"price":0.43999999999999995},{"strike":232.5,"price":0.275},{"strike":235,"price":0.185},{"strike":237.5,"price":0.115},{"strike":240,"price":0.07},{"strike":242.5,"price":0.065},{"strike":245,"price":0.03},{"strike":247.5,"price":0.02},{"strike":250,"price":0.02},{"strike":252.5,"price":0.14},{"strike":255,"price":0.01},{"strike":257.5,"price":0.025},{"strike":260,"price":0.005},{"strike":262.5,"price":0.01},{"strike":265,"price":0.01}]},{"maturity":0.052332982971841704,"rate":0.0246914784423667,"options":[{"strike":180,"price":38.125},{"strike":200,"price":18.625},{"strike":202.5,"price":16.3},{"strike":205,"price":14.075},{"strike":207.5,"price":11.9},{"strike":210,"price":9.850000000000001},{"strike":212.5,"price":7.975},{"strike":215,"price":6.25},{"strike":217.5,"price":4.800000000000001},{"strike":220,"price":3.5250000000000004},{"strike":222.5,"price":2.545},{"strike":225,"price":1.7650000000000001},{"strike":227.5,"price":1.205},{"strike":230,"price":0.825},{"strike":232.5,"price":0.5549999999999999},{"strike":235,"price":0.365},{"strike":237.5,"price":0.245},{"strike":240,"price":0.16999999999999998},{"strike":242.5,"price":0.135},{"strike":245,"price":0.105},{"strike":247.5,"price":0.065},{"strike":250,"price":0.05},{"strike":252.5,"price":0.045},{"strike":255,"price":0.04},{"strike":257.5,"price":0.13}]},{"maturity":0.07151106516362253,"rate":0.02469397799755774,"options":[{"strike":2.5,"price":215.2},{"strike":140,"price":84.07499999999999},{"strike":145,"price":79.1},{"strike":150,"price":72.175},{"strike":155,"price":69.15},{"strike":160,"price":58.075},{"strike":165,"price":53.125},{"strike":170,"price":48.175},{"strike":175,"price":43.224999999999994},{"strike":180,"price":38.3},{"strike":185,"price":33.35},{"strike":190,"price":28.5},{"strike":195,"price":23.7},{"strike":200,"price":19.1},{"strike":205,"price":14.575},{"strike":210,"price":10.475},{"strike":215,"price":6.95},{"strike":220,"price":4.225},{"strike":225,"price":2.34},{"strike":230,"price":1.22},{"strike":235,"price":0.61},{"strike":240,"price":0.315},{"strike":245,"price":0.16499999999999998},{"strike":250,"price":0.09},{"strike":255,"price":0.07},{"strike":260,"price":0.035},{"strike":265,"price":0.015},{"strike":270,"price":0.015},{"strike":275,"price":0.005},{"strike":280,"price":0.005},{"strike":285,"price":0.005},{"strike":290,"price":0.01},{"strike":295,"price":0.005},{"strike":300,"price":0.005},{"strike":305,"price":0.01},{"strike":310,"price":0.01},{"strike":320,"price":0.015},{"strike":325,"price":0.01},{"strike":330,"price":0.01},{"strike":335,"price":0.01},{"strike":340,"price":0.01}]},{"maturity":0.09068914735540334,"rate":0.02469725169854938,"options":[{"strike":200,"price":19.45},{"strike":205,"price":15.1},{"strike":210,"price":11.175},{"strike":212.5,"price":9.375},{"strike":215,"price":7.75},{"strike":217.5,"price":6.300000000000001},{"strike":220,"price":5},{"strike":222.5,"price":3.9},{"strike":225,"price":3.1},{"strike":227.5,"price":2.29},{"strike":230,"price":1.74},{"strike":232.5,"price":1.2650000000000001},{"strike":235,"price":0.95},{"strike":237.5,"price":0.69},{"strike":240,"price":0.51},{"strike":242.5,"price":0.39},{"strike":245,"price":0.28500000000000003},{"strike":247.5,"price":0.21500000000000002},{"strike":250,"price":0.19},{"strike":252.5,"price":0.13},{"strike":255,"price":0.09},{"strike":265,"price":0.045},{"strike":270,"price":0.095}]},{"maturity":0.10986722954718417,"rate":0.024701299545341622,"options":[{"strike":202.5,"price":18.275},{"strike":210,"price":12.7},{"strike":215,"price":9.425},{"strike":217.5,"price":8.024999999999999},{"strike":220,"price":6.800000000000001},{"strike":222.5,"price":5.675},{"strike":225,"price":4.675},{"strike":227.5,"price":3.775},{"strike":230,"price":3.1},{"strike":232.5,"price":2.46},{"strike":235,"price":1.95},{"strike":237.5,"price":1.55},{"strike":240,"price":1.22},{"strike":242.5,"price":0.97},{"strike":245,"price":0.765},{"strike":247.5,"price":0.6000000000000001},{"strike":250,"price":0.495},{"strike":255,"price":0.32}]},{"maturity":0.14822339393074582,"rate":0.024711717676327905,"options":[{"strike":95,"price":123.075},{"strike":105,"price":113.075},{"strike":120,"price":98.15},{"strike":130,"price":88.19999999999999},{"strike":140,"price":78.275},{"strike":145,"price":73.775},{"strike":150,"price":68.375},{"strike":155,"price":63.425},{"strike":160,"price":58.474999999999994},{"strike":165,"price":53.55},{"strike":170,"price":48.65},{"strike":175,"price":43.8},{"strike":180,"price":38.974999999999994},{"strike":185,"price":34.225},{"strike":190,"price":29.575000000000003},{"strike":195,"price":25.1},{"strike":200,"price":20.825000000000003},{"strike":205,"price":16.875},{"strike":210,"price":13.275},{"strike":215,"price":10.149999999999999},{"strike":220,"price":7.45},{"strike":225,"price":5.325},{"strike":230,"price":3.675},{"strike":235,"price":2.4400000000000004},{"strike":240,"price":1.625},{"strike":245,"price":1.065},{"strike":250,"price":0.7150000000000001},{"strike":255,"price":0.49},{"strike":260,"price":0.33499999999999996},{"strike":265,"price":0.24},{"strike":270,"price":0.16},{"strike":275,"price":0.135},{"strike":280,"price":0.08},{"strike":285,"price":0.125},{"strike":290,"price":0.09},{"strike":295,"price":0.025},{"strike":300,"price":0.025},{"strike":305,"price":0.01},{"strike":310,"price":0.01},{"strike":315,"price":0.02},{"strike":320,"price":0.005},{"strike":325,"price":0.015},{"strike":330,"price":0.015},{"strike":340,"price":0.03},{"strike":345,"price":0.02},{"strike":350,"price":0.02}]},{"maturity":0.24411380488964993,"rate":0.02475131055530411,"options":[{"strike":100,"price":118.075},{"strike":135,"price":83.275},{"strike":150,"price":68.425},{"strike":155,"price":63.5},{"strike":160,"price":58.6},{"strike":165,"price":53.7},{"strike":170,"price":48.85},{"strike":175,"price":44.075},{"strike":180,"price":39.325},{"strike":185,"price":34.725},{"strike":190,"price":30.275},{"strike":195,"price":25.975},{"strike":200,"price":21.924999999999997},{"strike":205,"price":18.175},{"strike":210,"price":14.774999999999999},{"strike":215,"price":11.75},{"strike":220,"price":9.125},{"strike":225,"price":6.925},{"strike":230,"price":5.15},{"strike":235,"price":3.75},{"strike":240,"price":2.7},{"strike":245,"price":1.915},{"strike":250,"price":1.365},{"strike":255,"price":0.985},{"strike":260,"price":0.7150000000000001},{"strike":265,"price":0.525},{"strike":270,"price":0.4},{"strike":275,"price":0.31000000000000005},{"strike":280,"price":0.24000000000000002},{"strike":285,"price":0.21500000000000002},{"strike":290,"price":0.155},{"strike":295,"price":0.125},{"strike":300,"price":0.16999999999999998}]},{"maturity":0.3208261336567732,"rate":0.024796919482895873,"options":[{"strike":2.5,"price":215.25},{"strike":60,"price":161.675},{"strike":70,"price":147.97500000000002},{"strike":75,"price":153.05},{"strike":80,"price":141.8},{"strike":85,"price":131.6},{"strike":90,"price":128.075},{"strike":95,"price":123.075},{"strike":97.5,"price":119.19999999999999},{"strike":100,"price":117.825},{"strike":105,"price":113.125},{"strike":110,"price":114.25},{"strike":115,"price":103.175},{"strike":120,"price":97.75},{"strike":125,"price":93.275},{"strike":130,"price":88.35},{"strike":135,"price":83.425},{"strike":140,"price":78.525},{"strike":145,"price":73.625},{"strike":150,"price":69.15},{"strike":155,"price":63.85},{"strike":160,"price":59},{"strike":165,"price":54.2},{"strike":170,"price":49.45},{"strike":175,"price":44.775},{"strike":180,"price":40.15},{"strike":185,"price":35.875},{"strike":190,"price":31.525},{"strike":195,"price":27.4},{"strike":200,"price":23.299999999999997},{"strike":205,"price":19.625},{"strike":210,"price":16.275},{"strike":215,"price":13.15},{"strike":220,"price":10.525},{"strike":225,"price":8.274999999999999},{"strike":230,"price":6.449999999999999},{"strike":235,"price":4.875},{"strike":240,"price":3.675},{"strike":245,"price":2.71},{"strike":250,"price":2.035},{"strike":255,"price":1.525},{"strike":260,"price":1.13},{"strike":265,"price":0.8500000000000001},{"strike":270,"price":0.6599999999999999},{"strike":275,"price":0.515},{"strike":280,"price":0.4},{"strike":285,"price":0.32},{"strike":290,"price":0.28},{"strike":295,"price":0.22},{"strike":300,"price":0.23},{"strike":305,"price":0.19},{"strike":310,"price":0.11},{"strike":315,"price":0.135},{"strike":320,"price":0.105},{"strike":325,"price":0.05},{"strike":330,"price":0.045},{"strike":335,"price":0.055},{"strike":340,"price":0.08499999999999999},{"strike":345,"price":0.045},{"strike":350,"price":0.04},{"strike":355,"price":0.04},{"strike":360,"price":0.035},{"strike":365,"price":0.035},{"strike":370,"price":0.035},{"strike":375,"price":0.02}]},{"maturity":0.3975384624238965,"rate":0.024854914743297228,"options":[{"strike":100,"price":124.25},{"strike":130,"price":92.5},{"strike":145,"price":73.975},{"strike":150,"price":69.125},{"strike":155,"price":64.30000000000001},{"strike":160,"price":59.525000000000006},{"strike":165,"price":54.775},{"strike":170,"price":56.05},{"strike":175,"price":51.425},{"strike":180,"price":41.05},{"strike":185,"price":36.7},{"strike":190,"price":32.55},{"strike":195,"price":28.575},{"strike":200,"price":24.924999999999997},{"strike":205,"price":21.325},{"strike":210,"price":18.1},{"strike":215,"price":15.3},{"strike":220,"price":12.625},{"strike":225,"price":10.375},{"strike":230,"price":8.375},{"strike":235,"price":6.75},{"strike":240,"price":5.35},{"strike":245,"price":4.225},{"strike":250,"price":3.3},{"strike":255,"price":2.605},{"strike":260,"price":2.04},{"strike":265,"price":1.6},{"strike":270,"price":1.2650000000000001},{"strike":275,"price":1.01},{"strike":280,"price":0.81},{"strike":285,"price":0.6599999999999999},{"strike":290,"price":0.54},{"strike":295,"price":0.44999999999999996},{"strike":300,"price":0.385},{"strike":310,"price":0.28},{"strike":320,"price":0.21999999999999997}]},{"maturity":0.5674014761225267,"rate":0.025027411733852766,"options":[{"strike":170,"price":51.275},{"strike":180,"price":42.599999999999994},{"strike":185,"price":38.474999999999994},{"strike":190,"price":34.5},{"strike":195,"price":31},{"strike":200,"price":27.424999999999997},{"strike":205,"price":23.924999999999997},{"strike":210,"price":20.825},{"strike":215,"price":17.950000000000003},{"strike":220,"price":15.35},{"strike":225,"price":13.1},{"strike":230,"price":11},{"strike":235,"price":9.2},{"strike":240,"price":7.625},{"strike":245,"price":6.325},{"strike":250,"price":5.199999999999999},{"strike":255,"price":4.275},{"strike":260,"price":3.4749999999999996},{"strike":265,"price":2.8600000000000003},{"strike":270,"price":2.325},{"strike":275,"price":1.92},{"strike":280,"price":1.5899999999999999},{"strike":285,"price":1.3},{"strike":290,"price":1.1},{"strike":295,"price":0.9299999999999999},{"strike":300,"price":0.79},{"strike":305,"price":0.6799999999999999},{"strike":320,"price":0.44999999999999996},{"strike":325,"price":0.4},{"strike":330,"price":0.51},{"strike":335,"price":0.315},{"strike":340,"price":0.385},{"strike":345,"price":0.345},{"strike":350,"price":0.235},{"strike":355,"price":0.28},{"strike":360,"price":0.255},{"strike":375,"price":0.155},{"strike":380,"price":0.1},{"strike":385,"price":0.085},{"strike":390,"price":0.155},{"strike":395,"price":0.15},{"strike":400,"price":0.125},{"strike":405,"price":0.125},{"strike":420,"price":0.135},{"strike":425,"price":0.125}]},{"maturity":0.7427439418759513,"rate":0.025269174283622135,"options":[{"strike":90,"price":128.175},{"strike":100,"price":118.425},{"strike":110,"price":108.69999999999999},{"strike":120,"price":99},{"strike":125,"price":103.375},{"strike":130,"price":89.4},{"strike":135,"price":75.125},{"strike":140,"price":79.875},{"strike":145,"price":84.2},{"strike":150,"price":70.525},{"strike":155,"price":65.92500000000001},{"strike":160,"price":61.425},{"strike":165,"price":56.95},{"strike":170,"price":52.65},{"strike":175,"price":48.425},{"strike":180,"price":44.35},{"strike":185,"price":40.425},{"strike":190,"price":36.675},{"strike":195,"price":33.275000000000006},{"strike":200,"price":30},{"strike":205,"price":26.6},{"strike":210,"price":23.65},{"strike":215,"price":20.85},{"strike":220,"price":18.275},{"strike":225,"price":16.05},{"strike":230,"price":13.899999999999999},{"strike":235,"price":12},{"strike":240,"price":10.325},{"strike":245,"price":8.875},{"strike":250,"price":7.575},{"strike":255,"price":6.475},{"strike":260,"price":5.525},{"strike":265,"price":4.699999999999999},{"strike":270,"price":3.95},{"strike":275,"price":3.375},{"strike":280,"price":2.865},{"strike":285,"price":2.46},{"strike":290,"price":2.09},{"strike":295,"price":1.79},{"strike":300,"price":1.55},{"strike":310,"price":1.1600000000000001},{"strike":320,"price":0.895},{"strike":330,"price":0.72},{"strike":340,"price":0.5900000000000001}]},{"maturity":1.318086407629376,"rate":0.02645901565649143,"options":[{"strike":80,"price":144.15},{"strike":85,"price":131.8},{"strike":90,"price":134.6},{"strike":95,"price":129.8},{"strike":100,"price":118.82499999999999},{"strike":105,"price":120.375},{"strike":110,"price":109.775},{"strike":115,"price":105.15},{"strike":120,"price":106.375},{"strike":125,"price":96},{"strike":130,"price":91.475},{"strike":135,"price":87},{"strike":140,"price":82.35},{"strike":145,"price":77.55000000000001},{"strike":150,"price":73.32499999999999},{"strike":155,"price":69.575},{"strike":160,"price":65.625},{"strike":165,"price":61.625},{"strike":170,"price":57.7},{"strike":175,"price":54.35},{"strike":180,"price":50.25},{"strike":185,"price":46.825},{"strike":190,"price":43.65},{"strike":195,"price":40.175},{"strike":200,"price":37.1},{"strike":205,"price":34.1},{"strike":210,"price":31.4},{"strike":215,"price":28.8},{"strike":220,"price":26.25},{"strike":225,"price":23.975},{"strike":230,"price":21.675},{"strike":235,"price":19.6},{"strike":240,"price":17.825000000000003},{"strike":245,"price":16.025},{"strike":250,"price":14.425},{"strike":255,"price":13},{"strike":260,"price":11.7},{"strike":270,"price":9.425},{"strike":280,"price":7.6},{"strike":290,"price":6.1},{"strike":300,"price":4.975},{"strike":310,"price":3.9749999999999996},{"strike":320,"price":3.275},{"strike":330,"price":2.6799999999999997},{"strike":340,"price":2.19}]},{"maturity":1.740004215848554,"rate":0.02732188823706506,"options":[{"strike":85,"price":134},{"strike":90,"price":127.1},{"strike":95,"price":124.55},{"strike":100,"price":120},{"strike":105,"price":118.4},{"strike":115,"price":107.75},{"strike":120,"price":101.525},{"strike":125,"price":97.5},{"strike":130,"price":93},{"strike":135,"price":88.75},{"strike":140,"price":85.6},{"strike":145,"price":85.525},{"strike":150,"price":76.5},{"strike":155,"price":77},{"strike":160,"price":68.5},{"strike":165,"price":64.5},{"strike":170,"price":61.05},{"strike":175,"price":57.400000000000006},{"strike":180,"price":54.2},{"strike":185,"price":50.8},{"strike":190,"price":47.75},{"strike":195,"price":44.675},{"strike":200,"price":42.35},{"strike":205,"price":39.1},{"strike":210,"price":36.2},{"strike":215,"price":33.400000000000006},{"strike":220,"price":31.875},{"strike":225,"price":28.975},{"strike":230,"price":26.8},{"strike":235,"price":24.799999999999997},{"strike":240,"price":23.175},{"strike":245,"price":20.75},{"strike":250,"price":18.95},{"strike":260,"price":15.975000000000001},{"strike":270,"price":13.5},{"strike":280,"price":11.7},{"strike":290,"price":10.125},{"strike":300,"price":8.375},{"strike":310,"price":7.575},{"strike":320,"price":5.675},{"strike":330,"price":4.925},{"strike":340,"price":4.35}]},{"maturity":2.3153466816019788,"rate":0.02801892979473643,"options":[{"strike":120,"price":103.5},{"strike":140,"price":87.25},{"strike":160,"price":72.25},{"strike":180,"price":58.5},{"strike":200,"price":47.75},{"strike":210,"price":42.75},{"strike":220,"price":37.75},{"strike":225,"price":35.75},{"strike":230,"price":32},{"strike":260,"price":21.5},{"strike":270,"price":20.05},{"strike":330,"price":8.25},{"strike":340,"price":7},{"strike":350,"price":6.775},{"strike":370,"price":4.475},{"strike":380,"price":4.375}]}],
-constraints:{}
+const parse = require('csv-parse')
+const parser=parse({
+    delimiter:',', 
+    cast:true, cast_date:true,
+    columns:true
+})
+const spline=require('cubic-spline')
+const fs=require('fs')
+const yieldCurve=require('./yield_curve.json')
+const asOfDate=Date.parse('2018-09-21')
+const asset=217.66
+const getIntegerArrayBetweenToPoints=(min, max)=>{
+    let arr=[]
+    for(let i=min; i<=max; ++i){
+      arr.push(i)
+    }
+    return arr
 }
+const yearsToMuturityForSpline=getIntegerArrayBetweenToPoints(0, 30)
+
+const ratioForUnixAndJSTimeStamp=1000
+
+const numMSInYears=24*60*60*365*ratioForUnixAndJSTimeStamp
+
+const getPriceFromBidAsk=({bid, ask})=>(bid+ask)*.5
+const getAnnualCurve=data=>data.dataset.data[0]
+const zeroCurveAtMaturities=(maturitiesInYears, annualCurve)=>{
+    annualCurve[0]=0
+    const updateAnnualCurve=annualCurve
+        .map(
+            (v, index)=>v*yearsToMuturityForSpline[index]
+        )
+    return maturitiesInYears.map(
+        maturityInYears=>spline(
+            maturityInYears, 
+            yearsToMuturityForSpline, 
+            updateAnnualCurve
+        )/maturityInYears
+    )
+}
+const convertPercentToNumber=val=>val*.01
+const convertPercentagesToNumber=vals=>vals.map(convertPercentToNumber)
 
 const createEvent=(data, parameters, queryStringParameters)=>({
     body:JSON.stringify(data),
@@ -10,7 +49,81 @@ const createEvent=(data, parameters, queryStringParameters)=>({
 })
 
 it('correctly calls calibrator handler for full model', (done)=>{
-    console.time("calibrator")
+    const annualCurve=convertPercentagesToNumber(getAnnualCurve(yieldCurve))
+    const input=fs.createReadStream('./tests/unit/apploptions.csv')
+    let results=[]
+    input.pipe(parser).on('data', row=>{
+        const updateRow={...row, spread:row.ask-row.bid, price:getPriceFromBidAsk(row)}
+        results.push(updateRow)
+    }).on('end', ()=>{
+        console.log(results)
+        const bestOptions=results.reduce((aggr, {maturity, strike, price, spread})=>{
+            const maturityInt=maturity.getTime()
+            if(!aggr[maturityInt]){
+                return {
+                    ...aggr,
+                    [maturityInt]:{
+                        [strike]:{
+                            price,
+                            spread
+                        }
+                    }
+                }
+            }
+            else if(!aggr[maturityInt][strike]||aggr[maturityInt][strike].spread>spread){
+                return {
+                    ...aggr,
+                    [maturityInt]:{
+                        ...aggr[maturityInt],
+                        [strike]:{
+                            price,
+                            spread
+                        }
+                    }
+                }
+            }
+            return aggr
+        }, {})
+        const maturities=Object.keys(bestOptions).filter((_v, i)=>i>0) //ignore the first one which is super close
+        const maturitiesInYears=maturities.map(maturity=>(new Date(parseInt(maturity))-asOfDate)/numMSInYears)
+        console.log(maturitiesInYears)
+        const zeroCurve=zeroCurveAtMaturities(maturitiesInYears, annualCurve)
+        const prettyResults=maturities.reduce((aggr, maturity, index)=>{
+            const priceAndStrike=Object.keys(bestOptions[maturity]).map(strike=>({
+                strike:parseFloat(strike),
+                price:bestOptions[maturity][strike].price
+            }))
+            return [...aggr, {
+                options:priceAndStrike,
+                maturity:maturitiesInYears[index],
+                rate:zeroCurve[index]            
+            }]
+        }, [])
+        fs.writeFile("./tests/unit/results.json", JSON.stringify({
+            options_and_rate:prettyResults,
+            asset}), err=>{
+            done()
+        })
+        //console.log(prettyResults)
+        /*const event=createEvent({
+            options_and_rate:prettyResults,
+            asset,
+            constraints:{}
+        }, {model:'cgmy'})
+        handler.calibrator(event, {}, (_err, val)=>{
+            console.log(val.body)
+            const parsedVal=JSON.parse(val.body).optimal_parameters
+            expect(parsedVal.sigma).toBeDefined()
+            expect(parsedVal.speed).toBeDefined()
+            expect(parsedVal.eta_v).toBeDefined()
+            expect(parsedVal.rho).toBeDefined()
+            console.timeEnd("calibrator")
+            done()
+        })*/
+        //done()
+    })
+    
+   /* console.time("calibrator")
     const event=createEvent(calibratorParams, {model:'merton_leverage'})
     handler.calibrator(event, {}, (_err, val)=>{
         console.log(val.body)
@@ -21,7 +134,7 @@ it('correctly calls calibrator handler for full model', (done)=>{
         expect(parsedVal.rho).toBeDefined()
         console.timeEnd("calibrator")
         done()
-    })
+    })*/
 }, 80000)
 
 /*

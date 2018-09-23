@@ -48,6 +48,10 @@ pub struct ParameterConstraints{
     pub lambda:cuckoo::UpperLower,
     pub mu_l:cuckoo::UpperLower,
     pub sig_l:cuckoo::UpperLower,
+    pub C:cuckoo::UpperLower,
+    pub G:cuckoo::UpperLower,
+    pub M:cuckoo::UpperLower,
+    pub Y:cuckoo::UpperLower,
     pub sigma:cuckoo::UpperLower,
     pub v0:cuckoo::UpperLower,
     pub speed:cuckoo::UpperLower,
@@ -74,6 +78,10 @@ pub fn get_constraints()->ParameterConstraints {
         asset:cuckoo::UpperLower{lower:0.0, upper:1000000.0},
         maturity:cuckoo::UpperLower{lower:0.0, upper:1000000.0},
         num_u:cuckoo::UpperLower{lower:5.0, upper:10.0},
+        C:cuckoo::UpperLower{lower:0.01, upper:2.0},
+        G:cuckoo::UpperLower{lower:0.01, upper:20.0},
+        M:cuckoo::UpperLower{lower:0.01, upper:20.0},
+        Y:cuckoo::UpperLower{lower:-1.0, upper:2.0},
         quantile:cuckoo::UpperLower{lower:0.0, upper:1.0}
     }
 }

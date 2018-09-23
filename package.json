@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/phillyfan1138/option_price_faas#readme",
   "dependencies": {
+    "csv": "^3.1.0",
     "cubic-spline": "^1.0.4"
   },
   "devDependencies": {
