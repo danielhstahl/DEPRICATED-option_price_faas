@@ -1,23 +1,9 @@
-# Welcome to Serverless!
-#
-# This file is the main config file for your service.
-# It's very minimal at this point and uses default values.
-# You can always add more config options for more control.
-# We've included some commented out config examples here.
-# Just uncomment any of them to get that config option.
-#
-# For full config options, check the docs:
-#    docs.serverless.com
-#
-# Happy Coding!
-
 service: option-price-faas
-
 
 provider:
   name: aws
   runtime: nodejs8.10
-
+  stage: prd
 
 package:
   exclude:
@@ -32,11 +18,9 @@ package:
     - serverless.yml
     - .travis.yml
   include:
-   - functions/target/x86_64-unknown-linux-musl/release/calibrator
    - functions/target/x86_64-unknown-linux-musl/release/output_constraints
    - functions/target/x86_64-unknown-linux-musl/release/pricer
    - lambda/**
-   - node_modules/cubic-spline/**
 functions:
   calculator:
     handler: lambda/pricer.calculator
@@ -76,51 +60,4 @@ functions:
             parameters:
               paths:
                 model: true
-  calibrator:
-    memorySize: 3008 # optional, in MB, default is 1024
-    timeout: 30 # optional, in seconds, default is 6
-    handler: lambda/calibrator.calibrator
-    events:
-      - http:
-          path: v1/{model}/calibrator
-          method: post
-          cors: true
-          request:
-            parameters:
-              paths:
-                model: true
-  ## no need for "v1" on the APIs since this will be for internal use only
-  getExpirationDates:
-    handler: lambda/marketData.getExpirationDates
-    events:
-      - http:
-          path: options/{ticker}/maturities
-          method: get
-          cors: true
-          request:
-            parameters:
-              paths:
-                ticker: true
-
-  getOptionPrices:
-    handler: lambda/marketData.getOptionPrices
-    events:
-      - http:
-          path: options/{ticker}/prices
-          method: get
-          cors: true
-          request:
-            parameters:
-              paths:
-                ticker: true
-              querystrings:
-                minOpenInterest: false
-                minRelativeBidAskSpread: false
-  getFortune500:
-    handler: lambda/marketData.getFortune500
-    events:
-      - http:
-          path: options/tickers
-          method: get
-          cors: true
   
