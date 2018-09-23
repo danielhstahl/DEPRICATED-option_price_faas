@@ -188,29 +188,159 @@ fn adjust_density<T>(
     print_density(&x_domain, &option_range)
 }
 
-
-fn get_vol_from_parameters(
-    parameters:&constraints::OptionParameters
-)->f64{
-    let constraints::OptionParameters {
-        sigma, lambda, mu_l, 
-        sig_l, maturity, ..
-    }=parameters;
-    get_jump_diffusion_vol(
-        *sigma, *lambda,
-        *mu_l, *sig_l, 
-        *maturity
-    )
-}
 const MAX_SIMS:usize=100;
 const PRECISION:f64=0.0000001;
+
+fn get_functions(
+    fn_choice:i32,
+    include_iv:bool,
+    num_u:usize,
+    asset:f64,
+    rate:f64,
+    maturity:f64,
+    quantile:f64,
+    x_max_density:f64,
+    strikes:&[f64],
+    inst_cf:&(Fn(&Complex<f64>)->Complex<f64>+std::marker::Sync)
+)->Result<(), io::Error>{
+    match fn_choice {
+        CALL_PRICE => if include_iv {
+            print_call_prices(
+                &strikes,
+                &option_pricing::fang_oost_call_price(
+                    num_u, asset, 
+                    &strikes, rate, 
+                    maturity, &inst_cf
+                ),
+                asset, rate, maturity
+            );
+            Ok(())
+        } else {
+            print_greeks(
+                &strikes,
+                &option_pricing::fang_oost_call_price(
+                    num_u, asset, 
+                    &strikes, rate, 
+                    maturity, &inst_cf
+                )
+            );
+            Ok(())
+        },
+        PUT_PRICE => if include_iv {
+            print_put_prices(
+                &strikes,
+                &option_pricing::fang_oost_put_price(
+                    num_u, asset, 
+                    &strikes, rate, 
+                    maturity, &inst_cf
+                ),
+                asset, rate, maturity
+            );
+            Ok(())
+        } else {
+            print_greeks(
+                &strikes,
+                &option_pricing::fang_oost_put_price(
+                    num_u, asset, 
+                    &strikes, rate, 
+                    maturity, &inst_cf
+                )
+            );
+            Ok(())
+        },
+        CALL_DELTA => {
+            print_greeks(
+                &strikes,
+                &option_pricing::fang_oost_call_delta(
+                    num_u, asset, 
+                    &strikes, rate, 
+                    maturity, &inst_cf
+                )
+            );
+            Ok(())
+        },
+        PUT_DELTA => {
+            print_greeks(
+                &strikes,
+                &option_pricing::fang_oost_put_delta(
+                    num_u, asset, 
+                    &strikes, rate, 
+                    maturity, &inst_cf
+                )
+            );
+            Ok(())
+        },
+        CALL_GAMMA => {
+            print_greeks(
+                &strikes,
+                &option_pricing::fang_oost_call_gamma(
+                    num_u, asset, 
+                    &strikes, rate, 
+                    maturity, &inst_cf
+                )
+            );
+            Ok(())
+        },
+        PUT_GAMMA => {
+            print_greeks(
+                &strikes,
+                &option_pricing::fang_oost_put_gamma(
+                    num_u, asset, 
+                    &strikes, rate, 
+                    maturity, &inst_cf
+                )
+            );
+            Ok(())
+        },
+        CALL_THETA => {
+            print_greeks(
+                &strikes,
+                &option_pricing::fang_oost_call_theta(
+                    num_u, asset, 
+                    &strikes, rate, 
+                    maturity, &inst_cf
+                )
+            );
+            Ok(())
+        },
+        PUT_THETA => {
+            print_greeks(
+                &strikes,
+                &option_pricing::fang_oost_put_theta(
+                    num_u, asset, 
+                    &strikes, rate, 
+                    maturity, &inst_cf
+                )
+            );
+            Ok(())
+        },
+        DENSITY => {
+            adjust_density(
+                num_u, x_max_density, &inst_cf
+            );
+            Ok(())
+        },
+        RISK_MEASURES => {
+            print_risk_measures(
+                cf_dist_utils::get_expected_shortfall_and_value_at_risk(
+                    quantile, num_u, -x_max_density, 
+                    x_max_density, MAX_SIMS, PRECISION, &inst_cf
+                )
+            );
+            Ok(())
+        },
+        _ => constraints::throw_no_existing("No function selected!")
+    }
+}
+
 fn main()-> Result<(), io::Error> {
     let args: Vec<String> = env::args().collect();
     let fn_choice:i32=args[1].parse().unwrap();
     let iv_choice:i32=args[2].parse().unwrap();
     let cf_choice:i32=args[3].parse().unwrap();
     let include_iv:bool=if iv_choice==1 {true} else {false};
-    let mut parameters:constraints::OptionParameters=serde_json::from_str(&args[4])?;
+    let parameters:constraints::OptionParameters=
+        serde_json::from_str(&args[4])?;
     constraints::check_parameters(
         &parameters, 
         &constraints::get_constraints()
@@ -225,57 +355,68 @@ fn main()-> Result<(), io::Error> {
         asset,
         quantile,
         num_u:num_u_base,
+        strikes,
         cf_parameters,
         ..
     }=parameters; //destructure
     
     let num_u=(2 as usize).pow(num_u_base as u32);
-    
-    let (strikes, inst_cf)=match cf_type {
+    match cf_choice {
         constraints::CGMY=>{
             constraints::check_cf_parameters(
-                cf_parameters, 
-                constraints::get_cgmy_constraints()
+                &cf_parameters, 
+                &constraints::get_cgmy_constraints()
             )?;
-            let c=cf_parameters.get("c")?;
-            let g=cf_parameters.get("g")?;
-            let m=cf_parameters.get("m")?;
-            let y=cf_parameters.get("y")?;
-            let sigma=cf_parameters.get("sigma")?;
-            let v0=cf_parameters.get("v0")?;
-            let speed=cf_parameters.get("speed")?;
-            let eta_v=cf_parameters.get("eta_v")?;
-            let rho=cf_parameters.get("rho")?;
+            let c=cf_parameters["c"]; //guaranteed to exist from the check
+            let g=cf_parameters["g"];
+            let m=cf_parameters["m"];
+            let y=cf_parameters["y"];
+            let sigma=cf_parameters["sigma"];
+            let v0=cf_parameters["v0"];
+            let speed=cf_parameters["speed"];
+            let eta_v=cf_parameters["eta_v"];
+            let rho=cf_parameters["rho"];
 
             let x_max_density=cf_functions::cgmy_diffusion_vol(
                 sigma, c, g, m, y, maturity
             )*density_scale;
             let x_max_options=x_max_density*option_scale_over_density;
-            parameters.extend_strikes(x_max_options);
+            //parameters.extend_strikes(x_max_options);
 
-            (
-                Vec::from(parameters.strikes),
-                cf_functions::cgmy_time_change_cf(
-                    maturity, rate, c, g, m, y, sigma, v0,
-                    speed, eta_v, rho
-                )
+            let inst_cf=cf_functions::cgmy_time_change_cf(
+                maturity, rate, c, g, m, y, sigma, v0,
+                speed, eta_v, rho
+            );
+            get_functions(
+                fn_choice,
+                include_iv,
+                num_u,
+                asset,
+                rate,
+                maturity,
+                quantile,
+                x_max_density,
+                &constraints::extend_strikes(
+                    strikes,
+                    asset, 
+                    x_max_options
+                ),
+                &inst_cf
             )
         },
         constraints::MERTON=>{
             constraints::check_cf_parameters(
-                cf_parameters, 
-                constraints::get_merton_constraints()
+                &cf_parameters, 
+                &constraints::get_merton_constraints()
             )?;
-            
-            
-            let lambda=cf_parameters.get("lambda")?;
-            let mu_l=cf_parameters.get("mu_l")?;
-            let sig_l=cf_parameters.get("sig_l")?;
-            let sigma=cf_parameters.get("sigma")?;
-            let v0=cf_parameters.get("v0")?;
-            let speed=cf_parameters.get("speed")?;
-            let eta_v=cf_parameters.get("eta_v")?;
-            let rho=cf_parameters.get("rho")?;
+            let lambda=cf_parameters["lambda"];
+            let mu_l=cf_parameters["mu_l"];
+            let sig_l=cf_parameters["sig_l"];
+            let sigma=cf_parameters["sigma"];
+            let v0=cf_parameters["v0"];
+            let speed=cf_parameters["speed"];
+            let eta_v=cf_parameters["eta_v"];
+            let rho=cf_parameters["rho"];
             let x_max_density=cf_functions::jump_diffusion_vol(
                 sigma,
                 lambda,
@@ -286,143 +427,70 @@ fn main()-> Result<(), io::Error> {
 
             let x_max_options=x_max_density*option_scale_over_density;
 
-            parameters.extend_strikes(x_max_options);
+            //parameters.extend_strikes(x_max_options);
 
-            (
-                Vec::from(parameters.strikes),
-                cf_functions::merton_time_change_cf(
-                    maturity, rate, lambda, mu_l, sig_l, sigma, v0,
-                    speed, eta_v, rho
-                )
+            //let strikes=Vec::from(parameters.strikes);
+            let inst_cf=cf_functions::merton_time_change_cf(
+                maturity, rate, lambda, mu_l, sig_l, sigma, v0,
+                speed, eta_v, rho
+            );
+            get_functions(
+                fn_choice,
+                include_iv,
+                num_u,
+                asset,
+                rate,
+                maturity,
+                quantile,
+                x_max_density,
+                &constraints::extend_strikes(
+                    strikes,
+                    asset, 
+                    x_max_options
+                ),
+                &inst_cf
             )
         },
         constraints::HESTON=>{
             constraints::check_cf_parameters(
-                cf_parameters, 
-                constraints::get_heston_constraints()
+                &cf_parameters, 
+                &constraints::get_heston_constraints()
             )?;
 
-            let sigma=cf_parameters.get("sigma")?;
-            let v0=cf_parameters.get("v0")?;
-            let speed=cf_parameters.get("speed")?;
-            let eta_v=cf_parameters.get("eta_v")?;
-            let rho=cf_parameters.get("rho")?;
+            let sigma=cf_parameters["sigma"];
+            let v0=cf_parameters["v0"];
+            let speed=cf_parameters["speed"];
+            let eta_v=cf_parameters["eta_v"];
+            let rho=cf_parameters["rho"];
 
             let x_max_density=sigma*density_scale;
             let x_max_options=x_max_density*option_scale_over_density;
-            parameters.extend_strikes(x_max_options);
+            //parameters.extend_strikes(x_max_options);
 
-            (
-                Vec::from(parameters.strikes),
-                cf_functions::heston_cf(
-                    maturity, rate, sigma, v0,
-                    speed, eta_v, rho
-                )
-            )
-        },
-    };
-
-
-    match fn_choice {
-        CALL_PRICE => if include_iv {
-            print_call_prices(
-                &strikes,
-                &option_pricing::fang_oost_call_price(
-                    num_u, asset, 
-                    &strikes, rate, 
-                    maturity, &inst_cf
+            //let strikes=Vec::from(parameters.strikes);
+            let inst_cf=cf_functions::heston_cf(
+                maturity, rate, sigma, v0,
+                speed, eta_v, rho
+            );
+            get_functions(
+                fn_choice,
+                include_iv,
+                num_u,
+                asset,
+                rate,
+                maturity,
+                quantile,
+                x_max_density,
+                &constraints::extend_strikes(
+                    strikes,
+                    asset, 
+                    x_max_options
                 ),
-                asset, rate, maturity
-            )
-        } else {
-            print_greeks(
-                &strikes,
-                &option_pricing::fang_oost_call_price(
-                    num_u, asset, 
-                    &strikes, rate, 
-                    maturity, &inst_cf
-                )
+                &inst_cf
             )
         },
-        PUT_PRICE => if include_iv {
-            print_put_prices(
-                &strikes,
-                &option_pricing::fang_oost_put_price(
-                    num_u, asset, 
-                    &strikes, rate, 
-                    maturity, &inst_cf
-                ),
-                asset, rate, maturity
-            )
-        } else {
-            print_greeks(
-                &strikes,
-                &option_pricing::fang_oost_put_price(
-                    num_u, asset, 
-                    &strikes, rate, 
-                    maturity, &inst_cf
-                )
-            )
-        },
-        CALL_DELTA => print_greeks(
-                &strikes,
-                &option_pricing::fang_oost_call_delta(
-                    num_u, asset, 
-                    &strikes, rate, 
-                    maturity, &inst_cf
-                )
-            ),
-        PUT_DELTA => print_greeks(
-                &strikes,
-                &option_pricing::fang_oost_put_delta(
-                    num_u, asset, 
-                    &strikes, rate, 
-                    maturity, &inst_cf
-                )
-            ),
-        CALL_GAMMA => print_greeks(
-                &strikes,
-                &option_pricing::fang_oost_call_gamma(
-                    num_u, asset, 
-                    &strikes, rate, 
-                    maturity, &inst_cf
-                )
-            ),
-        PUT_GAMMA => print_greeks(
-                &strikes,
-                &option_pricing::fang_oost_put_gamma(
-                    num_u, asset, 
-                    &strikes, rate, 
-                    maturity, &inst_cf
-                )
-            ),
-        CALL_THETA => print_greeks(
-                &strikes,
-                &option_pricing::fang_oost_call_theta(
-                    num_u, asset, 
-                    &strikes, rate, 
-                    maturity, &inst_cf
-                )
-            ),
-        PUT_THETA => print_greeks(
-                &strikes,
-                &option_pricing::fang_oost_put_theta(
-                    num_u, asset, 
-                    &strikes, rate, 
-                    maturity, &inst_cf
-                )
-            ),
-        DENSITY => adjust_density(
-                num_u, x_max_density, &inst_cf
-            ),
-        RISK_MEASURES => print_risk_measures(
-                cf_dist_utils::get_expected_shortfall_and_value_at_risk(
-                    quantile, num_u, -x_max_density, 
-                    x_max_density, MAX_SIMS, PRECISION, &inst_cf
-                )
-            ),
-        _ => println!("wow, nothing")
-    }
+        _ => constraints::throw_no_existing("No CF function chosen!")
+    }?;
     Ok(())
 }
 
@@ -442,7 +510,7 @@ mod tests {
         let seed:[u8; 32]=[2; 32];
         let mut rng_seed=get_rng_seed(seed);
         let uniform=Uniform::new(0.0f64, 1.0);
-        let constr=constraints::get_constraints();
+        let constr=constraints::get_merton_constraints();
         let asset=178.46;
         let num_u=256;
         let strikes=vec![
@@ -456,43 +524,43 @@ mod tests {
         let mut num_bad:usize=0;
         (0..num_total).for_each(|_|{
             let lambda_sim=get_over_region(
-                constr.lambda.lower,
-                constr.lambda.upper,
+                constr["lambda"].lower,
+                constr["lambda"].upper,
                 uniform.sample(&mut rng_seed)
             );
             let mu_l_sim=get_over_region(
-                constr.mu_l.lower,
-                constr.mu_l.upper,
+                constr["mu_l"].lower,
+                constr["mu_l"].upper,
                 uniform.sample(&mut rng_seed)
             );
             let sig_l_sim=get_over_region(
-                constr.sig_l.lower,
-                constr.sig_l.upper,
+                constr["sig_l"].lower,
+                constr["sig_l"].upper,
                 uniform.sample(&mut rng_seed)
             );
             let sigma_sim=get_over_region(
-                constr.sigma.lower,
-                constr.sigma.upper,
+                constr["sigma"].lower,
+                constr["sigma"].upper,
                 uniform.sample(&mut rng_seed)
             );
             let v0_sim=get_over_region(
-                constr.v0.lower,
-                constr.v0.upper,
+                constr["v0"].lower,
+                constr["v0"].upper,
                 uniform.sample(&mut rng_seed)
             );
             let speed_sim=get_over_region(
-                constr.speed.lower,
-                constr.speed.upper,
+                constr["speed"].lower,
+                constr["speed"].upper,
                 uniform.sample(&mut rng_seed)
             );
             let eta_v_sim=get_over_region(
-                constr.eta_v.lower,
-                constr.eta_v.upper,
+                constr["eta_v"].lower,
+                constr["eta_v"].upper,
                 uniform.sample(&mut rng_seed)
             );
             let rho_sim=get_over_region(
-                constr.rho.lower,
-                constr.rho.upper,
+                constr["rho"].lower,
+                constr["rho"].upper,
                 uniform.sample(&mut rng_seed)
             );
 
@@ -542,7 +610,7 @@ mod tests {
         let speed=0.87;
         let v0=1.2104;
         
-        let x_max=get_jump_diffusion_vol(
+        let x_max=cf_functions::jump_diffusion_vol(
             sigma, lambda,
             mu_l, sig_l, 
             maturity
