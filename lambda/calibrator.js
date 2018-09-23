@@ -5,9 +5,9 @@ const {calibratorKeys} =require('./constants/keys')
 const calibrator=spawnBinary('calibrator')
 
 module.exports.calibrator=(event, _context, callback)=>{
-    const {calibration}=event.pathParameters
+    const {model}=event.pathParameters
     calibrator(
-        calibratorKeys[calibration], 
+        calibratorKeys[model], 
         event.body, 
         transformCallback(callback)
     )

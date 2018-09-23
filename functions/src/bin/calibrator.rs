@@ -64,7 +64,7 @@ fn generate_const_parameters(
     (n, min_strike, max_strike)
 }
 
-const LARGE_NUMBER:f64=500000.0;
+//const LARGE_NUMBER:f64=500000.0;
 
 #[derive(Serialize, Deserialize)]
 struct CalibrationParameters{
@@ -74,7 +74,7 @@ struct CalibrationParameters{
 }
 
 fn get_obj_fn<'a, 'b:'a, T>(
-    phi_hat:&'b [(f64, Vec<Complex<f64>>)], //do we really want to borrow/move this??
+    phi_hat:&'b [(f64, Vec<Complex<f64>>)], 
     u_array:&'b [f64],
     cf_fn:T
 )->impl Fn(&[f64])->f64+'a
@@ -82,7 +82,11 @@ where T:Fn(&Complex<f64>, f64, &[f64])->Complex<f64>+'b
 {
     move |params|{
         phi_hat.iter().fold(0.0, |accum, (maturity, empirical_cf)|{
-            accum+empirical_cf.iter().zip(u_array)
+            accum+option_calibration::obj_fn_arr(
+                &empirical_cf, &u_array, &params, 
+                maturity, 
+                &cf_fn
+            )/*empirical_cf.iter().zip(u_array)
                 .fold(0.0, |accum_per_mat, (emp_cf, u)|{
                     let result=cf_fn(
                         &Complex::new(1.0, *u), 
@@ -94,7 +98,7 @@ where T:Fn(&Complex<f64>, f64, &[f64])->Complex<f64>+'b
                     else {
                         (emp_cf-result).norm_sqr()
                     }         
-                })
+                })*/
         })/((u_array.len()*phi_hat.len()) as f64)        
     }
 }

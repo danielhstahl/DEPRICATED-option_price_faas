@@ -42,7 +42,7 @@ functions:
     handler: lambda/pricer.calculator
     events:
       - http:
-          path: v1/calculator/{optionType}/{sensitivity}
+          path: v1/{model}/calculator/{optionType}/{sensitivity}
           method: post
           cors: true
           request:
@@ -50,39 +50,45 @@ functions:
               paths:
                 optionType: true
                 sensitivity: true
+                model: true
               querystrings:
                 includeImpliedVolatility: false
   density:
     handler: lambda/pricer.density
     events:
       - http:
-          path: v1/density/{densityType}
+          path: v1/{model}/density/{densityType}
           method: post
           cors: true
           request:
             parameters:
               paths:
                 densityType: true
+                model: true
   defaultParameters:
     handler: lambda/pricer.constraints
     events:
       - http:
-          path: v1/parameters/parameter_ranges
+          path: v1/{model}/parameters/parameter_ranges
           method: get
           cors: true
+          request:
+            parameters:
+              paths:
+                model: true
   calibrator:
     memorySize: 3008 # optional, in MB, default is 1024
     timeout: 30 # optional, in seconds, default is 6
     handler: lambda/calibrator.calibrator
     events:
       - http:
-          path: v1/calibrator/{calibration}
+          path: v1/{model}/calibrator
           method: post
           cors: true
           request:
             parameters:
               paths:
-                calibration: true
+                model: true
   ## no need for "v1" on the APIs since this will be for internal use only
   getExpirationDates:
     handler: lambda/marketData.getExpirationDates
@@ -100,14 +106,13 @@ functions:
     handler: lambda/marketData.getOptionPrices
     events:
       - http:
-          path: options/{ticker}/prices/{asOfDate}
+          path: options/{ticker}/prices
           method: get
           cors: true
           request:
             parameters:
               paths:
                 ticker: true
-                asOfDate: true
               querystrings:
                 minOpenInterest: false
                 minRelativeBidAskSpread: false
