@@ -167,7 +167,7 @@ it('correctly errors when not enough parameters', (done)=>{
         model:'merton'
     })
     handler.density(event, {}, (_err, val)=>{
-        expect(val.body.trim()).toEqual('Error: Custom { kind: Other, error: StringError("Parameter v0 does not exist") }')
+        expect(JSON.parse(val.body).err.trim()).toEqual('Error: Custom { kind: Other, error: StringError("Parameter v0 does not exist") }')
         done()
     })
 })
@@ -196,7 +196,7 @@ it('correctly errors when out of bounds', (done)=>{
         model:'merton'
     })
     handler.density(event, {}, (_err, val)=>{
-        expect(val.body.trim()).toEqual('Error: Custom { kind: Other, error: StringError("Parameter sigma out of bounds") }')
+        expect(JSON.parse(val.body).err.trim()).toEqual('Error: Custom { kind: Other, error: StringError("Parameter sigma out of bounds") }')
         done()
     })
 })

@@ -14,7 +14,7 @@ module.exports.errMsg=errMsg
 module.exports.msg=msg
 const transformCallback=callback=>(err, res)=>{
     if(err){
-      return callback(null, errMsg(err))
+      return callback(null, errMsg(JSON.stringify({err})))
     }
     return callback(null, msg(res))
 }
