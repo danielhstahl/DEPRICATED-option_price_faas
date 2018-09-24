@@ -1,0 +1,81 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "properties": {
+      "num_u": {
+        "type": "integer"
+      },
+      "rate": {
+        "type": "number"
+      },
+      "maturity": {
+        "type": "number"
+      },
+      "asset": {
+        "type": "number"
+      },
+      "cf_parameters": {
+        "type": "object",
+        "properties": {
+          "sigma": {
+            "type": "number"
+          },
+          "c": {
+            "type": "number"
+          },
+          "g": {
+            "type": "number"
+          },
+          "m": {
+            "type": "number"
+          },
+          "y": {
+            "type": "number"
+          },
+          "mu_l": {
+            "type": "number"
+          },
+          "sig_l": {
+            "type": "number"
+          },
+          "lambda": {
+            "type": "number"
+          },
+          "speed": {
+            "type": "number"
+          },
+          "v0": {
+            "type": "number"
+          },
+          "eta_v": {
+            "type": "number"
+          },
+          "rho": {
+            "type": "number"
+          }
+        },
+        "required": [
+        ]
+      },
+      "strikes": {
+        "type": "array",
+        "items": [
+          {
+            "type": "number"
+          }
+        ]
+      },
+      "quantile": {
+        "type": "number"
+      }
+    },
+    "required": [
+      "num_u",
+      "rate",
+      "maturity",
+      "asset",
+      "cf_parameters",
+      "strikes",
+      "quantile"
+    ]
+}
