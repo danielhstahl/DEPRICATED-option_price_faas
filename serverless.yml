@@ -116,12 +116,12 @@ functions:
                 schema:
                   type: bool
             methodResponses:
-              - statusCode: 200
+              - statusCode: '200'
                 responseBody:
                   description: Option prices and sensitivites
                 responseModels:
                   application/json: PostOptionsResponse
-              - statusCode: 400
+              - statusCode: '400'
                 responseBody:
                   description: An error message for incorrect request
                 responseModels:
@@ -154,12 +154,12 @@ functions:
                     - merton
                     - heston
             methodResponses:
-              - statusCode: 200
+              - statusCode: '200'
                 responseBody:
                   description: Density
                 responseModels:
                   application/json: PostDensityResponse
-              - statusCode: 400
+              - statusCode: '400'
                 responseBody:
                   description: An error message for incorrect request
                 responseModels:
@@ -192,12 +192,12 @@ functions:
                     - merton
                     - heston
             methodResponses:
-              - statusCode: 200
+              - statusCode: '200'
                 responseBody:
                   description: Value at risk and expected shortfall
                 responseModels:
                   application/json: PostRiskMetricResponse
-              - statusCode: 400
+              - statusCode: '400'
                 responseBody:
                   description: An error message for incorrect request
                 responseModels:
@@ -226,12 +226,12 @@ functions:
                     - merton
                     - heston
             methodResponses:
-              - statusCode: 200
+              - statusCode: '200'
                 responseBody:
                   description: Constraints
                 responseModels:
                   application/json: GetConstraintsResponse
-              - statusCode: 400
+              - statusCode: '400'
                 responseBody:
                   description: An error message for incorrect request
                 responseModels:
