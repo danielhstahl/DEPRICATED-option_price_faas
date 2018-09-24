@@ -5,7 +5,7 @@ components:
       properties:
         err:
           type: string
-    PostOptionResponse:
+    PostOptionsResponse:
       type: array
       items:
         - type: object
@@ -19,6 +19,61 @@ components:
           required:
             - value
             - at_point
+          additionalProperties: false
+    PostOptionsRequest:
+      type: object
+      properties:
+        num_u:
+          type: integer
+        rate:
+          type: number
+        maturity:
+          type: number
+        asset:
+          type: number
+        cf_parameters:
+          type: object
+          properties:
+            sigma:
+              type: number
+            c:
+              type: number
+            g:
+              type: number
+            m:
+              type: number
+            'y':
+              type: number
+            mu_l:
+              type: number
+            sig_l:
+              type: number
+            lambda:
+              type: number
+            speed:
+              type: number
+            v0:
+              type: number
+            eta_v:
+              type: number
+            rho:
+              type: number
+          additionalProperties: false
+        strikes:
+          type: array
+          items:
+            - type: number
+        quantile:
+          type: number
+      required:
+        - num_u
+        - rate
+        - maturity
+        - asset
+        - cf_parameters
+        - strikes
+        - quantile
+      additionalProperties: false
     PostDensityResponse:
       type: array
       items:
@@ -31,6 +86,7 @@ components:
           required:
             - value
             - at_point
+          additionalProperties: false
     PostRiskMetricResponse:
       type: object
       properties:
@@ -41,6 +97,7 @@ components:
       required:
         - value_at_risk
         - expected_shortfall
+      additionalProperties: false
     GetConstraintsResponse:
       type: object
       properties:
@@ -129,6 +186,7 @@ components:
             type: number
           upper:
             type: number
+      additionalProperties: false
   securitySchemes: {}
 info:
   title: Option Pricing and Sensitivities
@@ -150,7 +208,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PostOptionResponse'
+                $ref: '#/components/schemas/PostOptionsResponse'
         '400':
           description: An error message when creating a new user
           content:
