@@ -1,0 +1,213 @@
+openapi: 3.0.0
+components:
+  schemas:
+    ErrorResponse:
+      properties:
+        err:
+          type: string
+    PostOptionResponse:
+      type: array
+      items:
+        - type: object
+          properties:
+            value:
+              type: number
+            at_point:
+              type: number
+            iv:
+              type: number
+          required:
+            - value
+            - at_point
+    PostDensityResponse:
+      type: array
+      items:
+        - type: object
+          properties:
+            value:
+              type: number
+            at_point:
+              type: number
+          required:
+            - value
+            - at_point
+    PostRiskMetricResponse:
+      type: object
+      properties:
+        value_at_risk:
+          type: number
+        expected_shortfall:
+          type: number
+      required:
+        - value_at_risk
+        - expected_shortfall
+    GetConstraintsResponse:
+      type: object
+      properties:
+        rate:
+          lower:
+            type: number
+          upper:
+            type: number
+        asset:
+          lower:
+            type: number
+          upper:
+            type: number
+        maturity:
+          lower:
+            type: number
+          upper:
+            type: number
+        num_u:
+          lower:
+            type: number
+          upper:
+            type: number
+        quantile:
+          lower:
+            type: number
+          upper:
+            type: number
+        lambda:
+          lower:
+            type: number
+          upper:
+            type: number
+        mu_l:
+          lower:
+            type: number
+          upper:
+            type: number
+        sig_l:
+          lower:
+            type: number
+          upper:
+            type: number
+        c:
+          lower:
+            type: number
+          upper:
+            type: number
+        g:
+          lower:
+            type: number
+          upper:
+            type: number
+        m:
+          lower:
+            type: number
+          upper:
+            type: number
+        'y':
+          lower:
+            type: number
+          upper:
+            type: number
+        v0:
+          lower:
+            type: number
+          upper:
+            type: number
+        speed:
+          lower:
+            type: number
+          upper:
+            type: number
+        eta_v:
+          lower:
+            type: number
+          upper:
+            type: number
+        sigma:
+          lower:
+            type: number
+          upper:
+            type: number
+        rho:
+          lower:
+            type: number
+          upper:
+            type: number
+  securitySchemes: {}
+info:
+  title: Option Pricing and Sensitivities
+  description: >-
+    Option pricing using advanced models such as Heston, Extended Merton, and
+    Extended CGMY
+  version: '1'
+paths:
+  '/v1/{model}/calculator/{optionType}/{sensitivity}':
+    post:
+      operationId: calculator
+      summary: Calculator for computing option prices and sensitivities
+      description: >-
+        Computes European option prices, implied volatilities, and sensitivities
+        at every strike price
+      responses:
+        '200':
+          description: Option prices and sensitivites
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostOptionResponse'
+        '400':
+          description: An error message when creating a new user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  '/v1/{model}/density/density':
+    post:
+      operationId: density
+      summary: Calculator for computing probability densities
+      description: Computes probability density
+      responses:
+        '200':
+          description: Density
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostDensityResponse'
+        '400':
+          description: An error message when creating a new user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  '/v1/{model}/density/riskmetric':
+    post:
+      operationId: riskmetric
+      summary: Calculator for computing risk metrics
+      description: Computes value at risk and expected shortfall
+      responses:
+        '200':
+          description: Value at risk and expected shortfall
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostRiskMetricResponse'
+        '400':
+          description: An error message when creating a new user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  '/v1/{model}/parameters/parameter_ranges':
+    get:
+      operationId: constraints
+      summary: Parameter Constraints
+      description: Computes probability density
+      responses:
+        '200':
+          description: Constraints
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetConstraintsResponse'
+        '400':
+          description: An error message when creating a new user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'

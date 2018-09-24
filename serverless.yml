@@ -22,14 +22,14 @@ custom:
           properties:
             err: 
               type: "string"
-      - name: "PostOptionResponse"
+      - name: "PostOptionsResponse"
         description: "Results when providing correct body"
         contentType: "application/json"
-        schema: ${file(models/PostOptionResponse.json)}
-      - name: "PostOptionRequest"
+        schema: ${file(models/PostOptionsResponse.json)}
+      - name: "PostOptionsRequest"
         description: "Request parameters for option prices"
         contentType: "application/json"
-        schema: ${file(models/PostOptionRequest.json)}
+        schema: ${file(models/PostOptionsRequest.json)}
       - name: "PostDensityResponse"
         description: "Request parameters for density"
         contentType: "application/json"
@@ -81,7 +81,7 @@ functions:
             requestBody:
               description: "The parameters for the model"
             requestModels:
-              application/json: "PostOptionRequest"
+              application/json: "PostOptionsRequest"
             pathParams:
               - name: "model"
                 description: "The model to use"
@@ -117,7 +117,7 @@ functions:
                 responseBody:
                   description: "Option prices and sensitivites"
                 responseModels:
-                  application/json: "PostOptionResponse"
+                  application/json: "PostOptionsResponse"
               - statusCode: 400
                 responseBody:
                   description: "An error message when creating a new user"
