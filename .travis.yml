@@ -21,6 +21,7 @@ script:
 before_deploy:
   - npm install -g serverless
   - sls deploy
+  - sls downloadDocumentation --outputFileName=./lambda/openapi.yml
 addons:
   apt:
     packages:
