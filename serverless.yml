@@ -7,7 +7,7 @@ provider:
   stage: prd
 
 plugins:
-  #- serverless-openapi-documentation
+  - serverless-openapi-documentation
   - serverless-aws-documentation
 
 custom:

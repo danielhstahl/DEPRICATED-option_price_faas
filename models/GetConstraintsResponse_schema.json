@@ -3,140 +3,276 @@
     "type": "object",
     "properties": {
         "rate":{
-            "lower":{
-                "type":"number"
+            "type": "object",
+            "properties": {
+                "lower":{
+                    "type":"number"
+                },
+                "upper":{
+                    "type":"number"
+                }
             },
-            "upper":{
-                "type":"number"
-            }
+            "required": [
+                "lower",
+                "upper"
+            ],
+            "additionalProperties": false
         },
         "asset":{
-            "lower":{
-                "type":"number"
+            "type": "object",
+            "properties": {
+                "lower":{
+                    "type":"number"
+                },
+                "upper":{
+                    "type":"number"
+                }
             },
-            "upper":{
-                "type":"number"
-            }
+            "required": [
+                "lower",
+                "upper"
+            ],
+            "additionalProperties": false
         },
         "maturity":{
-            "lower":{
-                "type":"number"
+            "type": "object",
+            "properties": {
+                "lower":{
+                    "type":"number"
+                },
+                "upper":{
+                    "type":"number"
+                }
             },
-            "upper":{
-                "type":"number"
-            }
+            "required": [
+                "lower",
+                "upper"
+            ],
+            "additionalProperties": false
         },
         "num_u":{
-            "lower":{
-                "type":"number"
+            "type": "object",
+            "properties": {
+                "lower":{
+                    "type":"number"
+                },
+                "upper":{
+                    "type":"number"
+                }
             },
-            "upper":{
-                "type":"number"
-            }
+            "required": [
+                "lower",
+                "upper"
+            ],
+            "additionalProperties": false
         },
         "quantile":{
-            "lower":{
-                "type":"number"
+            "type": "object",
+            "properties": {
+                "lower":{
+                    "type":"number"
+                },
+                "upper":{
+                    "type":"number"
+                }
             },
-            "upper":{
-                "type":"number"
-            }
+            "required": [
+                "lower",
+                "upper"
+            ],
+            "additionalProperties": false
         },
         "lambda":{
-            "lower":{
-                "type":"number"
+            "type": "object",
+            "properties": {
+                "lower":{
+                    "type":"number"
+                },
+                "upper":{
+                    "type":"number"
+                }
             },
-            "upper":{
-                "type":"number"
-            }
+            "required": [
+                "lower",
+                "upper"
+            ],
+            "additionalProperties": false
         },
         "mu_l":{
-            "lower":{
-                "type":"number"
+            "type": "object",
+            "properties": {
+                "lower":{
+                    "type":"number"
+                },
+                "upper":{
+                    "type":"number"
+                }
             },
-            "upper":{
-                "type":"number"
-            }
+            "required": [
+                "lower",
+                "upper"
+            ],
+            "additionalProperties": false
         },
         "sig_l":{
-            "lower":{
-                "type":"number"
+            "type": "object",
+            "properties": {
+                "lower":{
+                    "type":"number"
+                },
+                "upper":{
+                    "type":"number"
+                }
             },
-            "upper":{
-                "type":"number"
-            }
+            "required": [
+                "lower",
+                "upper"
+            ],
+            "additionalProperties": false
         },
         "c":{
-            "lower":{
-                "type":"number"
+            "type": "object",
+            "properties": {
+                "lower":{
+                    "type":"number"
+                },
+                "upper":{
+                    "type":"number"
+                }
             },
-            "upper":{
-                "type":"number"
-            }
+            "required": [
+                "lower",
+                "upper"
+            ],
+            "additionalProperties": false
         },
         "g":{
-            "lower":{
-                "type":"number"
+            "type": "object",
+            "properties": {
+                "lower":{
+                    "type":"number"
+                },
+                "upper":{
+                    "type":"number"
+                }
             },
-            "upper":{
-                "type":"number"
-            }
+            "required": [
+                "lower",
+                "upper"
+            ],
+            "additionalProperties": false
         },
         "m":{
-            "lower":{
-                "type":"number"
+            "type": "object",
+            "properties": {
+                "lower":{
+                    "type":"number"
+                },
+                "upper":{
+                    "type":"number"
+                }
             },
-            "upper":{
-                "type":"number"
-            }
+            "required": [
+                "lower",
+                "upper"
+            ],
+            "additionalProperties": false
         },
         "y":{
-            "lower":{
-                "type":"number"
+            "type": "object",
+            "properties": {
+                "lower":{
+                    "type":"number"
+                },
+                "upper":{
+                    "type":"number"
+                }
             },
-            "upper":{
-                "type":"number"
-            }
+            "required": [
+                "lower",
+                "upper"
+            ],
+            "additionalProperties": false
         },
         "v0":{
-            "lower":{
-                "type":"number"
+            "type": "object",
+            "properties": {
+                "lower":{
+                    "type":"number"
+                },
+                "upper":{
+                    "type":"number"
+                }
             },
-            "upper":{
-                "type":"number"
-            }
+            "required": [
+                "lower",
+                "upper"
+            ],
+            "additionalProperties": false
         },
         "speed":{
-            "lower":{
-                "type":"number"
+            "type": "object",
+            "properties": {
+                "lower":{
+                    "type":"number"
+                },
+                "upper":{
+                    "type":"number"
+                }
             },
-            "upper":{
-                "type":"number"
-            }
+            "required": [
+                "lower",
+                "upper"
+            ],
+            "additionalProperties": false
         },
         "eta_v":{
-            "lower":{
-                "type":"number"
+            "type": "object",
+            "properties": {
+                "lower":{
+                    "type":"number"
+                },
+                "upper":{
+                    "type":"number"
+                }
             },
-            "upper":{
-                "type":"number"
-            }
+            "required": [
+                "lower",
+                "upper"
+            ],
+            "additionalProperties": false
         },
         "sigma":{
-            "lower":{
-                "type":"number"
+            "type": "object",
+            "properties": {
+                "lower":{
+                    "type":"number"
+                },
+                "upper":{
+                    "type":"number"
+                }
             },
-            "upper":{
-                "type":"number"
-            }
+            "required": [
+                "lower",
+                "upper"
+            ],
+            "additionalProperties": false
         },
         "rho":{
-            "lower":{
-                "type":"number"
+            "type": "object",
+            "properties": {
+                "lower":{
+                    "type":"number"
+                },
+                "upper":{
+                    "type":"number"
+                }
             },
-            "upper":{
-                "type":"number"
-            }
+            "required": [
+                "lower",
+                "upper"
+            ],
+            "additionalProperties": false
         }
     },
     "additionalProperties": false
