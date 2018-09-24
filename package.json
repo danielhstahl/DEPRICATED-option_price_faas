@@ -16,15 +16,11 @@
     "url": "https://github.com/phillyfan1138/option_price_faas/issues"
   },
   "homepage": "https://github.com/phillyfan1138/option_price_faas#readme",
-  "dependencies": {
-    "csv": "^3.1.0",
-    "cubic-spline": "^1.0.4"
-  },
+  "dependencies": {},
   "devDependencies": {
     "jest": "^23.4.1",
-    "json-schema-to-openapi-schema": "^0.2.0",
-    "serverless-aws-documentation": "^1.1.0",
-    "serverless-openapi-documentation": "^0.4.0"
+    "js-yaml": "^3.12.0",
+    "json-refs": "^3.0.10"
   },
   "directories": {
     "test": "tests"

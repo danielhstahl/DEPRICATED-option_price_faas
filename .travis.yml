@@ -21,7 +21,7 @@ script:
 before_deploy:
   - npm install -g serverless
   - sls deploy
-  - sls downloadDocumentation --outputFileName=./lambda/openapi.yml
+  - node index
 addons:
   apt:
     packages:
@@ -46,6 +46,7 @@ deploy:
   - "./functions/target/x86_64-unknown-linux-musl/release/pricer"
   - "./lambda/**"
   - "./serverless.yml"
+  - "./docs/openapi_merged.yml"
   skip_cleanup: true
   on:
     repo: phillyfan1138/option_price_faas

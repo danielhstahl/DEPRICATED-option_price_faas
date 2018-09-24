@@ -1,0 +1,150 @@
+openapi: 3.0.0
+info:
+  title: Option Pricing and Sensitivities
+  description: Option pricing using advanced models such as Heston, Extended Merton, and Extended CGMY.
+  version: '1'
+
+servers:
+  - url: https://zcz8a5ch68.execute-api.us-east-1.amazonaws.com/prd/
+    description: Production server
+
+
+paths:
+  v1/{model}/calculator/{optionType}/{sensitivity}:
+    post:
+      summary: Calculator for computing option prices and sensitivities
+      description: Computes European option prices, implied volatilities, and sensitivities at every strike price
+      responses: 
+        '200':
+          description: Option prices and sensitivites
+          content:
+            application/json: 
+              schema:
+                $ref: './PostOptionsResponse.json'
+        '400':
+          description: Error for incorrect request
+          content:
+            application/json: 
+              schema:
+                $ref: './ErrorResponse.json'
+      parameters:
+        - name: model
+          in: path
+          required: true
+          description: The model to use.
+          schema:
+            type: string
+            enum: [cgmy, merton, heston]
+        - name: optionType
+          in: path
+          required: true
+          description: The type of option.
+          schema:
+            type: string
+            enum: [call, put]
+        - name: sensitivity
+          in: path
+          required: true
+          description: Prices or Greeks
+          schema:
+            type: string
+            enum: [price, delta, gamma, theta]
+        - name: includeImpliedVolatility
+          in: query
+          description: Whether to include implied volatility in the results.  Defaults to 'false'.  Only applicable for sensitivity='price'
+          schema:
+            type: boolean
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './PostOptionsRequest.json'
+  v1/{model}/density:
+    post:
+      summary: Calculator for computing probability densities
+      description: Computes probability density
+      responses: 
+        '200':
+          description: Density
+          content:
+            application/json: 
+              schema:
+                $ref: './PostDensityResponse.json'
+        '400':
+          description: Error for incorrect request
+          content:
+            application/json: 
+              schema:
+                $ref: './ErrorResponse.json'
+      parameters:
+        - name: model
+          in: path
+          required: true
+          description: The model to use.
+          schema:
+            type: string
+            enum: [cgmy, merton, heston]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './PostOptionsRequest.json'
+  v1/{model}/riskmetric:
+    post:
+      summary: Calculator for computing risk metrics
+      description: Computes value at risk and expected shortfall
+      responses: 
+        '200':
+          description: Value at risk and expected shortfall
+          content:
+            application/json: 
+              schema:
+                $ref: './PostRiskMetricResponse.json'
+        '400':
+          description: Error for incorrect request
+          content:
+            application/json: 
+              schema:
+                $ref: './ErrorResponse.json'
+      parameters:
+        - name: model
+          in: path
+          required: true
+          description: The model to use.
+          schema:
+            type: string
+            enum: [cgmy, merton, heston]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './PostOptionsRequest.json'
+  v1/{model}/parameters/parameter_ranges:
+    get:
+      summary: Parameter Constraints
+      description: Obtains the constraints that the parameters in the post requests are required to conform to.
+      responses: 
+        '200':
+          description: Constraints
+          content:
+            application/json: 
+              schema:
+                $ref: './GetConstraintsResponse.json'
+        '400':
+          description: Error for incorrect request
+          content:
+            application/json: 
+              schema:
+                $ref: './ErrorResponse.json'
+      parameters:
+        - name: model
+          in: path
+          required: true
+          description: The model to use.
+          schema:
+            type: string
+            enum: [cgmy, merton, heston]
+        

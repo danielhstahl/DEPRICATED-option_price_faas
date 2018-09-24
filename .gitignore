@@ -3,4 +3,3 @@
 *.lock
 node_modules
 quandlkey.txt
-*.yml

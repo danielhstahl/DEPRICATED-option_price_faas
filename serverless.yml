@@ -1,49 +1,9 @@
 service: option-price-faas
-frameworkVersion: ">=1.1.0 < 2.0.0"
 
 provider:
   name: aws
   runtime: nodejs8.10
   stage: prd
-
-plugins:
-  - serverless-openapi-documentation
-  - serverless-aws-documentation
-
-custom:
-  documentation:
-    version: '1'
-    title: Option Pricing and Sensitivities
-    description: Option pricing using advanced models such as Heston, Extended Merton, and Extended CGMY
-    models: 
-      - name: ErrorResponse
-        description: Error when providing incorrect or out of bounds body
-        contentType: application/json
-        schema:
-          $schema: http://json-schema.org/draft-07/schema# 
-          properties:
-            err: 
-              type: string
-      - name: PostOptionsResponse
-        description: Results when providing correct body
-        contentType: application/json
-        schema: ${file(models/PostOptionsResponse.json)}
-      - name: PostOptionsRequest
-        description: Request parameters for option prices
-        contentType: application/json
-        schema: ${file(models/PostOptionsRequest.json)}
-      - name: PostDensityResponse
-        description: Request parameters for density
-        contentType: application/json
-        schema: ${file(models/PostDensityResponse.json)}
-      - name: PostRiskMetricResponse
-        description: Request parameters for risk measures
-        contentType: application/json
-        schema: ${file(models/PostRiskMetricResponse.json)}
-      - name: GetConstraintsResponse
-        description: Request 
-        contentType: application/json
-        schema: ${file(models/GetConstraintsResponse.json)}
 
 package:
   exclude:
@@ -57,6 +17,7 @@ package:
     - README.md
     - serverless.yml
     - .travis.yml
+    - docs
   include:
    - functions/target/x86_64-unknown-linux-musl/release/output_constraints
    - functions/target/x86_64-unknown-linux-musl/release/pricer
@@ -77,131 +38,31 @@ functions:
                 model: true
               querystrings:
                 includeImpliedVolatility: false
-          documentation:
-            summary: Calculator for computing option prices and sensitivities
-            description: Computes European option prices, implied volatilities, and sensitivities at every strike price
-            requestBody:
-              description: The parameters for the model
-            requestModels:
-              application/json: PostOptionsRequest
-            pathParams:
-              - name: model
-                description: The model to use
-                required: true
-                schema:
-                  type: string
-                  enum:
-                    - cgmy
-                    - merton
-                    - heston
-              - name: optionType
-                description: The type of option
-                schema:
-                  type: string
-                  enum:
-                    - call
-                    - put
-              - name: sensitivity
-                description: Prices or Greeks
-                schema:
-                  type: string
-                  enum:
-                    - price
-                    - delta
-                    - gamma
-                    - theta
-            queryParams:
-              - name: includeImpliedVolatility
-                description: Whether to include implied volatility in the results.  Defaults to 'false'.  Only applicable for sensitivity='price'
-                schema:
-                  type: bool
-            methodResponses:
-              - statusCode: '200'
-                responseBody:
-                  description: Option prices and sensitivites
-                responseModels:
-                  application/json: PostOptionsResponse
-              - statusCode: '400'
-                responseBody:
-                  description: An error message for incorrect request
-                responseModels:
-                  application/json: ErrorResponse
+
   density:
     handler: lambda/pricer.density
     events:
       - http:
-          path: v1/{model}/density/density
+          path: v1/{model}/density
           method: post
           cors: true
           request:
             parameters:
               paths:
                 model: true
-          documentation:
-            summary: Calculator for computing probability densities
-            description: Computes probability density
-            requestBody:
-              description: The parameters for the model
-            requestModels:
-              application/json: PostOptionsRequest
-            pathParams:
-              - name: model
-                description: The model to use
-                schema:
-                  type: string
-                  enum:
-                    - cgmy
-                    - merton
-                    - heston
-            methodResponses:
-              - statusCode: '200'
-                responseBody:
-                  description: Density
-                responseModels:
-                  application/json: PostDensityResponse
-              - statusCode: '400'
-                responseBody:
-                  description: An error message for incorrect request
-                responseModels:
-                  application/json: ErrorResponse
+
   riskmetric:
-    handler: lambda/pricer.density
+    handler: lambda/pricer.riskmetric
     events:
       - http:
-          path: v1/{model}/density/riskmetric
+          path: v1/{model}/riskmetric
           method: post
           cors: true
           request:
             parameters:
               paths:
                 model: true
-          documentation:
-            summary: Calculator for computing risk metrics
-            description: Computes value at risk and expected shortfall
-            requestBody:
-              description: The parameters for the model
-            requestModels:
-              application/json: PostOptionsRequest
-            pathParams:
-              - name: model
-                description: The model to use
-                schema:
-                  type: string
-                  enum:
-                    - cgmy
-                    - merton
-                    - heston
-            methodResponses:
-              - statusCode: '200'
-                responseBody:
-                  description: Value at risk and expected shortfall
-                responseModels:
-                  application/json: PostRiskMetricResponse
-              - statusCode: '400'
-                responseBody:
-                  description: An error message for incorrect request
-                responseModels:
-                  application/json: ErrorResponse
+          
   constraints:
     handler: lambda/pricer.constraints
     events:
@@ -213,26 +74,3 @@ functions:
             parameters:
               paths:
                 model: true
-          documentation:
-            summary: Parameter Constraints
-            description: Computes probability density
-            pathParams:
-              - name: model
-                description: The model to use
-                schema:
-                  type: string
-                  enum:
-                    - cgmy
-                    - merton
-                    - heston
-            methodResponses:
-              - statusCode: '200'
-                responseBody:
-                  description: Constraints
-                responseModels:
-                  application/json: GetConstraintsResponse
-              - statusCode: '400'
-                responseBody:
-                  description: An error message for incorrect request
-                responseModels:
-                  application/json: ErrorResponse
