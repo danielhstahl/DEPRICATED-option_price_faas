@@ -53,9 +53,7 @@
           "rho": {
             "type": "number"
           }
-        },
-        "required": [
-        ]
+        }
       },
       "strikes": {
         "type": "array",
