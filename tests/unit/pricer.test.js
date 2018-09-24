@@ -65,6 +65,38 @@ it('correctly calls calculator with iv', (done)=>{
         done()
     })
 })
+it('correctly calls calculator with cgmy', (done)=>{
+    const event=createEvent({
+        strikes:[40, 50, 60],
+        maturity:5,
+        rate:0.05,
+        asset:50.0,
+        cf_parameters:{
+            sigma:0.4,
+            c:1.5,
+            g:0.05,
+            m:0.2,
+            y:0.2,
+            v0:0.5,
+            speed:0.5,
+            eta_v:0.3,
+            rho:0.4,
+        },  
+        num_u:8,
+        quantile:0.01
+    }, {
+        optionType:'call',
+        sensitivity:'price',
+        model:'cgmy'
+    },{
+        includeImpliedVolatility:true
+    })
+    return handler.calculator(event, {}, (_err, val)=>{
+        const parsedVal=JSON.parse(val.body)
+        expect(Array.isArray(parsedVal)).toEqual(true)
+        done()
+    })
+})
 it('correctly calls constraints', (done)=>{
     const event=createEvent({
         

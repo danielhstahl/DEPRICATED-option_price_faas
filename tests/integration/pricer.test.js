@@ -4,9 +4,8 @@ const createEvent=(data, parameters, queryStringParameters)=>({
     pathParameters:parameters,
     queryStringParameters
 })
-//TODO!! Add CGMY tests
 it('correctly returns heston price', (done)=>{
-    //http://ta.twi.tudelft.nl/mf/users/oosterle/oosterlee/COS.pdf pg 15
+    //https://mpra.ub.uni-muenchen.de/8914/4/MPRA_paper_8914.pdf pg 15
     const rate=0.0
     const maturity=1.0
     const asset=100
@@ -71,7 +70,7 @@ it('correctly returns heston price', (done)=>{
     })
 })
 it('correctly returns heston price and iv', (done)=>{
-    //http://ta.twi.tudelft.nl/mf/users/oosterle/oosterlee/COS.pdf pg 15
+    //https://mpra.ub.uni-muenchen.de/8914/4/MPRA_paper_8914.pdf pg 15
     const rate=0.0
     const maturity=1.0
     const asset=100
@@ -148,6 +147,129 @@ it('correctly returns merton price', (done)=>{
     return handler.calculator(event, {}, (_err, val)=>{
         const parsedVal=JSON.parse(val.body)
         expect(parsedVal[0].value).toBeCloseTo(5.9713, 3)
+        done()
+    })
+})
+it('correctly returns cgmy price: v1', (done)=>{
+    //https://mpra.ub.uni-muenchen.de/8914/4/MPRA_paper_8914.pdf pg 18
+    //S0 = 100, K = 100, r = 0.1, q = 0, C = 1, G = 5, M = 5, T = 1
+    const rate=.1
+    const maturity=1.0
+    const asset=100
+    const c=1
+    const g=5
+    const m=5
+    const y=0.5
+    const strike=100
+    const parameters={
+        num_u:8,
+        rate,
+        maturity,
+        asset,
+        cf_parameters:{
+            sigma:0, 
+            c,
+            g,
+            m,
+            y,
+            speed:0,
+            v0:1,
+            eta_v:0,
+            rho:0
+        },        
+        strikes:[strike],
+        quantile:0.01
+    }
+    const event=createEvent(parameters, {
+        optionType:'call',
+        sensitivity:'price',
+        model:'cgmy'
+    })
+    return handler.calculator(event, {}, (_err, val)=>{
+        const parsedVal=JSON.parse(val.body)
+        expect(parsedVal[0].value).toBeCloseTo(19.812948843, 3)
+        done()
+    })
+})
+it('correctly returns cgmy price: v2', (done)=>{
+    //https://mpra.ub.uni-muenchen.de/8914/4/MPRA_paper_8914.pdf pg 18
+    //S0 = 100, K = 100, r = 0.1, q = 0, C = 1, G = 5, M = 5, T = 1
+    const rate=.1
+    const maturity=1.0
+    const asset=100
+    const c=1
+    const g=5
+    const m=5
+    const y=1.5
+    const strike=100
+    const parameters={
+        num_u:8,
+        rate,
+        maturity,
+        asset,
+        cf_parameters:{
+            sigma:0, 
+            c,
+            g,
+            m,
+            y,
+            speed:0,
+            v0:1,
+            eta_v:0,
+            rho:0
+        },        
+        strikes:[strike],
+        quantile:0.01
+    }
+    const event=createEvent(parameters, {
+        optionType:'call',
+        sensitivity:'price',
+        model:'cgmy'
+    })
+    return handler.calculator(event, {}, (_err, val)=>{
+        const parsedVal=JSON.parse(val.body)
+        expect(parsedVal[0].value).toBeCloseTo(49.790905469, 3)
+        done()
+    })
+})
+it('correctly returns cgmy price: v3', (done)=>{
+    //https://mpra.ub.uni-muenchen.de/8914/4/MPRA_paper_8914.pdf pg 18
+    //S0 = 100, K = 100, r = 0.1, q = 0, C = 1, G = 5, M = 5, T = 1
+    const rate=.1
+    const maturity=1.0
+    const asset=100
+    const c=1
+    const g=5
+    const m=5
+    const y=1.98
+    const strike=100
+    const parameters={
+        num_u:8,
+        rate,
+        maturity,
+        asset,
+        cf_parameters:{
+            sigma:0, 
+            c,
+            g,
+            m,
+            y,
+            speed:0,
+            v0:1,
+            eta_v:0,
+            rho:0
+        },        
+        strikes:[strike],
+        quantile:0.01
+    }
+    const event=createEvent(parameters, {
+        optionType:'call',
+        sensitivity:'price',
+        model:'cgmy'
+    })
+    return handler.calculator(event, {}, (_err, val)=>{
+        const parsedVal=JSON.parse(val.body)
+        expect(parsedVal[0].value).toBeCloseTo(99.999905510, 3)
         done()
     })
 })

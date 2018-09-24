@@ -11,7 +11,6 @@ fn main() {
             json!(
                 constraints::get_cgmy_constraints()
             )
-             
         },
         constraints::MERTON=>{
             json!(
