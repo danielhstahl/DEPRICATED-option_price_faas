@@ -12,7 +12,7 @@ before_install:
 - nvm install 8
 - node --version
 - rustup target add x86_64-unknown-linux-musl
-- git fetch --all
+- git fetch --all # intended for getting tags
 script:
   - cd functions
   - cargo build --release --target=x86_64-unknown-linux-musl
@@ -22,7 +22,7 @@ script:
   - npm test
   - cd main_site
   - cd src
-  - echo "export default {tag: $(git describe --abbrev=0 --tags)}" > ./main_site/src/_git_commit.js # creates tag for the main site to know which docs to grab
+  - echo "export default {tag: \"$(git describe --abbrev=0 --tags)\"}" > ./_git_commit.js # creates tag for the main site to know which docs to grab
   - cd ..
   - npm install 
   - npm test -- --coverage
