@@ -4,12 +4,11 @@
   "description": "Lambda functions for option pricing and calibrations",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
-    "git-tag-info": "echo export default \"{\\\"tag\\\": \\\"$(git describe --abbrev=0 --tags)\\\"}\"  > main_site/src/_git_commit.js"
+    "test": "jest"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "node index && npm run git-tag-info && git add ."
+      "pre-commit": "node index && git add ."
     }
   },
   "repository": {
