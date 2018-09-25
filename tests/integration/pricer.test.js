@@ -354,10 +354,9 @@ it('correctly returns VaR', (done)=>{
         strikes:[]
     }
     const event=createEvent(parameters, {
-        densityType:'riskmetric',
         model:'merton'
     })
-    return handler.density(event, {}, (_err, val)=>{
+    return handler.riskmetric(event, {}, (_err, val)=>{
         const parsedVal=JSON.parse(val.body)
         expect(parsedVal.value_at_risk).toBeCloseTo(.261503, 3)
         done()
