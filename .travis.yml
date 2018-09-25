@@ -21,7 +21,6 @@ script:
 before_deploy:
   - npm install -g serverless
   - sls deploy
-  - node index
 addons:
   apt:
     packages:
