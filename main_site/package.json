@@ -1,0 +1,34 @@
+{
+  "name": "main_site",
+  "homepage": "https://phillyfan1138.github.io/commerce_site",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "antd": "^3.9.2",
+    "gh-pages": "^2.0.0",
+    "husky": "^0.14.3",
+    "lint-staged": "^7.2.2",
+    "prettier": "^1.14.2",
+    "react": "^16.5.1",
+    "react-dom": "^16.5.1",
+    "react-lincoln": "^0.4.1",
+    "react-router-dom": "^4.3.1",
+    "react-scripts": "1.1.5",
+    "swagger-ui": "^3.19.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "precommit": "lint-staged"
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx,json,css}": [
+      "prettier --single-quote --write --no-semi",
+      "git add"
+    ]
+  }
+}
