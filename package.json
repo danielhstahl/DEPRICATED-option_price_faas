@@ -9,7 +9,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "node index && && npm run git-tag-info && git add ."
+      "pre-commit": "node index && npm run git-tag-info && git add ."
     }
   },
   "repository": {

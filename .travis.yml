@@ -72,7 +72,7 @@ matrix:
         provider: pages
         skip_cleanup: true
         github_token: $github_token
-        local_dir: build
+        local_dir: main_site/build
         on:
           repo: phillyfan1138/option_price_faas
           tags: true
