@@ -5,12 +5,12 @@ info:
   version: '1'
 
 servers:
-  - url: https://zcz8a5ch68.execute-api.us-east-1.amazonaws.com/prd/
+  - url: https://zcz8a5ch68.execute-api.us-east-1.amazonaws.com/prd
     description: Production server
 
 
 paths:
-  v1/{model}/calculator/{optionType}/{sensitivity}:
+  /v1/{model}/calculator/{optionType}/{sensitivity}:
     post:
       summary: Calculator for computing option prices and sensitivities
       description: Computes European option prices, implied volatilities, and sensitivities at every strike price
@@ -60,7 +60,7 @@ paths:
           application/json:
             schema:
               $ref: './PostOptionsRequest.json'
-  v1/{model}/density:
+  /v1/{model}/density:
     post:
       summary: Calculator for computing probability densities
       description: Computes probability density
@@ -91,7 +91,7 @@ paths:
           application/json:
             schema:
               $ref: './PostOptionsRequest.json'
-  v1/{model}/riskmetric:
+  /v1/{model}/riskmetric:
     post:
       summary: Calculator for computing risk metrics
       description: Computes value at risk and expected shortfall
@@ -122,7 +122,7 @@ paths:
           application/json:
             schema:
               $ref: './PostOptionsRequest.json'
-  v1/{model}/parameters/parameter_ranges:
+  /v1/{model}/parameters/parameter_ranges:
     get:
       summary: Parameter Constraints
       description: Obtains the constraints that the parameters in the post requests are required to conform to.
