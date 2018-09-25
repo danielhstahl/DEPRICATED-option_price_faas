@@ -8,7 +8,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "node index"
+      "pre-commit": "node index && git add ."
     }
   },
   "repository": {
