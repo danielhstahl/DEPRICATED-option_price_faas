@@ -15,9 +15,7 @@ before_install:
 - git fetch --all # intended for getting tags
 script:
   - cd main_site
-  - cd src
-  - echo "export default {tag: \"$(git describe --abbrev=0 --tags)\"}" > ./_git_commit.js # creates tag for the main site to know which docs to grab
-  - cd ..
+  - echo "REACT_APP_TAG=$TRAVIS_TAG" > .env # creates tag for the main site to know which docs to grab
   - cd ..
   - cd functions
   - cargo build --release --target=x86_64-unknown-linux-musl
