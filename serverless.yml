@@ -15,9 +15,10 @@ package:
     - package-lock.json
     - package.json
     - README.md
+    - main_site/**
     - serverless.yml
     - .travis.yml
-    - docs
+    - docs/**
   include:
    - functions/target/x86_64-unknown-linux-musl/release/output_constraints
    - functions/target/x86_64-unknown-linux-musl/release/pricer
