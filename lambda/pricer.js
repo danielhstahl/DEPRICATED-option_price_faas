@@ -17,7 +17,6 @@ module.exports.calculator=(event, _context, callback)=>{
 }
 const density=(event, densityType, callback)=>{
     const {model}=event.pathParameters
-    const densityType='density'
     const function_choice=calculatorKeys[densityType]
     const cf_choice=calculatorKeys[model]
     genericSpawn(
