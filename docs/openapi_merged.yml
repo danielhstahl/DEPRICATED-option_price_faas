@@ -9,18 +9,20 @@ servers:
   - url: 'https://zcz8a5ch68.execute-api.us-east-1.amazonaws.com/prd'
     description: Production server
 paths:
-  '/v1/{model}/calculator/{optionType}/{sensitivity}':
+  '/v1/cgmy/calculator/{optionType}/{sensitivity}':
     post:
-      summary: Calculator for computing option prices and sensitivities
+      summary: >-
+        Calculator for computing option prices and sensitivities for a CGMY
+        process
       description: >-
         Computes European option prices, implied volatilities, and sensitivities
-        at every strike price
+        at every strike price for an asset that follows an extended CGMY process
       responses:
         '200':
           description: Option prices and sensitivites
           content:
             application/json:
-              schema:
+              schema: &ref_0
                 type: array
                 items:
                   type: object
@@ -39,7 +41,7 @@ paths:
           description: Error for incorrect request
           content:
             application/json:
-              schema: &ref_0
+              schema: &ref_1
                 type: object
                 properties:
                   err:
@@ -48,16 +50,6 @@ paths:
                   - err
                 additionalProperties: false
       parameters:
-        - name: model
-          in: path
-          required: true
-          description: The model to use.
-          schema:
-            type: string
-            enum:
-              - cgmy
-              - merton
-              - heston
         - name: optionType
           in: path
           required: true
@@ -89,7 +81,7 @@ paths:
         required: true
         content:
           application/json:
-            schema: &ref_1
+            schema: &ref_2
               type: object
               properties:
                 num_u:
@@ -122,6 +114,213 @@ paths:
                     'y':
                       type: number
                       example: 1.2
+                    speed:
+                      type: number
+                      example: 0.2
+                    v0:
+                      type: number
+                      example: 0.9
+                    eta_v:
+                      type: number
+                      example: 0.2
+                    rho:
+                      type: number
+                      example: -0.5
+                  additionalProperties: false
+                strikes:
+                  type: array
+                  items:
+                    type: number
+                  example:
+                    - 50
+                quantile:
+                  type: number
+                  example: 0.01
+              required:
+                - num_u
+                - rate
+                - maturity
+                - asset
+                - cf_parameters
+                - strikes
+                - quantile
+              additionalProperties: false
+  '/v1/heston/calculator/{optionType}/{sensitivity}':
+    post:
+      summary: >-
+        Calculator for computing option prices and sensitivities for a Heston
+        model
+      description: >-
+        Computes European option prices, implied volatilities, and sensitivities
+        at every strike price for an asset that follows a Heston process
+      responses:
+        '200':
+          description: Option prices and sensitivites
+          content:
+            application/json:
+              schema: *ref_0
+        '400':
+          description: Error for incorrect request
+          content:
+            application/json:
+              schema: *ref_1
+      parameters:
+        - name: optionType
+          in: path
+          required: true
+          description: The type of option.
+          schema:
+            type: string
+            enum:
+              - call
+              - put
+        - name: sensitivity
+          in: path
+          required: true
+          description: Prices or Greeks
+          schema:
+            type: string
+            enum:
+              - price
+              - delta
+              - gamma
+              - theta
+        - name: includeImpliedVolatility
+          in: query
+          description: >-
+            Whether to include implied volatility in the results.  Defaults to
+            'false'.  Only applicable for sensitivity='price'
+          schema:
+            type: boolean
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: &ref_4
+              type: object
+              properties:
+                num_u:
+                  type: integer
+                  example: 8
+                rate:
+                  type: number
+                  example: 0.04
+                maturity:
+                  type: number
+                  example: 0.5
+                asset:
+                  type: number
+                  example: 50
+                cf_parameters:
+                  type: object
+                  properties:
+                    sigma:
+                      type: number
+                      example: 0.3
+                    speed:
+                      type: number
+                      example: 0.2
+                    v0:
+                      type: number
+                      example: 0.25
+                    eta_v:
+                      type: number
+                      example: 0.2
+                    rho:
+                      type: number
+                      example: -0.5
+                  additionalProperties: false
+                strikes:
+                  type: array
+                  items:
+                    type: number
+                  example:
+                    - 50
+                quantile:
+                  type: number
+                  example: 0.01
+              required:
+                - num_u
+                - rate
+                - maturity
+                - asset
+                - cf_parameters
+                - strikes
+                - quantile
+              additionalProperties: false
+  '/v1/merton/calculator/{optionType}/{sensitivity}':
+    post:
+      summary: >-
+        Calculator for computing option prices and sensitivities for a Merton
+        model
+      description: >-
+        Computes European option prices, implied volatilities, and sensitivities
+        at every strike price for an asset that follows an extended Merton
+        process
+      responses:
+        '200':
+          description: Option prices and sensitivites
+          content:
+            application/json:
+              schema: *ref_0
+        '400':
+          description: Error for incorrect request
+          content:
+            application/json:
+              schema: *ref_1
+      parameters:
+        - name: optionType
+          in: path
+          required: true
+          description: The type of option.
+          schema:
+            type: string
+            enum:
+              - call
+              - put
+        - name: sensitivity
+          in: path
+          required: true
+          description: Prices or Greeks
+          schema:
+            type: string
+            enum:
+              - price
+              - delta
+              - gamma
+              - theta
+        - name: includeImpliedVolatility
+          in: query
+          description: >-
+            Whether to include implied volatility in the results.  Defaults to
+            'false'.  Only applicable for sensitivity='price'
+          schema:
+            type: boolean
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: &ref_5
+              type: object
+              properties:
+                num_u:
+                  type: integer
+                  example: 8
+                rate:
+                  type: number
+                  example: 0.04
+                maturity:
+                  type: number
+                  example: 0.5
+                asset:
+                  type: number
+                  example: 50
+                cf_parameters:
+                  type: object
+                  properties:
+                    sigma:
+                      type: number
+                      example: 0.3
                     mu_l:
                       type: number
                       example: -0.05
@@ -162,16 +361,16 @@ paths:
                 - strikes
                 - quantile
               additionalProperties: false
-  '/v1/{model}/density':
+  /v1/cgmy/density:
     post:
-      summary: Calculator for computing probability densities
-      description: Computes probability density
+      summary: Calculator for computing probability densities for CGMY process
+      description: Computes probability density for an extended CGMY process
       responses:
         '200':
           description: Density
           content:
             application/json:
-              schema:
+              schema: &ref_3
                 type: array
                 items:
                   type: object
@@ -188,33 +387,62 @@ paths:
           description: Error for incorrect request
           content:
             application/json:
-              schema: *ref_0
-      parameters:
-        - name: model
-          in: path
-          required: true
-          description: The model to use.
-          schema:
-            type: string
-            enum:
-              - cgmy
-              - merton
-              - heston
+              schema: *ref_1
       requestBody:
         required: true
         content:
           application/json:
-            schema: *ref_1
-  '/v1/{model}/riskmetric':
+            schema: *ref_2
+  /v1/heston/density:
     post:
-      summary: Calculator for computing risk metrics
-      description: Computes value at risk and expected shortfall
+      summary: Calculator for computing probability densities for Heston model
+      description: Computes probability density for a Heston model
+      responses:
+        '200':
+          description: Density
+          content:
+            application/json:
+              schema: *ref_3
+        '400':
+          description: Error for incorrect request
+          content:
+            application/json:
+              schema: *ref_1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: *ref_4
+  /v1/merton/density:
+    post:
+      summary: Calculator for computing probability densities for Merton model
+      description: Computes probability density for a Merton model
+      responses:
+        '200':
+          description: Density
+          content:
+            application/json:
+              schema: *ref_3
+        '400':
+          description: Error for incorrect request
+          content:
+            application/json:
+              schema: *ref_1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: *ref_5
+  /v1/cgmy/riskmetric:
+    post:
+      summary: Calculator for computing risk metrics for CGMY process
+      description: Computes value at risk and expected shortfall for extended CGMY process
       responses:
         '200':
           description: Value at risk and expected shortfall
           content:
             application/json:
-              schema:
+              schema: &ref_6
                 type: object
                 properties:
                   value_at_risk:
@@ -229,23 +457,54 @@ paths:
           description: Error for incorrect request
           content:
             application/json:
-              schema: *ref_0
-      parameters:
-        - name: model
-          in: path
-          required: true
-          description: The model to use.
-          schema:
-            type: string
-            enum:
-              - cgmy
-              - merton
-              - heston
+              schema: *ref_1
       requestBody:
         required: true
         content:
           application/json:
-            schema: *ref_1
+            schema: *ref_2
+  /v1/heston/riskmetric:
+    post:
+      summary: Calculator for computing risk metrics for Heston model
+      description: Computes value at risk and expected shortfall for a Heston model
+      responses:
+        '200':
+          description: Value at risk and expected shortfall
+          content:
+            application/json:
+              schema: *ref_6
+        '400':
+          description: Error for incorrect request
+          content:
+            application/json:
+              schema: *ref_1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: *ref_4
+  /v1/merton/riskmetric:
+    post:
+      summary: Calculator for computing risk metrics for Merton model
+      description: >-
+        Computes value at risk and expected shortfall for an extended Merton
+        model
+      responses:
+        '200':
+          description: Value at risk and expected shortfall
+          content:
+            application/json:
+              schema: *ref_6
+        '400':
+          description: Error for incorrect request
+          content:
+            application/json:
+              schema: *ref_1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: *ref_5
   '/v1/{model}/parameters/parameter_ranges':
     get:
       summary: Parameter Constraints
@@ -452,7 +711,7 @@ paths:
           description: Error for incorrect request
           content:
             application/json:
-              schema: *ref_0
+              schema: *ref_1
       parameters:
         - name: model
           in: path

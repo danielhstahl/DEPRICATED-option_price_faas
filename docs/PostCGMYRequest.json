@@ -40,18 +40,6 @@
             "type": "number",
             "example": 1.2
           },
-          "mu_l": {
-            "type": "number",
-            "example": -0.05
-          },
-          "sig_l": {
-            "type": "number",
-            "example": 0.2
-          },
-          "lambda": {
-            "type": "number",
-            "example": 1.0
-          },
           "speed": {
             "type": "number",
             "example": 0.2

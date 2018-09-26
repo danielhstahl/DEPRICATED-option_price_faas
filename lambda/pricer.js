@@ -15,7 +15,7 @@ module.exports.calculator=(event, _context, callback)=>{
         cf_choice, event.body
     ], transformCallback(callback))
 }
-module.exports.density=(event, _context, callback)=>{
+const density=(event, densityType, callback)=>{
     const {model}=event.pathParameters
     const densityType='density'
     const function_choice=calculatorKeys[densityType]
@@ -26,17 +26,9 @@ module.exports.density=(event, _context, callback)=>{
         transformCallback(callback)
     )
 }
-module.exports.riskmetric=(event, _context, callback)=>{
-    const {model}=event.pathParameters
-    const densityType='riskmetric'
-    const function_choice=calculatorKeys[densityType]
-    const cf_choice=calculatorKeys[model]
-    genericSpawn(
-        'pricer', 
-        [function_choice, 0, cf_choice, event.body], 
-        transformCallback(callback)
-    )
-}
+module.exports.density=(event, _context, callback)=>density(event, 'density', callback)
+module.exports.riskmetric=(event, _context, callback)=>density(event, 'riskmetric', callback)
+
 module.exports.constraints=(event, _context, callback)=>{
     const {model}=event.pathParameters
     const cf_choice=calculatorKeys[model]

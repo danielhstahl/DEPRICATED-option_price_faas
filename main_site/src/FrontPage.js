@@ -50,11 +50,11 @@ export default ()=>[
             </li>
             </ul>
             <p>
-            For more information on the models, see the
+            For more information on the models, see the 
             <a href={`${process.env.PUBLIC_URL}/OptionCalculation.pdf`}>
                 summary documentation
             </a>
-            and the detailed
+            and the detailed 
             <a href={`${process.env.PUBLIC_URL}/OptionCalibration.pdf`}>
                 calibration documentation
             </a>
