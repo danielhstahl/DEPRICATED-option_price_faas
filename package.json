@@ -6,6 +6,9 @@
   "scripts": {
     "test": "jest"
   },
+  "jest":{
+    "testPathIgnorePatterns":["node_modules", "main_site"]
+  },
   "husky": {
     "hooks": {
       "pre-commit": "node index && git add ."
