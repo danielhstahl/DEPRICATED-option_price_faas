@@ -3,7 +3,6 @@ import { Layout, Menu } from 'antd'
 import Swagger from './Swagger'
 import FrontPage from './FrontPage'
 import './App.css'
-import 'antd/dist/antd.css'
 import { HashRouter as Router, Route, Link, Redirect, Switch } from 'react-router-dom'
 
 const { Content, Footer, Header } = Layout
@@ -22,7 +21,6 @@ const AppMenu=({match:{params:{page}}})=>(
 const App = () => (
   <Router>
     <Layout>
-      
       <Header>
         <Switch>
           <Redirect from='/' exact to='/home' />

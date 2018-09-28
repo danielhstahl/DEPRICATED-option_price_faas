@@ -50,14 +50,7 @@ export default ()=>[
             </li>
             </ul>
             <p>
-            For more information on the models, see the 
-            <a href={`${process.env.PUBLIC_URL}/OptionCalculation.pdf`}>
-                summary documentation
-            </a>
-            and the detailed 
-            <a href={`${process.env.PUBLIC_URL}/OptionCalibration.pdf`}>
-                calibration documentation
-            </a>
+            For more information on the models, see the <a href={`${process.env.PUBLIC_URL}/OptionCalculation.pdf`}>documentation</a>.
             </p>
         </Col>
     </Row>,
@@ -68,8 +61,7 @@ export default ()=>[
     </Row>,
     <Row style={divLight} gutter={16} key='about'>
         <Col  sm={sm} md={md} lg={lg} style={padding}>
-            About
-            <Link to="/api_docs">Api Docs</Link>
+            About: <Link to="/api_docs">Api Docs</Link>
         </Col>
     </Row>
 ]

@@ -6,8 +6,11 @@
   "scripts": {
     "test": "jest"
   },
-  "jest":{
-    "testPathIgnorePatterns":["node_modules", "main_site"]
+  "jest": {
+    "testPathIgnorePatterns": [
+      "node_modules",
+      "main_site"
+    ]
   },
   "husky": {
     "hooks": {
@@ -24,7 +27,6 @@
     "url": "https://github.com/phillyfan1138/option_price_faas/issues"
   },
   "homepage": "https://github.com/phillyfan1138/option_price_faas#readme",
-  "dependencies": {},
   "devDependencies": {
     "husky": "^1.0.0-rc.15",
     "jest": "^23.4.1",
