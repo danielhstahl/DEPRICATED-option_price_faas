@@ -12,10 +12,10 @@ const hLight={ color: standardLight }
 const sm={span:22, offset:1}
 const md={span:16, offset:2}
 const lg={span:16, offset:3}
-
+const padding={padding:20}
 export default ()=>[
     <Row style={divDark} gutter={16} key='summary'>
-        <Col sm={sm} md={md} lg={lg} style={{paddingTop:10}}>
+        <Col sm={sm} md={md} lg={lg} style={padding}>
         
             <h1 style={hLight}>
                 Derivatives Modeling as a Service
@@ -31,7 +31,7 @@ export default ()=>[
         </Col>
     </Row>,
     <Row style={divLight} gutter={16} key='description'>
-        <Col sm={sm} md={md} lg={lg}>
+        <Col sm={sm} md={md} lg={lg} style={padding}>
             <h1>Option Pricing Models</h1>
             <p>
             Our models are the most sophisticated in the industry. Our
@@ -62,12 +62,12 @@ export default ()=>[
         </Col>
     </Row>,
     <Row style={divDark} gutter={16} key='pricing'>
-        <Col  sm={sm} md={md} lg={lg} style={hLight}>
+        <Col  sm={sm} md={md} lg={lg} style={{...hLight, ...padding}}>
             Pricing
         </Col>
     </Row>,
     <Row style={divLight} gutter={16} key='about'>
-        <Col  sm={sm} md={md} lg={lg}>
+        <Col  sm={sm} md={md} lg={lg} style={padding}>
             About
             <Link to="/api_docs">Api Docs</Link>
         </Col>

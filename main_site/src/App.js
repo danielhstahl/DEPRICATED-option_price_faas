@@ -35,7 +35,10 @@ const App = () => (
           path="/home"
           component={FrontPage}
         />
-        <Route path="/api_docs" component={Swagger} />
+        <Route 
+          path="/api_docs" 
+          component={Swagger} 
+        />
       </Content>
       <Footer></Footer>
     </Layout>
