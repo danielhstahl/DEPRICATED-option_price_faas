@@ -27,8 +27,10 @@ script:
   - npm install 
   - npm test -- --coverage
   - npm run build
+  - cd build
   - wget https://github.com/phillyfan1138/fang_oost_cal_charts/raw/master/docs/OptionCalculation.pdf
   - wget https://github.com/phillyfan1138/fang_oost_cal_charts/raw/master/docs/OptionCalibration.pdf
+  - cd ..
   - cd ..
 before_deploy:
 - npm install -g serverless

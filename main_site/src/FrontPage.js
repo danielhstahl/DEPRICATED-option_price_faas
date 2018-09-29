@@ -34,19 +34,16 @@ export default ()=>[
             <h1>Option Pricing Models</h1>
             <p>
             Our models are the most sophisticated in the industry. Our
-            software engineering is top notch.
+            software engineering is top notch.  
             </p>
             <ul>
-            <li>Robust Black-Scholes implied volatility</li>
-            <li>
-                Modern calibration techniques using advanced models which go
-                far beyond Heston.
-            </li>
-            <li>
-                Modern calculation techniques including pricing, Greeks,
-                option implied density, value at risk, and expected
-                shortfall.
-            </li>
+                <li>Robust Black-Scholes implied volatility</li>
+                <li>
+                    Option Pricing under extended Merton, Heston, and CGMY
+                </li>
+                <li>Greeks</li>
+                <li>Value at Risk</li>
+                <li>Expected Shortfall</li>
             </ul>
             <p>
             For more information on the models, see the <a href='/OptionCalculation.pdf'>documentation</a>.

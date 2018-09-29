@@ -5,6 +5,16 @@ provider:
   runtime: nodejs8.10
   stage: prd
 
+plugins:
+  - serverless-domain-manager
+
+custom:
+  customDomain:
+    domainName: finside.org
+    basePath: 'realoptions'
+    stage: ${self:provider.stage}
+    createRoute53Record: true
+
 package:
   exclude:
     - functions/**

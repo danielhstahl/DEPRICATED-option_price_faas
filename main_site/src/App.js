@@ -9,7 +9,7 @@ const LogoC=()=><Logo height='64px' width='64px' className='logo-primary'/>
 const { Content, Footer, Header } = Layout
 const lineHeight={lineHeight:'64px'}
 const rmPadding={padding:0}
-const marginRight={marginRight:'40%', float:'right'}
+const marginRight={marginRight:'30%', float:'right'}
 const AppMenu=({match:{params:{page}}})=>(
   <Menu
       mode="horizontal"
