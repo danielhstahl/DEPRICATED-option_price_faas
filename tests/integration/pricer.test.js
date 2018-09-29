@@ -315,25 +315,9 @@ it('correctly returns monte carlo price', (done)=>{
     })
     return handler.calculator(event, {}, (_err, val)=>{
         const parsedVal=JSON.parse(val.body)
-        //MC price is 4.779121, bounds are provided as test criteria
-        //expect(parsedVal[0].value).toBeLessThan(4.816284)
-        //
-        //expect(parsedVal[0].value).toBeGreaterThan(4.741957)
-
-        //MC price is 4.826208
-        
-        //expect(parsedVal[0].value).toBeLessThan(4.863758)
-        //expect(parsedVal[0].value).toBeGreaterThan(4.788658)
-
-
         //MC price is 4.793274
         expect(parsedVal[0].value).toBeLessThan(4.805023)
         expect(parsedVal[0].value).toBeGreaterThan(4.781525)
-
-
-
-
-        
         done()
     })
 })

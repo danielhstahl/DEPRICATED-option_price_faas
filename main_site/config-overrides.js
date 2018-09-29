@@ -10,7 +10,7 @@ module.exports = function override(config, env) {
     modifyVars: { 
       "@primary-color": "#eb2f96",  
       '@link-color': '#eb2f96',
-      '@font-size-base': '22px',
+      '@font-size-base': '20px',
       '@layout-header-background': '#030852'
     },
     javascriptEnabled: true,

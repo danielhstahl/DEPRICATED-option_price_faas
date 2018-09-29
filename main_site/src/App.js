@@ -9,6 +9,7 @@ const LogoC=()=><Logo height='64px' width='64px' className='logo-primary'/>
 const { Content, Footer, Header } = Layout
 const lineHeight={lineHeight:'64px'}
 const rmPadding={padding:0}
+const marginRight={marginRight:'40%', float:'right'}
 const AppMenu=({match:{params:{page}}})=>(
   <Menu
       mode="horizontal"
@@ -20,14 +21,15 @@ const AppMenu=({match:{params:{page}}})=>(
     <Menu.Item key='api_docs'><Link to='/api_docs'>API Docs</Link></Menu.Item>
   </Menu>
 )
+
 const App = () => (
-  <Router>
+  <Router basename={process.env.PUBLIC_URL}>
     <Layout>
       <Header style={rmPadding}>
         
         <Row >
           <Col xs={6} md={4} lg={4} >
-            <Icon component={LogoC} style={{marginRight:'40%', float:'right'}} />
+            <Icon component={LogoC} style={marginRight} />
           </Col>
           <Col xs={18} md={20} lg={20} >
             <Switch>
