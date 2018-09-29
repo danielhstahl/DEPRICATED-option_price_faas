@@ -10,8 +10,8 @@ plugins:
 
 custom:
   customDomain:
-    domainName: finside.org
-    basePath: 'realoptions'
+    domainName: api.finside.org
+    basePath: realoptions
     stage: ${self:provider.stage}
     createRoute53Record: true
 
