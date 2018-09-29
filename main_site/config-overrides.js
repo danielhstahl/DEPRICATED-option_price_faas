@@ -8,10 +8,10 @@ module.exports = function override(config, env) {
   )
   const config_babel_loader = rewireLess.withLoaderOptions({
     modifyVars: { 
-      "@primary-color": "#009688",  
-      '@link-color': '#009688',
-      '@font-size-base': '25px',
-      '@layout-header-background': '#f50057'
+      "@primary-color": "#eb2f96",  
+      '@link-color': '#eb2f96',
+      '@font-size-base': '22px',
+      '@layout-header-background': '#030852'
     },
     javascriptEnabled: true,
   })(config_babel, env)

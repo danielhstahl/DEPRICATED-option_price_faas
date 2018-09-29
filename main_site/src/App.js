@@ -1,12 +1,14 @@
 import React from 'react'
-import { Layout, Menu } from 'antd'
+import { Layout, Menu, Row, Col, Icon } from 'antd'
 import Swagger from './Swagger'
 import FrontPage from './FrontPage'
 import './App.css'
 import { HashRouter as Router, Route, Link, Redirect, Switch } from 'react-router-dom'
-
+import Logo from './Logo.js'
+const LogoC=()=><Logo height='64px' width='64px' className='logo-primary'/>
 const { Content, Footer, Header } = Layout
 const lineHeight={lineHeight:'64px'}
+const rmPadding={padding:0}
 const AppMenu=({match:{params:{page}}})=>(
   <Menu
       mode="horizontal"
@@ -21,11 +23,19 @@ const AppMenu=({match:{params:{page}}})=>(
 const App = () => (
   <Router>
     <Layout>
-      <Header>
-        <Switch>
-          <Redirect from='/' exact to='/home' />
-          <Route path='/:page' component={AppMenu} />     
-        </Switch>     
+      <Header style={rmPadding}>
+        
+        <Row >
+          <Col xs={6} md={4} lg={4} >
+            <Icon component={LogoC} style={{marginRight:'40%', float:'right'}} />
+          </Col>
+          <Col xs={18} md={20} lg={20} >
+            <Switch>
+              <Redirect from='/' exact to='/home' />
+              <Route path='/:page' component={AppMenu} />     
+            </Switch>    
+          </Col>
+        </Row> 
       </Header>
       <Content>
         <Route

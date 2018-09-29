@@ -1,26 +1,25 @@
 import React from 'react'
 import {  Row, Col } from 'antd'
 import './App.css'
-import 'antd/dist/antd.css'
 import { Link } from 'react-router-dom'
+import './styles/frontPage.less'
+import {xs, md, lg} from './styles/spanStyles'
 
-const standardLight = '#fff'
-const standardDark = '#001529'
-const divDark = { background: standardDark, height: '100vh' }
-const divLight = { background: standardLight, height: '100vh' }
-const hLight={ color: standardLight }
-const sm={span:22, offset:1}
-const md={span:16, offset:2}
-const lg={span:16, offset:3}
-const padding={padding:20}
+//const standardLight = '#fff'
+//const standardDark = '#001529'
+const heightStyle = { height: '100vh' }
+const padding={paddingTop:20}
+//const divLight = { background: standardLight, height: '100vh' }
+//const hLight={ color: standardLight }
+
 export default ()=>[
-    <Row style={divDark} gutter={16} key='summary'>
-        <Col sm={sm} md={md} lg={lg} style={padding}>
+    <Row style={heightStyle} className='row-primary' gutter={16} key='summary' >
+        <Col xs={xs} md={md} lg={lg} style={padding}>
         
-            <h1 style={hLight}>
+            <h1 className='light-color'>
                 Derivatives Modeling as a Service
             </h1>
-            <p style={hLight}>
+            <p className='light-color'>
                 For decades, the same financial models have been programmed
                 and re-programmed at every bank. We are changing that.
                 Combining state-of-the-art modeling with modern REST APIs, our
@@ -30,8 +29,8 @@ export default ()=>[
         
         </Col>
     </Row>,
-    <Row style={divLight} gutter={16} key='description'>
-        <Col sm={sm} md={md} lg={lg} style={padding}>
+    <Row style={heightStyle} className='row-secondary'  gutter={16} key='description'>
+        <Col xs={xs} md={md} lg={lg}  style={padding}>
             <h1>Option Pricing Models</h1>
             <p>
             Our models are the most sophisticated in the industry. Our
@@ -54,13 +53,13 @@ export default ()=>[
             </p>
         </Col>
     </Row>,
-    <Row style={divDark} gutter={16} key='pricing'>
-        <Col  sm={sm} md={md} lg={lg} style={{...hLight, ...padding}}>
+    <Row style={heightStyle} gutter={16} className='row-primary light-color' key='pricing'>
+        <Col xs={xs} md={md} lg={lg}  style={padding}>
             Pricing
         </Col>
     </Row>,
-    <Row style={divLight} gutter={16} key='about'>
-        <Col  sm={sm} md={md} lg={lg} style={padding}>
+    <Row style={heightStyle} gutter={16} className='row-secondary' key='about'>
+        <Col  xs={xs} md={md} lg={lg}  style={padding}>
             About: <Link to="/api_docs">Api Docs</Link>
         </Col>
     </Row>

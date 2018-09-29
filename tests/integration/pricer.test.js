@@ -273,9 +273,9 @@ it('correctly returns cgmy price: v3', (done)=>{
         done()
     })
 })
+
 it('correctly returns monte carlo price', (done)=>{
     //https://github.com/phillyfan1138/fang_oost_cal_charts/blob/master/docs/OptionCalculation.Rnw
-
     const rate=0.03
     const maturity=1.0
     const asset=50
@@ -287,7 +287,7 @@ it('correctly returns monte carlo price', (done)=>{
     const speed=0.3
     const eta_v=0.2
     const v0=0.9
-    const delta=0.1
+    //const delta=0.1
     const rho=-0.5
     
     const parameters={
@@ -316,8 +316,24 @@ it('correctly returns monte carlo price', (done)=>{
     return handler.calculator(event, {}, (_err, val)=>{
         const parsedVal=JSON.parse(val.body)
         //MC price is 4.779121, bounds are provided as test criteria
-        expect(parsedVal[0].value).toBeLessThan(4.816284)
-        expect(parsedVal[0].value).toBeGreaterThan(4.741957)
+        //expect(parsedVal[0].value).toBeLessThan(4.816284)
+        //
+        //expect(parsedVal[0].value).toBeGreaterThan(4.741957)
+
+        //MC price is 4.826208
+        
+        //expect(parsedVal[0].value).toBeLessThan(4.863758)
+        //expect(parsedVal[0].value).toBeGreaterThan(4.788658)
+
+
+        //MC price is 4.793274
+        expect(parsedVal[0].value).toBeLessThan(4.805023)
+        expect(parsedVal[0].value).toBeGreaterThan(4.781525)
+
+
+
+
+        
         done()
     })
 })
