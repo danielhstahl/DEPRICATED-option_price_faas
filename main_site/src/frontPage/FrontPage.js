@@ -1,9 +1,8 @@
 import React from 'react'
 import {  Row, Col } from 'antd'
-import './App.css'
 import { Link } from 'react-router-dom'
-import './styles/frontPage.less'
-import {xs, md, lg} from './styles/spanStyles'
+import '../styles/frontPage.less'
+import {xs, md, lg} from '../styles/spanStyles'
 
 const heightStyle = { height: '100vh' }
 const padding={paddingTop:20}

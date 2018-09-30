@@ -11,7 +11,7 @@ export default ({height='1em', width='1em', className='logo-primary'})=>(
             </clipPath>
         </defs>
         <g 
-            clip-path="url(#a)" 
+            clipPath="url(#a)" 
             className={className}
         >
             <path 
