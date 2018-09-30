@@ -3,7 +3,7 @@ import { Layout, Menu, Row, Col, Icon } from 'antd'
 import Swagger from './Swagger'
 import FrontPage from './FrontPage'
 import './App.css'
-import { HashRouter as Router, Route, Link, Redirect, Switch } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Link, Redirect, Switch } from 'react-router-dom'
 import Logo from './Logo.js'
 const LogoC=()=><Logo height='64px' width='64px' className='logo-primary'/>
 const { Content, Footer, Header } = Layout

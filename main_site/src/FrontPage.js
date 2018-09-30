@@ -5,12 +5,8 @@ import { Link } from 'react-router-dom'
 import './styles/frontPage.less'
 import {xs, md, lg} from './styles/spanStyles'
 
-//const standardLight = '#fff'
-//const standardDark = '#001529'
 const heightStyle = { height: '100vh' }
 const padding={paddingTop:20}
-//const divLight = { background: standardLight, height: '100vh' }
-//const hLight={ color: standardLight }
 
 export default ()=>[
     <Row style={heightStyle} className='row-primary' gutter={16} key='summary' >
@@ -42,8 +38,7 @@ export default ()=>[
                     Option Pricing under extended Merton, Heston, and CGMY
                 </li>
                 <li>Greeks</li>
-                <li>Value at Risk</li>
-                <li>Expected Shortfall</li>
+                <li>Value at Risk and Expected Shortfall</li>
             </ul>
             <p>
             For more information on the models, see the <a 
