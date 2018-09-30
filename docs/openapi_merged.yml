@@ -6,7 +6,7 @@ info:
     Extended CGMY.
   version: '1'
 servers:
-  - url: 'https://zcz8a5ch68.execute-api.us-east-1.amazonaws.com/prd'
+  - url: 'https://api.finside.org/realoptions'
     description: Production server
 paths:
   '/v1/cgmy/calculator/{optionType}/{sensitivity}':

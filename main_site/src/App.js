@@ -21,7 +21,7 @@ const AppMenu=({match:{params:{page}}})=>(
     <Menu.Item key='api_docs'><Link to='/api_docs'>API Docs</Link></Menu.Item>
   </Menu>
 )
-
+//TODO!! will "PUBLIC_URL" be the custom domain??
 const App = () => (
   <Router basename={process.env.PUBLIC_URL}>
     <Layout>
