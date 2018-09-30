@@ -46,7 +46,10 @@ export default ()=>[
                 <li>Expected Shortfall</li>
             </ul>
             <p>
-            For more information on the models, see the <a href={`${process.env.PUBLIC_URL}/OptionCalculation.pdf`}>documentation</a>.
+            For more information on the models, see the <a 
+                href={`${process.env.PUBLIC_URL}/OptionCalculation.pdf`}
+                target='_blank'
+            >documentation</a>.
             </p>
         </Col>
     </Row>,

@@ -33,8 +33,12 @@ script:
   - cd ..
   - cd ..
 before_deploy:
-- npm install -g serverless
-- sls deploy
+  - > #ensure only runs once :|
+    if ! [ "$BEFORE_DEPLOY_RUN" ]; then
+      export BEFORE_DEPLOY_RUN=1;
+      npm install -g serverless;
+      sls deploy;
+    fi
 addons:
   apt:
     packages:
