@@ -13,7 +13,7 @@ import {
 } from './aws'
 import apigClientFactory from 'aws-api-gateway-client'
 import {
-    UPDATE_LOGIN_VALUES,
+    //UPDATE_LOGIN_VALUES,
     UPDATE_AWS_CREDENTIALS,
     LOGIN_ERROR,
     UPDATE_API_KEY,
@@ -85,11 +85,6 @@ export const login=dispatch=>(email, password)=>{
                         err
                     })
                 }
-                
-                dispatch({
-                    type:UPDATE_AWS_CREDENTIALS,
-                    value:AWS.config.credentials
-                })
                 const {
                     accessKeyId,
                     sessionToken,
@@ -106,7 +101,6 @@ export const login=dispatch=>(email, password)=>{
                     type:UPDATE_AWS_CLIENT,
                     value:apigClient
                 })
-                console.log(apigClient)
                 signIn(dispatch)(apigClient)
             })
         },

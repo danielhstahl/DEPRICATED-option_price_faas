@@ -4,7 +4,7 @@ const rewireLess = require('react-app-rewire-less')
 module.exports = function override(config, env) {
   const config_babel = injectBabelPlugin(
     ['import', { libraryName: 'antd', libraryDirectory: 'es', style: true }], // change importing css to less
-    config,
+    config
   )
   const config_babel_loader = rewireLess.withLoaderOptions({
     modifyVars: { 

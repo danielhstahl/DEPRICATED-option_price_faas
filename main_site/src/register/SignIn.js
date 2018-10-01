@@ -1,12 +1,11 @@
 import React from 'react'
 import { 
     Button, Form, 
-    Icon, Input,
-    Checkbox 
+    Icon, Input 
 } from 'antd'
 import { connect } from 'react-redux'
 import { register, login } from '../services/auth'
-import { confirmMarketplaceSubscription } from '../services/api-catalog'
+//import { confirmMarketplaceSubscription } from '../services/api-catalog'
 const FormItem = Form.Item
 const UserIcon=<Icon 
     type="user" 
@@ -16,9 +15,8 @@ const PasswordIcon=<Icon
     type="lock"
     style={{ color: 'rgba(0,0,0,.25)' }} 
 /> 
-export const SignIn=({/*username, password, */login, ...rest})=>{
-    //console.log(rest)
-    return (
+export const SignIn=({login, isSignedIn})=>isSignedIn?<div>Welcome</div>:
+(
     <Form onSubmit={login}>
         <FormItem>
             <Input 
@@ -43,7 +41,7 @@ export const SignIn=({/*username, password, */login, ...rest})=>{
         </FormItem>
     </Form>
 )
-    }
+
 const mapDispatchToProps=dispatch=>({
     register:e=>{
         e.preventDefault()
@@ -60,7 +58,7 @@ const mapDispatchToProps=dispatch=>({
         //register(dispatch)(email, password)
     }
 })
-const mapStateToProps=({auth})=>auth
+const mapStateToProps=({auth:{isSignedIn}})=>({isSignedIn})
 export default connect(
     mapStateToProps, 
     mapDispatchToProps
