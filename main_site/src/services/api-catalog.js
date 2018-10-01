@@ -9,8 +9,11 @@ import {
     DELETE_SUBSCRIPTION,
     UPDATE_USAGE
 } from '../actions/constants'
-export const getCatalog=dispatch=>headers=>fetch(
-    `${url}/catalog`, {headers}
+
+export const getCatalog=dispatch=>client=>client.invokeApi(
+    {},
+    `${url}/catalog`, 
+    'GET', {}, {}
 )
 .then(({data})=>dispatch({type:UPDATE_CATALOG, value:data}))
 .catch(err=>dispatch({type:CATALOG_ERROR, err}))

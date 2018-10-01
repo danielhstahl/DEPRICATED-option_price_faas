@@ -10,16 +10,16 @@ export default (state={}, action)=>{
     switch(action.type){
         case UPDATE_LOGIN_VALUES:
             const {type, ...rest}=action
-            console.log(rest)
+            //console.log(rest)
             return {...state, ...rest}
         case UPDATE_AWS_CREDENTIALS:
-            console.log(action.value)
+            //console.log(action.value)
             return {
                 ...state,
                 ...action.value
             }
         case UPDATE_API_KEY:
-            console.log(action.value)
+            //console.log(action.value)
             return {
                 ...state,
                 apiKey:action.value

@@ -1,5 +1,5 @@
 import AWS from 'aws-sdk'
-import {url, getHeaders} from './aws'
+import {url, awsRegion} from './aws'
 import { 
     CognitoUserPool, 
     CognitoUser, 
@@ -11,7 +11,7 @@ import {
     cognitoClientId, 
     cognitoRegion 
 } from './aws'
-
+import apigClientFactory from 'aws-api-gateway-client'
 import {
     UPDATE_LOGIN_VALUES,
     UPDATE_AWS_CREDENTIALS,
@@ -21,6 +21,7 @@ import {
     REGISTER_ERROR,
     LOGOUT,
     UPDATE_SIGN_IN,
+    UPDATE_AWS_CLIENT,
     SIGN_IN_ERROR
 } from '../actions/constants'
 
@@ -89,7 +90,24 @@ export const login=dispatch=>(email, password)=>{
                     type:UPDATE_AWS_CREDENTIALS,
                     value:AWS.config.credentials
                 })
-                signIn(dispatch)(getHeaders(AWS.config.credentials))
+                const {
+                    accessKeyId,
+                    sessionToken,
+                    secretAccessKey
+                }=AWS.config.credentials
+                const apigClient=apigClientFactory.newClient({
+                    accessKey:accessKeyId,
+                    secretKey:secretAccessKey,
+                    sessionToken,
+                    region:awsRegion, 
+                    invokeUrl:url
+                })
+                dispatch({
+                    type:UPDATE_AWS_CLIENT,
+                    value:apigClient
+                })
+                console.log(apigClient)
+                signIn(dispatch)(apigClient)
             })
         },
         onFailure: err => {
@@ -108,7 +126,7 @@ export const logout=dispatch=>()=>dispatch({
 })
 
 export const showApiKey=dispatch=>headers=>fetch(
-    `${url}/apikey`, {headers}
+    '/apikey', {headers}
 )
 .then(({data}) => dispatch({
     type:UPDATE_API_KEY,
@@ -119,8 +137,12 @@ export const showApiKey=dispatch=>headers=>fetch(
     err
 }))
 
-export const signIn=dispatch=>headers=>fetch(
-    `${url}/signin`, {headers, type:'POST'}
+export const signIn=dispatch=>client=>client.invokeApi(
+    {},
+    '/signin',
+    'POST', 
+    {},
+    {}
 )
 .then(({data}) => dispatch({
     type:UPDATE_SIGN_IN,

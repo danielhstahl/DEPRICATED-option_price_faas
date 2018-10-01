@@ -17,7 +17,7 @@ const PasswordIcon=<Icon
     style={{ color: 'rgba(0,0,0,.25)' }} 
 /> 
 export const SignIn=({/*username, password, */login, ...rest})=>{
-    console.log(rest)
+    //console.log(rest)
     return (
     <Form onSubmit={login}>
         <FormItem>

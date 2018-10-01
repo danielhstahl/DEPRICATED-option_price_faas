@@ -6,8 +6,10 @@
   "dependencies": {
     "amazon-cognito-identity-js": "^2.0.30",
     "antd": "^3.9.3",
+    "aws-api-gateway-client": "^0.2.16",
     "aws-sdk": "^2.325.0",
     "babel-plugin-import": "^1.9.1",
+    "crypto-js": "^3.1.9-1",
     "gh-pages": "^2.0.0",
     "husky": "^0.14.3",
     "lint-staged": "^7.2.2",
