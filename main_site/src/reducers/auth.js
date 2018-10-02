@@ -8,23 +8,13 @@ import {
 
 export default (state={}, action)=>{
     switch(action.type){
-        /*case UPDATE_LOGIN_VALUES:
-            const {type, ...rest}=action
-            //console.log(rest)
-            return {...state, ...rest}*/
-        /*case UPDATE_AWS_CREDENTIALS:
-            //console.log(action.value)
-            return {
-                ...state,
-                ...action.value
-            }*/
         case UPDATE_API_KEY:
-            //console.log(action.value)
             return {
                 ...state,
                 apiKey:action.value
             }
         case UPDATE_SIGN_IN:
+            console.log(action.value)
             return {...state, isSignedIn:true}
         case LOGOUT:
             return {}

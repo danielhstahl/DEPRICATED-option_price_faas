@@ -13,8 +13,6 @@ import {
 } from './aws'
 import apigClientFactory from 'aws-api-gateway-client'
 import {
-    //UPDATE_LOGIN_VALUES,
-    UPDATE_AWS_CREDENTIALS,
     LOGIN_ERROR,
     UPDATE_API_KEY,
     API_ERROR,
@@ -22,7 +20,8 @@ import {
     LOGOUT,
     UPDATE_SIGN_IN,
     UPDATE_AWS_CLIENT,
-    SIGN_IN_ERROR
+    SIGN_IN_ERROR,
+    IS_LOGGING_IN
 } from '../actions/constants'
 
 const POOL_DATA = {
@@ -54,6 +53,10 @@ export const register=dispatch=>(email, password)=>{
 }
 
 export const login=dispatch=>(email, password)=>{
+    dispatch({
+        type:IS_LOGGING_IN,
+        value:true
+    })
     const authenticationData = {
         Username: email,
         Password: password
@@ -101,7 +104,12 @@ export const login=dispatch=>(email, password)=>{
                     type:UPDATE_AWS_CLIENT,
                     value:apigClient
                 })
-                signIn(dispatch)(apigClient)
+                signIn(dispatch)(apigClient).then(()=>{
+                    dispatch({
+                        type:IS_LOGGING_IN,
+                        value:false
+                    })
+                })
             })
         },
         onFailure: err => {
@@ -119,12 +127,15 @@ export const logout=dispatch=>()=>dispatch({
     type:LOGOUT
 })
 
-export const showApiKey=dispatch=>headers=>fetch(
-    '/apikey', {headers}
+export const showApiKey=dispatch=>client=>client.invokeApi(
+    {},
+    '/apikey', 
+    'GET',
+    {}, {}
 )
-.then(({data}) => dispatch({
+.then(({data:{value}}) => dispatch({
     type:UPDATE_API_KEY,
-    value:data.value
+    value
 }))
 .catch(err=>dispatch({
     type:API_ERROR,

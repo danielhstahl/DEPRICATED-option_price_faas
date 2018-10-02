@@ -12,7 +12,14 @@ provider:
     throttle:
       burstLimit: 200
       rateLimit: 100
-
+  #UsagePlanKey:
+  #    Type: "AWS::ApiGateway::UsagePlanKey"
+  #    Properties:
+  #      KeyId:
+  #        Ref: ApiGatewayApiKey1
+  #      KeyType: API_KEY
+  #      UsagePlanId:
+  #        Ref: UsagePlan
 plugins:
   - serverless-domain-manager
 
@@ -49,6 +56,7 @@ functions:
           path: v1/{model}/calculator/{optionType}/{sensitivity}
           method: post
           cors: true
+          private: true
           request:
             parameters:
               paths:
@@ -65,6 +73,7 @@ functions:
           path: v1/{model}/density
           method: post
           cors: true
+          private: true
           request:
             parameters:
               paths:
@@ -77,6 +86,7 @@ functions:
           path: v1/{model}/riskmetric
           method: post
           cors: true
+          private: true
           request:
             parameters:
               paths:
@@ -89,6 +99,7 @@ functions:
           path: v1/{model}/parameters/parameter_ranges
           method: get
           cors: true
+          private: true
           request:
             parameters:
               paths:

@@ -1,11 +1,12 @@
 import React from 'react'
 import { 
     Button, Form, 
-    Icon, Input 
+    Icon, Input
 } from 'antd'
 import { connect } from 'react-redux'
 import { register, login } from '../services/auth'
-//import { confirmMarketplaceSubscription } from '../services/api-catalog'
+import Loading from '../components/Loading'
+
 const FormItem = Form.Item
 const UserIcon=<Icon 
     type="user" 
@@ -15,9 +16,10 @@ const PasswordIcon=<Icon
     type="lock"
     style={{ color: 'rgba(0,0,0,.25)' }} 
 /> 
-export const SignIn=({login, isSignedIn})=>isSignedIn?<div>Welcome</div>:
-(
-    <Form onSubmit={login}>
+const maxWidth={maxWidth:600}
+export const SignIn=({login, isLoggingIn})=>isLoggingIn?
+    <Loading/>:
+    <Form onSubmit={login} style={maxWidth}>
         <FormItem>
             <Input 
                 prefix={UserIcon} placeholder="Username" 
@@ -40,7 +42,7 @@ export const SignIn=({login, isSignedIn})=>isSignedIn?<div>Welcome</div>:
             </Button>
         </FormItem>
     </Form>
-)
+
 
 const mapDispatchToProps=dispatch=>({
     register:e=>{
@@ -48,17 +50,16 @@ const mapDispatchToProps=dispatch=>({
         //console.log(e.target)
         const [{value:email}, {value:password}]=e.target
         register(dispatch)(email, password)
-        //register(dispatch)(email, password)
     },
     login:e=>{
         e.preventDefault()
         //console.log(e.target)
         const [{value:email}, {value:password}]=e.target
         login(dispatch)(email, password)
-        //register(dispatch)(email, password)
     }
 })
-const mapStateToProps=({auth:{isSignedIn}})=>({isSignedIn})
+const mapStateToProps=({loading:{isLoggingIn}})=>({isLoggingIn})
+
 export default connect(
     mapStateToProps, 
     mapDispatchToProps

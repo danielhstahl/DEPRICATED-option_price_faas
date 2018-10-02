@@ -1,9 +1,15 @@
 import React from 'react'
-import {  Row, Col, Card, Button, Spin } from 'antd'
+import {  Row, Col, Card, Button } from 'antd'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-import AsyncLoad from '../helperComponents/AsyncLoad'
-import {addSubscription, removeSubscription, getCatalog, getSubscriptions} from '../services/api-catalog'
+import Loading from '../components/Loading'
+import ApiModal from '../components/ApiModal'
+import AsyncLoad from '../components/AsyncLoad'
+import {
+    addSubscription, removeSubscription, 
+    getCatalog, getSubscriptions
+} from '../services/api-catalog'
+
 const UnsubscribeButton=({unsubscribe, usagePlanId, client})=>(
     <Button onClick={()=>unsubscribe(usagePlanId, client)}>
         Unsubscribe
@@ -14,6 +20,7 @@ const SubscribeButton=({subscribe, usagePlanId, client})=>(
         Subscribe
     </Button>
 )
+
 const ChooseButton=({
     isSubscribed, unsubscribe, 
     subscribe, usagePlanId, client
@@ -28,25 +35,34 @@ const ChooseButton=({
         usagePlanId={usagePlanId} 
         client={client}
     />
-const centerStyle={marginRight:'50%', marginLeft:'50%'}
+
 const padding={paddingTop:20}
-const loading=()=><Spin style={centerStyle}/>
-export const Products=({
+
+
+
+export const Developers=({
     catalog, isSignedIn, getCatalog, 
     subscriptions, subscribe, 
-    unsubscribe, client, getSubscriptions
+    unsubscribe, client, 
+    getSubscriptions, apiKey,
+    match
 })=>(
-<AsyncLoad onLoad={getCatalog} loading={loading} render={()=>(
-    <Row gutter={16} key='summary' type="flex" justify="space-around" >
+<AsyncLoad 
+    requiredObject={catalog.length>0} 
+    onLoad={getCatalog} 
+    loading={Loading} 
+    render={()=>(
+    <Row gutter={16} key='apirow' type="flex" justify="space-around" >
         {catalog.map(({id:usagePlanId, name, apis})=>apis.map(({id:apiId})=>(
             <Col xs={24} md={12} lg={8} key={apiId} style={padding}>
-                <Card title={name} extra={<Link to="/api_docs">Api Docs</Link>}>
+                <Card title={name} extra={<Link to={`${match.url}/api_docs`}>Api Docs</Link>}>
                     {
-                        //TODO!!!  make subscriptions find the subscription id (I currently don't know what the subscription keys are)
-                        isSignedIn?(
+                        isSignedIn?[
                             <AsyncLoad 
+                                key='subscription'
+                                requiredObject={subscriptions.length>0}
                                 onLoad={()=>getSubscriptions(client)}
-                                loading={loading}
+                                loading={Loading}
                                 render={()=>(
                                     <ChooseButton 
                                         isSubscribed={subscriptions.find(({id})=>id===usagePlanId)}
@@ -56,8 +72,9 @@ export const Products=({
                                         client={client}
                                     />
                                 )}
-                            />
-                        ):<Link to="/log_in">Log In</Link>
+                            />,
+                            <ApiModal key='apimodal'/>
+                        ]:<p>Log in to view subscriptions</p>
                     }
                 </Card>
             </Col>
@@ -65,11 +82,12 @@ export const Products=({
     </Row>
 )}/>
 )
-const mapStateToProps=({catalog, auth:{isSignedIn}, subscriptions, client})=>({
+const mapStateToProps=({catalog, auth:{isSignedIn, apiKey}, subscriptions, client})=>({
     catalog,
     isSignedIn,
     subscriptions,
-    client
+    client,
+    apiKey
 })
 
 const mapDispatchToProps=dispatch=>({
@@ -82,4 +100,4 @@ const mapDispatchToProps=dispatch=>({
 export default connect(
     mapStateToProps,
     mapDispatchToProps
-)(Products)
+)(Developers)

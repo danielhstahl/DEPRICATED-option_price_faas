@@ -10,7 +10,6 @@ const padding={paddingTop:20}
 export default ()=>[
     <Row style={heightStyle} className='row-primary' gutter={16} key='summary' >
         <Col xs={xs} md={md} lg={lg} style={padding}>
-        
             <h1 className='light-color'>
                 Derivatives Modeling as a Service
             </h1>
@@ -21,7 +20,6 @@ export default ()=>[
                 models as a service provides robust, scalable infrastructure
                 at a bargain price.
             </p>
-        
         </Col>
     </Row>,
     <Row style={heightStyle} className='row-secondary'  gutter={16} key='description'>
