@@ -77,6 +77,11 @@ paths:
             'false'.  Only applicable for sensitivity='price'
           schema:
             type: boolean
+        - name: x-api-key
+          in: header
+          schema:
+            type: string
+          required: true
       requestBody:
         required: true
         content:
@@ -192,6 +197,11 @@ paths:
             'false'.  Only applicable for sensitivity='price'
           schema:
             type: boolean
+        - name: x-api-key
+          in: header
+          schema:
+            type: string
+          required: true
       requestBody:
         required: true
         content:
@@ -296,6 +306,11 @@ paths:
             'false'.  Only applicable for sensitivity='price'
           schema:
             type: boolean
+        - name: x-api-key
+          in: header
+          schema:
+            type: string
+          required: true
       requestBody:
         required: true
         content:
@@ -388,6 +403,12 @@ paths:
           content:
             application/json:
               schema: *ref_1
+      parameters:
+        - name: x-api-key
+          in: header
+          schema:
+            type: string
+          required: true
       requestBody:
         required: true
         content:
@@ -408,6 +429,12 @@ paths:
           content:
             application/json:
               schema: *ref_1
+      parameters:
+        - name: x-api-key
+          in: header
+          schema:
+            type: string
+          required: true
       requestBody:
         required: true
         content:
@@ -428,6 +455,12 @@ paths:
           content:
             application/json:
               schema: *ref_1
+      parameters:
+        - name: x-api-key
+          in: header
+          schema:
+            type: string
+          required: true
       requestBody:
         required: true
         content:
@@ -458,6 +491,12 @@ paths:
           content:
             application/json:
               schema: *ref_1
+      parameters:
+        - name: x-api-key
+          in: header
+          schema:
+            type: string
+          required: true
       requestBody:
         required: true
         content:
@@ -478,6 +517,12 @@ paths:
           content:
             application/json:
               schema: *ref_1
+      parameters:
+        - name: x-api-key
+          in: header
+          schema:
+            type: string
+          required: true
       requestBody:
         required: true
         content:
@@ -500,6 +545,12 @@ paths:
           content:
             application/json:
               schema: *ref_1
+      parameters:
+        - name: x-api-key
+          in: header
+          schema:
+            type: string
+          required: true
       requestBody:
         required: true
         content:
@@ -723,3 +774,8 @@ paths:
               - cgmy
               - merton
               - heston
+        - name: x-api-key
+          in: header
+          schema:
+            type: string
+          required: true
