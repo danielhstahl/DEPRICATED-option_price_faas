@@ -8,6 +8,14 @@ info:
 servers:
   - url: 'https://api.finside.org/realoptions'
     description: Production server
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-Key
+security:
+  - ApiKeyAuth: []
 paths:
   '/v1/cgmy/calculator/{optionType}/{sensitivity}':
     post:
@@ -77,11 +85,6 @@ paths:
             'false'.  Only applicable for sensitivity='price'
           schema:
             type: boolean
-        - name: x-api-key
-          in: header
-          schema:
-            type: string
-          required: true
       requestBody:
         required: true
         content:
@@ -197,11 +200,6 @@ paths:
             'false'.  Only applicable for sensitivity='price'
           schema:
             type: boolean
-        - name: x-api-key
-          in: header
-          schema:
-            type: string
-          required: true
       requestBody:
         required: true
         content:
@@ -306,11 +304,6 @@ paths:
             'false'.  Only applicable for sensitivity='price'
           schema:
             type: boolean
-        - name: x-api-key
-          in: header
-          schema:
-            type: string
-          required: true
       requestBody:
         required: true
         content:
@@ -403,12 +396,6 @@ paths:
           content:
             application/json:
               schema: *ref_1
-      parameters:
-        - name: x-api-key
-          in: header
-          schema:
-            type: string
-          required: true
       requestBody:
         required: true
         content:
@@ -429,12 +416,6 @@ paths:
           content:
             application/json:
               schema: *ref_1
-      parameters:
-        - name: x-api-key
-          in: header
-          schema:
-            type: string
-          required: true
       requestBody:
         required: true
         content:
@@ -455,12 +436,6 @@ paths:
           content:
             application/json:
               schema: *ref_1
-      parameters:
-        - name: x-api-key
-          in: header
-          schema:
-            type: string
-          required: true
       requestBody:
         required: true
         content:
@@ -491,12 +466,6 @@ paths:
           content:
             application/json:
               schema: *ref_1
-      parameters:
-        - name: x-api-key
-          in: header
-          schema:
-            type: string
-          required: true
       requestBody:
         required: true
         content:
@@ -517,12 +486,6 @@ paths:
           content:
             application/json:
               schema: *ref_1
-      parameters:
-        - name: x-api-key
-          in: header
-          schema:
-            type: string
-          required: true
       requestBody:
         required: true
         content:
@@ -545,12 +508,6 @@ paths:
           content:
             application/json:
               schema: *ref_1
-      parameters:
-        - name: x-api-key
-          in: header
-          schema:
-            type: string
-          required: true
       requestBody:
         required: true
         content:
@@ -774,8 +731,3 @@ paths:
               - cgmy
               - merton
               - heston
-        - name: x-api-key
-          in: header
-          schema:
-            type: string
-          required: true

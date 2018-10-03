@@ -8,6 +8,15 @@ servers:
   - url: https://api.finside.org/realoptions
     description: Production server
 
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-Key
+
+security:
+  - ApiKeyAuth: []
 
 paths:
   /v1/cgmy/calculator/{optionType}/{sensitivity}:
@@ -47,11 +56,6 @@ paths:
           description: Whether to include implied volatility in the results.  Defaults to 'false'.  Only applicable for sensitivity='price'
           schema:
             type: boolean
-        - name: x-api-key
-          in: header
-          schema: 
-            type: string
-          required: true
       requestBody:
         required: true
         content:
@@ -95,11 +99,6 @@ paths:
           description: Whether to include implied volatility in the results.  Defaults to 'false'.  Only applicable for sensitivity='price'
           schema:
             type: boolean
-        - name: x-api-key
-          in: header
-          schema: 
-            type: string
-          required: true
       requestBody:
         required: true
         content:
@@ -144,11 +143,6 @@ paths:
           description: Whether to include implied volatility in the results.  Defaults to 'false'.  Only applicable for sensitivity='price'
           schema:
             type: boolean
-        - name: x-api-key
-          in: header
-          schema: 
-            type: string
-          required: true
       requestBody:
         required: true
         content:
@@ -173,12 +167,6 @@ paths:
             application/json: 
               schema:
                 $ref: './ErrorResponse.json'
-      parameters:
-        - name: x-api-key
-          in: header
-          schema: 
-            type: string
-          required: true
       requestBody:
         required: true
         content:
@@ -203,12 +191,6 @@ paths:
             application/json: 
               schema:
                 $ref: './ErrorResponse.json'
-      parameters:
-        - name: x-api-key
-          in: header
-          schema: 
-            type: string
-          required: true
       requestBody:
         required: true
         content:
@@ -233,12 +215,6 @@ paths:
             application/json: 
               schema:
                 $ref: './ErrorResponse.json'
-      parameters:
-        - name: x-api-key
-          in: header
-          schema: 
-            type: string
-          required: true
       requestBody:
         required: true
         content:
@@ -263,12 +239,6 @@ paths:
             application/json: 
               schema:
                 $ref: './ErrorResponse.json'
-      parameters:
-        - name: x-api-key
-          in: header
-          schema: 
-            type: string
-          required: true
       requestBody:
         required: true
         content:
@@ -292,12 +262,6 @@ paths:
             application/json: 
               schema:
                 $ref: './ErrorResponse.json'
-      parameters:
-        - name: x-api-key
-          in: header
-          schema: 
-            type: string
-          required: true
       requestBody:
         required: true
         content:
@@ -321,12 +285,6 @@ paths:
             application/json: 
               schema:
                 $ref: './ErrorResponse.json'
-      parameters:
-        - name: x-api-key
-          in: header
-          schema: 
-            type: string
-          required: true
       requestBody:
         required: true
         content:
@@ -359,8 +317,3 @@ paths:
           schema:
             type: string
             enum: [cgmy, merton, heston]
-        - name: x-api-key
-          in: header
-          schema: 
-            type: string
-          required: true
