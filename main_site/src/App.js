@@ -3,6 +3,8 @@ import { Layout, Row, Col, Icon } from 'antd'
 import Swagger from './pages/Swagger'
 import FrontPage from './pages/FrontPage'
 import Developers from './pages/Developers'
+import Login from './pages/Login'
+import Register from './pages/Register'
 import AppMenu from './components/AppMenu'
 import './App.css'
 import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom'
@@ -51,6 +53,14 @@ const App = () => (
           <Route 
             path="/developers" 
             component={Developers} 
+          />
+          <Route 
+            path="/register" 
+            component={Register} 
+          />
+          <Route 
+            path="/login" 
+            component={Login} 
           />
           <Route 
             path="/developers/api_docs" 

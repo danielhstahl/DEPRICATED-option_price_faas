@@ -17,9 +17,9 @@ const PasswordIcon=<Icon
     style={{ color: 'rgba(0,0,0,.25)' }} 
 /> 
 const maxWidth={maxWidth:600}
-export const SignIn=({login, isLoggingIn})=>isLoggingIn?
+export const SignIn=({isRegistration, login, register, isLoggingIn})=>isLoggingIn?
     <Loading/>:
-    <Form onSubmit={login} style={maxWidth}>
+    <Form onSubmit={isRegistration?register:login} style={maxWidth}>
         <FormItem>
             <Input 
                 prefix={UserIcon} placeholder="Username" 
@@ -43,20 +43,14 @@ export const SignIn=({login, isLoggingIn})=>isLoggingIn?
         </FormItem>
     </Form>
 
-
+const getForm=(fn, dispatch)=>e=>{
+    e.preventDefault()
+    const [{value:email}, {value:password}]=e.target
+    fn(dispatch)(email, password)
+}
 const mapDispatchToProps=dispatch=>({
-    register:e=>{
-        e.preventDefault()
-        //console.log(e.target)
-        const [{value:email}, {value:password}]=e.target
-        register(dispatch)(email, password)
-    },
-    login:e=>{
-        e.preventDefault()
-        //console.log(e.target)
-        const [{value:email}, {value:password}]=e.target
-        login(dispatch)(email, password)
-    }
+    register:getForm(register, dispatch),
+    login:getForm(login, dispatch),
 })
 const mapStateToProps=({loading:{isLoggingIn}})=>({isLoggingIn})
 

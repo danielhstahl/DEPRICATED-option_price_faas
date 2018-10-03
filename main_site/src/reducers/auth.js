@@ -1,9 +1,8 @@
 import {
-    //UPDATE_LOGIN_VALUES,
     UPDATE_SIGN_IN,
     LOGOUT,
     UPDATE_API_KEY,
-    //UPDATE_AWS_CREDENTIALS
+    UPDATE_COGNITO_USER
 } from '../actions/constants'
 
 export default (state={}, action)=>{
@@ -14,8 +13,9 @@ export default (state={}, action)=>{
                 apiKey:action.value
             }
         case UPDATE_SIGN_IN:
-            console.log(action.value)
             return {...state, isSignedIn:true}
+        case UPDATE_COGNITO_USER:
+            return {...state, cognitoUser:action.value}
         case LOGOUT:
             return {}
         default:

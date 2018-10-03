@@ -21,6 +21,7 @@ import {
     UPDATE_SIGN_IN,
     UPDATE_AWS_CLIENT,
     SIGN_IN_ERROR,
+    UPDATE_COGNITO_USER,
     IS_LOGGING_IN
 } from '../actions/constants'
 
@@ -31,7 +32,7 @@ const POOL_DATA = {
 
 const COGNITO_LOGIN_KEY=`cognito-idp.${cognitoRegion}.amazonaws.com/${cognitoUserPoolId}`
 
-export const register=dispatch=>(email, password)=>{
+export const register=dispatch=>(email, password)=>new Promise((resolve, reject)=>{
     const userPool=new CognitoUserPool(POOL_DATA)
     userPool.signUp(
         email, password, 
@@ -44,15 +45,60 @@ export const register=dispatch=>(email, password)=>{
                     type:REGISTER_ERROR,
                     err
                 })
+                reject(err)
             } else {
                 console.log(result)
-                login(dispatch)(email, password)
+                login(dispatch)(email, password).then(resolve)
             }
         }
     )
-}
+})
 
-export const login=dispatch=>(email, password)=>{
+const credentialRefresh=(token, cognitoUser, dispatch)=>new Promise((resolve, reject)=>{
+    const Logins={
+        [COGNITO_LOGIN_KEY]:token
+    }
+    AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+        IdentityPoolId: cognitoIdentityPoolId,
+        Logins
+    })
+    AWS.config.credentials.refresh(err=>{
+        if(err){
+            return dispatch({
+                type:LOGIN_ERROR,
+                err
+            })
+        }
+        const {
+            accessKeyId,
+            sessionToken,
+            secretAccessKey
+        }=AWS.config.credentials
+        const apigClient=apigClientFactory.newClient({
+            accessKey:accessKeyId,
+            secretKey:secretAccessKey,
+            sessionToken,
+            region:awsRegion, 
+            invokeUrl:url
+        })
+        dispatch({
+            type:UPDATE_AWS_CLIENT,
+            value:apigClient
+        })
+        dispatch({
+            type:UPDATE_COGNITO_USER,
+            value:cognitoUser
+        })
+        signIn(dispatch)(apigClient).then(()=>{
+            dispatch({
+                type:IS_LOGGING_IN,
+                value:false
+            })
+            resolve()
+        })
+    })
+})
+export const login=dispatch=>(email, password)=>new Promise((resolve, reject)=>{
     dispatch({
         type:IS_LOGGING_IN,
         value:true
@@ -70,62 +116,43 @@ export const login=dispatch=>(email, password)=>{
     const cognitoUser = new CognitoUser(userData)
     cognitoUser.authenticateUser(authDets, {
         onSuccess: result => {
-            console.log(result)
             const token=result
                 .getIdToken()
                 .getJwtToken()
-            const Logins={
-                [COGNITO_LOGIN_KEY]:token
-            }
-            AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-                IdentityPoolId: cognitoIdentityPoolId,
-                Logins
-            })
-            AWS.config.credentials.refresh(err=>{
-                if(err){
-                    return dispatch({
-                        type:LOGIN_ERROR,
-                        err
-                    })
-                }
-                const {
-                    accessKeyId,
-                    sessionToken,
-                    secretAccessKey
-                }=AWS.config.credentials
-                const apigClient=apigClientFactory.newClient({
-                    accessKey:accessKeyId,
-                    secretKey:secretAccessKey,
-                    sessionToken,
-                    region:awsRegion, 
-                    invokeUrl:url
-                })
-                dispatch({
-                    type:UPDATE_AWS_CLIENT,
-                    value:apigClient
-                })
-                signIn(dispatch)(apigClient).then(()=>{
-                    dispatch({
-                        type:IS_LOGGING_IN,
-                        value:false
-                    })
-                })
-            })
+            credentialRefresh(token, cognitoUser, dispatch).then(resolve)
         },
         onFailure: err => {
-            console.log(err)
-            return dispatch({
+            dispatch({
                 type:LOGIN_ERROR,
                 err
             })
+            reject(err)
         }
     })
+})
+
+export const init=dispatch=>()=>{
+    const userPool = new CognitoUserPool(POOL_DATA)
+    const cognitoUser = userPool.getCurrentUser()
+    return cognitoUser?new Promise((resolve, reject)=>{
+        cognitoUser.getSession((err, session)=>{
+            if(err) {
+                return reject(err)
+            }
+            const token=session.getIdToken().getJwtToken()
+            credentialRefresh(token, cognitoUser, dispatch)
+            resolve()
+        })
+    }):Promise.resolve()
 }
 
 
-export const logout=dispatch=>()=>dispatch({
-    type:LOGOUT
-})
+export const logout=dispatch=>cognitoUser=>{
+    cognitoUser.signOut()
+    dispatch({
+        type:LOGOUT
+    })
+}
 
 export const showApiKey=dispatch=>client=>client.invokeApi(
     {},
