@@ -29,7 +29,7 @@ const AppMenu=({match:{params:{page}}, isSignedIn, logout, init, cognitoUser})=>
         <Link to='/register' key='register'>Sign Up</Link>   
     </Menu.Item>}
     <Menu.Item key='login' style={floatRight}> 
-        <AsyncLoad key='login' onLoad={init} loading={Loading} render={()=>isSignedIn?
+        <AsyncLoad onLoad={init} loading={Loading} render={()=>isSignedIn?
             <LogOut 
                 logout={logout} 
                 cognitoUser={cognitoUser}

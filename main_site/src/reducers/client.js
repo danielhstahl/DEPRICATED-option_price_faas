@@ -5,7 +5,7 @@ import {
 export default (state={}, action)=>{
     switch(action.type){
         case UPDATE_AWS_CLIENT:
-            return action.value
+            return action.client
         default:
             return state
     }

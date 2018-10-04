@@ -14,6 +14,7 @@ import { createStore } from 'redux'
 import awsApp from './reducers'
 import Products from './pages/Products'
 import {menuBarHeight} from './styles/menu'
+import {HOME} from './routes/names'
 const { Content, Footer, Header } = Layout
 const store=createStore(awsApp)
 
@@ -43,7 +44,7 @@ const App = () => (
         <Content>
           <Route
             exact
-            path="/home"
+            path={HOME}
             component={FrontPage}
           />
           <Route 

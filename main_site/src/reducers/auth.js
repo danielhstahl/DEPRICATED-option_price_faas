@@ -1,8 +1,8 @@
 import {
-    UPDATE_SIGN_IN,
     LOGOUT,
     UPDATE_API_KEY,
-    UPDATE_COGNITO_USER
+    UPDATE_AWS_CLIENT, 
+    LOGIN_ERROR
 } from '../actions/constants'
 
 export default (state={}, action)=>{
@@ -12,10 +12,10 @@ export default (state={}, action)=>{
                 ...state,
                 apiKey:action.value
             }
-        case UPDATE_SIGN_IN:
-            return {...state, isSignedIn:true}
-        case UPDATE_COGNITO_USER:
-            return {...state, cognitoUser:action.value}
+        case UPDATE_AWS_CLIENT:
+            return {...state, isSignedIn:true, cognitoUser:action.user, error:null}
+        case LOGIN_ERROR:
+            return {...state, error:action.value}
         case LOGOUT:
             return {}
         default:

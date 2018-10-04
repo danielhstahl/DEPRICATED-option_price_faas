@@ -13,17 +13,20 @@ import {
 } from './aws'
 import apigClientFactory from 'aws-api-gateway-client'
 import {
-    LOGIN_ERROR,
+    signUp, 
+    credentialRefresh,
+    authenticateUser,
+    getSession
+} from './helpers/promisifyAuth'
+import {
     UPDATE_API_KEY,
     API_ERROR,
-    REGISTER_ERROR,
-    LOGOUT,
-    UPDATE_SIGN_IN,
-    UPDATE_AWS_CLIENT,
-    SIGN_IN_ERROR,
-    UPDATE_COGNITO_USER,
-    IS_LOGGING_IN
 } from '../actions/constants'
+
+import {
+    updateSignIn,
+    updateLogOut
+} from '../actions/signIn'
 
 const POOL_DATA = {
   UserPoolId: cognitoUserPoolId,
@@ -32,29 +35,7 @@ const POOL_DATA = {
 
 const COGNITO_LOGIN_KEY=`cognito-idp.${cognitoRegion}.amazonaws.com/${cognitoUserPoolId}`
 
-export const register=dispatch=>(email, password)=>new Promise((resolve, reject)=>{
-    const userPool=new CognitoUserPool(POOL_DATA)
-    userPool.signUp(
-        email, password, 
-        [], null, 
-        (err, result) => {
-            
-            if (err) {
-                console.log(err)
-                dispatch({
-                    type:REGISTER_ERROR,
-                    err
-                })
-                reject(err)
-            } else {
-                console.log(result)
-                login(dispatch)(email, password).then(resolve)
-            }
-        }
-    )
-})
-
-const credentialRefresh=(token, cognitoUser, dispatch)=>new Promise((resolve, reject)=>{
+const updateCredentials=(token, cognitoUser, dispatch)=>{
     const Logins={
         [COGNITO_LOGIN_KEY]:token
     }
@@ -62,99 +43,68 @@ const credentialRefresh=(token, cognitoUser, dispatch)=>new Promise((resolve, re
         IdentityPoolId: cognitoIdentityPoolId,
         Logins
     })
-    AWS.config.credentials.refresh(err=>{
-        if(err){
-            dispatch({
-                type:LOGIN_ERROR,
-                err
+    return credentialRefresh(AWS.config.credentials)
+        .then(()=>{
+            const {
+                accessKeyId,
+                sessionToken,
+                secretAccessKey
+            }=AWS.config.credentials
+            const apigClient=apigClientFactory.newClient({
+                accessKey:accessKeyId,
+                secretKey:secretAccessKey,
+                sessionToken,
+                region:awsRegion, 
+                invokeUrl:url
             })
-            return reject(err)
-        }
-        const {
-            accessKeyId,
-            sessionToken,
-            secretAccessKey
-        }=AWS.config.credentials
-        const apigClient=apigClientFactory.newClient({
-            accessKey:accessKeyId,
-            secretKey:secretAccessKey,
-            sessionToken,
-            region:awsRegion, 
-            invokeUrl:url
+            return signIn(dispatch)(apigClient)
+                .then(()=>updateSignIn(dispatch, apigClient, cognitoUser))
         })
-        dispatch({
-            type:UPDATE_AWS_CLIENT,
-            value:apigClient
-        })
-        dispatch({
-            type:UPDATE_COGNITO_USER,
-            value:cognitoUser
-        })
-        signIn(dispatch)(apigClient).then(()=>{
-            dispatch({
-                type:IS_LOGGING_IN,
-                value:false
-            })
-            resolve()
-        })
-    })
-})
-export const login=dispatch=>(email, password)=>new Promise((resolve, reject)=>{
-    dispatch({
-        type:IS_LOGGING_IN,
-        value:true
-    })
+}
+
+export const login=dispatch=>(email, password)=>{
     const authenticationData = {
         Username: email,
         Password: password
     }
-    const authDets = new AuthenticationDetails(authenticationData)
+    const authDetails = new AuthenticationDetails(authenticationData)
     const userPool=new CognitoUserPool(POOL_DATA)
     const userData = {
         Username: email,
         Pool: userPool
     }
     const cognitoUser = new CognitoUser(userData)
-    cognitoUser.authenticateUser(authDets, {
-        onSuccess: result => {
+    return authenticateUser(cognitoUser, authDetails)
+        .then(result=>{
             const token=result
                 .getIdToken()
                 .getJwtToken()
-            credentialRefresh(token, cognitoUser, dispatch).then(resolve)
-        },
-        onFailure: err => {
-            dispatch({
-                type:LOGIN_ERROR,
-                err
-            })
-            reject(err)
-        }
-    })
-})
+            return updateCredentials(token, cognitoUser, dispatch)
+        })
+}
+
+export const register=dispatch=>(email, password)=>{
+    const userPool=new CognitoUserPool(POOL_DATA)
+    return signUp(userPool, email, password)
+        .then(()=>login(dispatch)(email, password))
+}
 
 export const init=dispatch=>()=>{
     const userPool = new CognitoUserPool(POOL_DATA)
     const cognitoUser = userPool.getCurrentUser()
-    return cognitoUser?new Promise((resolve, reject)=>{
-        cognitoUser.getSession((err, session)=>{
-            if(err) {
-                return reject(err)
-            }
-            const token=session.getIdToken().getJwtToken()
-            credentialRefresh(token, cognitoUser, dispatch)
-            resolve()
-        })
+    return cognitoUser?getSession(cognitoUser).then(session=>{
+        const token=session.getIdToken().getJwtToken()
+        return updateCredentials(token, cognitoUser, dispatch)
     }):Promise.resolve()
 }
 
 
 export const logout=dispatch=>cognitoUser=>{
     cognitoUser.signOut()
-    dispatch({
-        type:LOGOUT
-    })
+    updateLogOut(dispatch)
 }
 
+//I'm not enthused about the dispatches after showApiKey, consider refactoring
 export const showApiKey=dispatch=>client=>client.invokeApi(
     {},
     '/apikey', 
@@ -170,13 +120,13 @@ export const showApiKey=dispatch=>client=>client.invokeApi(
     err
 }))
 
-export const signIn=dispatch=>client=>client.invokeApi(
+const signIn=dispatch=>client=>client.invokeApi(
     {},
     '/signin',
     'POST', 
     {},
     {}
-)
+)/*
 .then(({data}) => dispatch({
     type:UPDATE_SIGN_IN,
     value:data
@@ -184,4 +134,4 @@ export const signIn=dispatch=>client=>client.invokeApi(
 .catch(err=>dispatch({
     type:SIGN_IN_ERROR,
     err
-}))
+}))*/
