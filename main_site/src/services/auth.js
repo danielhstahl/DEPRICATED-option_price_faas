@@ -64,10 +64,11 @@ const credentialRefresh=(token, cognitoUser, dispatch)=>new Promise((resolve, re
     })
     AWS.config.credentials.refresh(err=>{
         if(err){
-            return dispatch({
+            dispatch({
                 type:LOGIN_ERROR,
                 err
             })
+            return reject(err)
         }
         const {
             accessKeyId,
