@@ -1,5 +1,6 @@
 import React from 'react'
-import { Layout, Row, Col, Icon } from 'antd'
+//import { Layout, Row, Col, Icon } from 'antd'
+import { Container, Row, Col } from 'reactstrap'
 import Swagger from './pages/Swagger'
 import FrontPage from './pages/FrontPage'
 import Developers from './pages/Developers'
@@ -15,7 +16,7 @@ import awsApp from './reducers'
 import Products from './pages/Products'
 import {menuBarHeight} from './styles/menu'
 import {HOME} from './routes/names'
-const { Content, Footer, Header } = Layout
+//const { Content, Footer, Header } = Layout
 const store=createStore(awsApp)
 
 const LogoC=()=><Logo height={menuBarHeight} width={menuBarHeight} className='logo-primary'/>
@@ -26,50 +27,37 @@ const marginRight={marginRight:'30%', float:'right'}
 const App = () => (
   <Provider store={store}>
     <Router basename={process.env.PUBLIC_URL}>
-      <Layout>
-        <Header style={rmPadding}>
-          
-          <Row >
-            <Col xs={6} md={4} lg={4} >
-              <Icon component={LogoC} style={marginRight} />
-            </Col>
-            <Col xs={18} md={20} lg={20} >
-              <Switch>
-                <Redirect from='/' exact to='/home' />
-                <Route path='/:page' component={AppMenu} />     
-              </Switch>    
-            </Col>
-          </Row> 
-        </Header>
-        <Content>
-          <Route
-            exact
-            path={HOME}
-            component={FrontPage}
-          />
-          <Route 
-            path="/products" 
-            component={Products} 
-          />
-          <Route 
-            path="/developers" 
-            component={Developers} 
-          />
-          <Route 
-            path="/register" 
-            component={Register} 
-          />
-          <Route 
-            path="/login" 
-            component={Login} 
-          />
-          <Route 
-            path="/developers/api_docs" 
-            component={Swagger} 
-          />
-        </Content>
-        <Footer></Footer>
-      </Layout>
+      <div>
+        <Switch>
+          <Redirect from='/' exact to='/home' />
+          <Route path='/:page' component={AppMenu} />     
+        </Switch>    
+        <Route
+          exact
+          path={HOME}
+          component={FrontPage}
+        />
+        <Route 
+          path="/products" 
+          component={Products} 
+        />
+        <Route 
+          path="/developers" 
+          component={Developers} 
+        />
+        <Route 
+          path="/register" 
+          component={Register} 
+        />
+        <Route 
+          path="/login" 
+          component={Login} 
+        />
+        <Route 
+          path="/developers/api_docs" 
+          component={Swagger} 
+        />
+      </div>
     </Router>
   </Provider>
 )
