@@ -57,7 +57,7 @@ const updateCredentials=(token, cognitoUser, dispatch)=>{
                 region:awsRegion, 
                 invokeUrl:url
             })
-            return signIn(dispatch)(apigClient)
+            return signIn(apigClient)
                 .then(()=>updateSignIn(dispatch, apigClient, cognitoUser))
         })
 }
@@ -120,7 +120,7 @@ export const showApiKey=dispatch=>client=>client.invokeApi(
     err
 }))
 
-const signIn=dispatch=>client=>client.invokeApi(
+const signIn=client=>client.invokeApi(
     {},
     '/signin',
     'POST', 

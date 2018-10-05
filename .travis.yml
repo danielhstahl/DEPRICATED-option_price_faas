@@ -16,6 +16,7 @@ before_install:
 script:
   - cd main_site
   - echo "REACT_APP_TAG=$TRAVIS_TAG" > .env # creates tag for the main site to know which docs to grab
+  - echo "SKIP_PREFLIGHT_CHECK=true" >> .env # creates tag for the main site to know which docs to grab
   - cd ..
   - cd functions
   - cargo build --release --target=x86_64-unknown-linux-musl
