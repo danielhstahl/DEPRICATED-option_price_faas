@@ -1,4 +1,4 @@
 import React from 'react'
-import {  Spin } from 'antd'
-const centerStyle={marginRight:'50%', marginLeft:'50%'}
-export default ()=><Spin style={centerStyle}/>
+import {  Progress } from 'reactstrap'
+//const centerStyle={marginRight:'50%', marginLeft:'50%'}
+export default ()=><Progress  animated value={100}/>

@@ -8,11 +8,7 @@ import {
     NavbarBrand,
     Nav,
     NavItem,
-    NavLink,
-    UncontrolledDropdown,
-    DropdownToggle,
-    DropdownMenu,
-    DropdownItem
+    NavLink
 } from 'reactstrap'
 import Logo from '../Logo.js'
 import {HOME} from '../routes/names'
@@ -23,15 +19,10 @@ import AsyncLoad from './AsyncLoad'
 import {init} from '../services/auth'
 import {toggleNavBar} from '../actions/menu'
 
-const lineHeight={lineHeight:menuBarHeight}
-
-const LogOut=({logout, cognitoUser})=><span onClick={()=>logout(cognitoUser)}>Log Out</span>
-
-//const LogoC=()=><Logo height={menuBarHeight} width={menuBarHeight} className='logo-primary'/>
+const LogOut=({logout, cognitoUser})=><NavLink href="#" onClick={()=>logout(cognitoUser)}>Log Out</NavLink>
 
 
 //the "purchase" link will go to amazon web store
-//tag={Link} to="/somewhere"
 const AppMenu=({
     match:{params:{page}}, 
     toggleNavBar, isSignedIn, 

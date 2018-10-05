@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Modal } from 'antd'
+import {Button, Modal, ModalHeader, ModalBody} from 'reactstrap'
 import { connect } from 'react-redux'
 import {
     toggleOpen
@@ -18,11 +18,12 @@ const mapDispatchToProps=dispatch=>({
 export const ApiModal=({isOpen, toggleOpen, isSignedIn, apiKey, client, onLoad})=>[
     <Button onClick={toggleOpen} key='button'>View API Key</Button>,
     <Modal 
-        key='modal' title='API Key' visible={isOpen} 
-        onOk={toggleOpen} onCancel={toggleOpen}
+        key='modal' isOpen={isOpen} 
+        toggle={toggleOpen} 
     >
+        <ModalHeader>API Key</ModalHeader>
         <AsyncLoad requiredObject={apiKey} onLoad={()=>onLoad(client)} loading={Loading} render={()=>(
-            <p>{apiKey}</p>
+            <ModalBody>{apiKey}</ModalBody>
         )}/>
     </Modal>
 ]

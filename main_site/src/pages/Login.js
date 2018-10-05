@@ -1,5 +1,5 @@
 import React from 'react'
-import {  Row, Col } from 'antd'
+import {Container, Row, Col} from 'reactstrap'
 import SignIn from '../components/SignIn'
 import RedirectToHomeIfLoggedIn from '../components/RedirectToHomeIfLoggedIn'
 
@@ -7,10 +7,12 @@ const padding={paddingTop:20}
 
 export default ({history})=>(
     <RedirectToHomeIfLoggedIn>
-        <Row gutter={16} key='apirow' type="flex" justify="space-around" >
-            <Col xs={24} md={12} lg={8} style={padding}>
-                <SignIn history={history}/>
-            </Col>
-        </Row>
+        <Container>
+            <Row >
+                <Col xs={12} md={6} lg={4} style={padding}>
+                    <SignIn history={history}/>
+                </Col>
+            </Row>
+        </Container>
     </RedirectToHomeIfLoggedIn>
 )
