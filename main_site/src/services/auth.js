@@ -126,12 +126,4 @@ const signIn=client=>client.invokeApi(
     'POST', 
     {},
     {}
-)/*
-.then(({data}) => dispatch({
-    type:UPDATE_SIGN_IN,
-    value:data
-}))
-.catch(err=>dispatch({
-    type:SIGN_IN_ERROR,
-    err
-}))*/
+)
