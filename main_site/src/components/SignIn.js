@@ -1,24 +1,14 @@
 import React from 'react'
-import { 
-    Button, Form, 
-    Icon, Input, Alert
-} from 'antd'
+import {
+    Button, Form, FormGroup,
+    Label, Input, Alert
+} from 'reactstrap'
 import { connect } from 'react-redux'
 import { register, login } from '../services/auth'
 import {loginError, updateLoggingIn} from '../actions/signIn'
 import Loading from '../components/Loading'
 import {HOME} from '../routes/names'
 
-const FormItem = Form.Item
-const UserIcon=<Icon 
-    type="user" 
-    style={{ color: 'rgba(0,0,0,.25)' }} 
-/>
-const PasswordIcon=<Icon 
-    type="lock"
-    style={{ color: 'rgba(0,0,0,.25)' }} 
-/> 
-const maxWidth={maxWidth:600}
 const goToPreviousPageOrHome=(fn, history, loginError, updateLoggingIn)=>{
     const navigate=history.length>0?history.goBack:()=>history.push(HOME)
     return e=>{
@@ -30,42 +20,34 @@ export const SignIn=({
     isRegistration, login, register, 
     isLoggingIn, history, loginError,
     error, updateLoggingIn
-})=>isLoggingIn?
-    <Loading/>:
+})=>(
     <Form 
         onSubmit={goToPreviousPageOrHome(
             isRegistration?register:login, 
             history, loginError, updateLoggingIn
-        )} 
-        style={maxWidth}
+        )}
     >
-        <FormItem>
-            <Input 
-                prefix={UserIcon} placeholder="Username" 
-            />
-        </FormItem>
-        <FormItem>
-            <Input 
-                prefix={PasswordIcon} 
-                placeholder="Password" 
-                type="password"
-            />
-        </FormItem>
-        <FormItem>
+        {error&&<Alert color='danger'>{error.message}</Alert>}
+        <FormGroup>
+            <Label for='emailId'>Email</Label>
+            <Input type='email' name='email' id='emailId'/>
+        </FormGroup>
+        <FormGroup>
+            <Label for='passwordId'>Password</Label>
+            <Input type='password' name='password' id='passwordId'/>
+        </FormGroup>
+        {isLoggingIn?
+            <Loading/>:
             <Button 
-                type="primary" 
-                htmlType="submit"    
+                color='primary'
                 className="login-form-button"
             >
                 {isRegistration?'Register':'Log In'}
             </Button>
-        </FormItem>
-        {error&&<Alert
-            message={error.message}
-            type="error"
-        />}
+        }
+        
     </Form>
-
+)
 const getForm=(fn, dispatch)=>e=>{
     e.preventDefault()
     const [{value:email}, {value:password}]=e.target
