@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
+import '../styles/swaggerOverrides.css'
 import 'swagger-ui/dist/swagger-ui.css'
+
 import SwaggerUI from 'swagger-ui'
 export default class SwaggerTest extends Component {
   componentDidMount() {

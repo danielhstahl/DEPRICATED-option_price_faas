@@ -81,7 +81,7 @@ export const ApiCard=({
     </Card>
 )
 
-const mapStateToProps=({catalog, auth:{isSignedIn}, subscriptions, client})=>({
+const mapStateToProps=({auth:{isSignedIn}, subscriptions, client})=>({
     isSignedIn,
     subscriptions,
     client

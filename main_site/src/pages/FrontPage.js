@@ -3,9 +3,7 @@ import { Jumbotron, Container } from 'reactstrap'
 import { Link } from 'react-router-dom'
 
 const heightStyle = { height: '100vh' }
-//const noMargin={margin:0}
-//const primaryJumbo={...heightStyle,  ...noMargin}
-//const secondaryJumbo={...heightStyle, ...noMargin}
+
 export default ()=>[
     <Jumbotron 
         style={heightStyle} 

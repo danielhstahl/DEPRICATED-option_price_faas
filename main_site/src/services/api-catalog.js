@@ -32,13 +32,12 @@ export const addSubscription=dispatch=>(usagePlanId, client)=>client.invokeApi(
     'PUT',
     {}, {}
 )
-//.then(({data})=>dispatch({type:INSERT_SUBSCRIPTION, value:data}))
 .then(()=>getSubscriptions(dispatch)(client))
 .catch(err=>dispatch({type:SUBSCRIPTION_ERROR, err}))
 
 
 export const confirmMarketplaceSubscription=dispatch=>(
-    usagePlanId, token, client
+    usagePlanId, client
 )=>client.invokeApi(
     {},
     `/marketplace-subscriptions/${usagePlanId}`, 

@@ -24,7 +24,6 @@ const LogOut=({logout, cognitoUser})=><NavLink href="#" onClick={()=>logout(cogn
 
 //the "purchase" link will go to amazon web store
 const AppMenu=({
-    match:{params:{page}}, 
     toggleNavBar, isSignedIn, 
     isOpen, 
     logout, init, cognitoUser

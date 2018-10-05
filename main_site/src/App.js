@@ -19,9 +19,9 @@ const App = () => (
   <Provider store={store}>
     <Router basename={process.env.PUBLIC_URL}>
       <div>
+        <AppMenu/>
         <Switch>
-          <Redirect from='/' exact to='/home' />
-          <Route path='/:page' component={AppMenu} />     
+          <Redirect from='/' exact to={HOME} />    
         </Switch>    
         <Route
           exact
