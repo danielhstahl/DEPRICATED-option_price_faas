@@ -2,7 +2,7 @@ import React from 'react'
 import { Jumbotron, Container } from 'reactstrap'
 import { Link } from 'react-router-dom'
 
-const heightStyle = { height: '100vh' }
+const heightStyle = { minHeight: '100vh' }
 
 export default ()=>[
     <Jumbotron 
