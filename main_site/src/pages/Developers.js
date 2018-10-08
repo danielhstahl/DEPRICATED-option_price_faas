@@ -27,7 +27,12 @@ export const Developers=({
                     .map(({id:usagePlanId, name, apis})=>apis
                     .map(({id:apiId})=>(
                     <Col xs={12} md={6} lg={4} key={apiId} style={padding}>
-                        <ApiCard url={match.url} usagePlanId={usagePlanId} name={name}/>
+                        <ApiCard 
+                            url={match.url} 
+                            usagePlanId={usagePlanId} 
+                            name={name}
+                            description='Option Pricing API: RealOptions'
+                        />
                     </Col>
             )))}/>
         </Row>

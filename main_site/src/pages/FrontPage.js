@@ -1,7 +1,7 @@
 import React from 'react'
 import { Jumbotron, Container } from 'reactstrap'
 import { Link } from 'react-router-dom'
-
+import {PRODUCTS, APIDOCS} from '../routes/names'
 const heightStyle = { minHeight: '100vh' }
 
 export default ()=>[
@@ -44,11 +44,7 @@ export default ()=>[
                 <li>Value at Risk and Expected Shortfall</li>
             </ul>
             <p className="lead">
-            For more information on the models, see the <a 
-                href={`${process.env.PUBLIC_URL}/OptionCalculation.pdf`}
-                target='_blank'
-                rel="noopener noreferrer"
-            >documentation</a>.
+            For more information on the models see the <Link to={PRODUCTS}>products page</Link>.
             </p>
         </Container>
     </Jumbotron>,
@@ -64,6 +60,6 @@ export default ()=>[
         style={heightStyle} key='about' 
         fluid className='no-margin'
     >
-        <h1 className="display-3">About: <Link to="/api_docs">Api Docs</Link></h1>
+        <h1 className="display-3">About: <Link to={APIDOCS}>Api Docs</Link></h1>
     </Jumbotron>
 ]

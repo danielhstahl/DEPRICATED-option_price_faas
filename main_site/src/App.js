@@ -11,7 +11,7 @@ import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 import awsApp from './reducers'
 import Products from './pages/Products'
-import {HOME} from './routes/names'
+import {HOME, PRODUCTS, APIDOCS, DEVELOPERS} from './routes/names'
 
 const store=createStore(awsApp)
 
@@ -29,11 +29,11 @@ const App = () => (
           component={FrontPage}
         />
         <Route 
-          path="/products" 
+          path={PRODUCTS}
           component={Products} 
         />
         <Route 
-          path="/developers" 
+          path={DEVELOPERS}
           component={Developers} 
         />
         <Route 
@@ -45,7 +45,7 @@ const App = () => (
           component={Login} 
         />
         <Route 
-          path="/developers/api_docs" 
+          path={APIDOCS} 
           component={Swagger} 
         />
       </div>

@@ -11,7 +11,7 @@ import {
     NavLink
 } from 'reactstrap'
 import Logo from '../Logo.js'
-import {HOME} from '../routes/names'
+import {HOME, DEVELOPERS, PRODUCTS} from '../routes/names'
 import {logout} from '../services/auth'
 import {menuBarHeight} from '../styles/menu'
 import Loading from './Loading'
@@ -21,7 +21,11 @@ import {toggleNavBar} from '../actions/menu'
 
 const LogOut=({logout, cognitoUser})=><NavLink href="#" onClick={()=>logout(cognitoUser)}>Log Out</NavLink>
 
-
+/*const isActive = path=>(match, location) => {
+    console.log(path)
+    console.log(location.pathname)
+    return !!(match || path === location.pathname)
+}*/
 //the "purchase" link will go to amazon web store
 const AppMenu=({
     toggleNavBar, isSignedIn, 
@@ -39,10 +43,10 @@ const AppMenu=({
                 <NavLink to={HOME} tag={Link} >Home</NavLink>
             </NavItem>
             <NavItem>
-                <NavLink to='/products' tag={Link} >Products</NavLink>
+                <NavLink to={PRODUCTS} tag={Link}  >Products</NavLink>
             </NavItem>
             <NavItem>
-                <NavLink to='/developers' tag={Link} >Developers</NavLink>
+                <NavLink to={DEVELOPERS} tag={Link} >Developers</NavLink>
             </NavItem>
             <NavItem>
                 <NavLink to='/purchase' tag={Link} >Purchase</NavLink>

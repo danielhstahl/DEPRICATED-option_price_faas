@@ -13,6 +13,9 @@ import {
     addSubscription, removeSubscription, 
     getSubscriptions
 } from '../services/api-catalog'
+import {
+    APIEXTENSION
+} from '../routes/names'
 
 const marginRight={marginRight:10}
 const UnsubscribeButton=({unsubscribe, usagePlanId, client, ...props})=>(
@@ -48,16 +51,20 @@ export const ApiCard=({
     getSubscriptions,
     name, isSignedIn,
     client, subscribe, 
+    description,
     unsubscribe, usagePlanId
 })=>(
     <Card title={name}>
         <CardBody>
             <CardTitle>{name}</CardTitle>
             <CardSubtitle>
-                <Link to={`${url}/api_docs`}>Api Docs</Link>
+                <Link to={url+APIEXTENSION}>Api Docs</Link>
             </CardSubtitle>
             {
                 isSignedIn?[
+                    <CardText key='description'>
+                        {description}
+                    </CardText>,
                     <AsyncLoad 
                         key='subscription'
                         requiredObject={subscriptions.length>0}
