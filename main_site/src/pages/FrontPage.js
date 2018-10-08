@@ -1,9 +1,10 @@
 import React from 'react'
 import { Jumbotron, Container } from 'reactstrap'
 import { Link } from 'react-router-dom'
-import {PRODUCTS, APIDOCS} from '../routes/names'
+import {PRODUCTS} from '../routes/names'
+import Pricing from '../components/Pricing'
 const heightStyle = { minHeight: '100vh' }
-
+const paddingTop={paddingTop:20}
 export default ()=>[
     <Jumbotron 
         style={heightStyle} 
@@ -53,13 +54,15 @@ export default ()=>[
         fluid 
         className='bg-dark light-text no-margin'
     >
-        <h1 className="display-3">Pricing</h1>
-        
-    </Jumbotron>,
+        <Container >
+            <h1 className="display-3">Pricing</h1>
+            <Pricing style={paddingTop}/>
+        </Container>
+    </Jumbotron>/*,
     <Jumbotron 
         style={heightStyle} key='about' 
         fluid className='no-margin'
     >
         <h1 className="display-3">About: <Link to={APIDOCS}>Api Docs</Link></h1>
-    </Jumbotron>
+    </Jumbotron>*/
 ]

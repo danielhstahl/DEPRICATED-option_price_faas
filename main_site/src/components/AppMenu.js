@@ -11,7 +11,7 @@ import {
     NavLink
 } from 'reactstrap'
 import Logo from '../Logo.js'
-import {HOME, DEVELOPERS, PRODUCTS} from '../routes/names'
+import {HOME, DEVELOPERS, PRODUCTS, REGISTER} from '../routes/names'
 import {logout} from '../services/auth'
 import {menuBarHeight} from '../styles/menu'
 import Loading from './Loading'
@@ -61,7 +61,7 @@ const AppMenu=({
                 }/>
             </NavItem>
             {isSignedIn?'':<NavItem>
-                <NavLink to='/register' tag={Link} >Sign Up</NavLink>
+                <NavLink to={REGISTER} tag={Link} >Sign Up</NavLink>
             </NavItem>}
         </Nav>
     </Collapse>
