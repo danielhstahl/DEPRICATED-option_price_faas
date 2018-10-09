@@ -8,6 +8,8 @@ info:
 servers:
   - url: 'https://api.finside.org/realoptions'
     description: Production server
+  - url: 'https://zcz8a5ch68.execute-api.us-east-1.amazonaws.com/prd'
+    description: Raw url
 components:
   securitySchemes:
     ApiKeyAuth:

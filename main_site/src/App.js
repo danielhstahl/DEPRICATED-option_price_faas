@@ -11,17 +11,23 @@ import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 import awsApp from './reducers'
 import Products from './pages/Products'
-import {HOME, PRODUCTS, APIDOCS, DEVELOPERS} from './routes/names'
+import {
+  HOME, PRODUCTS, APIDOCS, 
+  DEVELOPERS, LOGIN, REGISTER
+} from './routes/names'
 
 const store=createStore(awsApp)
 
+//note that the route has to include AppMenu even those AppMenu doesn't use "page".
+//this is because AppMenu won't update the selected menu unless part of
+//a route
 const App = () => (
   <Provider store={store}>
     <Router basename={process.env.PUBLIC_URL}>
       <div>
-        <AppMenu/>
         <Switch>
-          <Redirect from='/' exact to={HOME} />    
+          <Redirect from='/' exact to={HOME} />
+          <Route path='/:page' component={AppMenu}/>    
         </Switch>    
         <Route
           exact
@@ -37,11 +43,11 @@ const App = () => (
           component={Developers} 
         />
         <Route 
-          path="/register" 
+          path={REGISTER}
           component={Register} 
         />
         <Route 
-          path="/login" 
+          path={LOGIN}
           component={Login} 
         />
         <Route 
