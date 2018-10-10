@@ -29,10 +29,10 @@ const PricingCard=({
         <h4>{title}</h4>
     </CardHeader>
     <CardBody>
-        <CardTitle>
-            <h1>${price} <small class="text-muted">/ API call</small></h1>
+        <CardTitle tag='h1'>
+            ${price} <small className="text-muted">/ API call</small>
         </CardTitle>
-        <ul class="list-unstyled">
+        <ul className="list-unstyled">
             {attributes.map(v=><li key={v}>{v}</li>)}
         </ul>
         <Link to={link}><Button color='primary' outline={outline}>{buttonText}</Button></Link>
