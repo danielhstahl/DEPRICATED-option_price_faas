@@ -2,6 +2,7 @@ import React from 'react'
 import {
     Container, Row, Col
 } from 'reactstrap'
+import {REGISTER} from '../routes/names'
 import Pricing from '../components/Pricing'
 import {Link} from 'react-router-dom'
 const padding={paddingTop:40, paddingBottom:20}
@@ -22,7 +23,7 @@ export default ()=>(
         </Col>
         <Col xs={12} sm={6}>
             <h3>Easy to use</h3>
-            <p><Link to='/register'>Obtain an API key</Link> and start making API calls!</p>
+            <p><Link to={REGISTER}>Obtain an API key</Link> and start making API calls!</p>
         </Col>
     </Row>
     <Row>
