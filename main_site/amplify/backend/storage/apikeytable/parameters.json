@@ -1,0 +1,5 @@
+{
+    "tableName": "apikeytable",
+    "partitionKeyName": "Id",
+    "partitionKeyType": "S"
+}

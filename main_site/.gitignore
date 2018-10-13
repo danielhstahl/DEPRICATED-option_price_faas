@@ -20,5 +20,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 *.pdf
-*.yml
 .env
+/amplify/.config
+serverless.yml
+lambda

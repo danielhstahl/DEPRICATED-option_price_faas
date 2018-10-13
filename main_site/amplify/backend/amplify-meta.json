@@ -1,0 +1,114 @@
+{
+    "providers": {
+        "awscloudformation": {
+            "AuthRoleName": "mainsite-20181013074908-authRole",
+            "UnauthRoleArn": "arn:aws:iam::029524284009:role/mainsite-20181013074908-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::029524284009:role/mainsite-20181013074908-authRole",
+            "Region": "us-east-1",
+            "DeploymentBucketName": "mainsite-20181013074908-deployment",
+            "UnauthRoleName": "mainsite-20181013074908-unauthRole",
+            "StackName": "mainsite-20181013074908",
+            "StackId": "arn:aws:cloudformation:us-east-1:029524284009:stack/mainsite-20181013074908/608578c0-cee6-11e8-995a-500c28b4b099"
+        }
+    },
+    "auth": {
+        "cognitoe74a6664": {
+            "service": "Cognito",
+            "providerPlugin": "awscloudformation",
+            "[object Object]": {},
+            "lastPushTimeStamp": "2018-10-13T21:12:21.328Z",
+            "providerMetadata": {
+                "s3TemplateURL": "https://s3.amazonaws.com/mainsite-20181013074908-deployment/amplify-cfn-templates/auth/cognitoe74a6664-cloudformation-template.yml",
+                "logicalId": "authcognitoe74a6664"
+            }
+        }
+    },
+    "api": {
+        "apikeys": {
+            "service": "API Gateway",
+            "providerPlugin": "awscloudformation",
+            "dependsOn": [
+                {
+                    "category": "function",
+                    "resourceName": "apikeys",
+                    "attributes": [
+                        "Name",
+                        "Arn"
+                    ]
+                },
+                {
+                    "category": "function",
+                    "resourceName": "catalog",
+                    "attributes": [
+                        "Name",
+                        "Arn"
+                    ]
+                }
+            ],
+            "providerMetadata": {
+                "s3TemplateURL": "https://s3.amazonaws.com/mainsite-20181013074908-deployment/amplify-cfn-templates/api/apikeys-cloudformation-template.json",
+                "logicalId": "apiapikeys"
+            },
+            "lastPushTimeStamp": "2018-10-13T21:12:21.244Z"
+        }
+    },
+    "storage": {
+        "apikeytable": {
+            "service": "DynamoDB",
+            "providerPlugin": "awscloudformation",
+            "providerMetadata": {
+                "s3TemplateURL": "https://s3.amazonaws.com/mainsite-20181013074908-deployment/amplify-cfn-templates/storage/apikeytable-cloudformation-template.json",
+                "logicalId": "storageapikeytable"
+            },
+            "lastPushTimeStamp": "2018-10-13T21:12:21.200Z"
+        }
+    },
+    "function": {
+        "apikeys": {
+            "service": "Lambda",
+            "providerPlugin": "awscloudformation",
+            "build": true,
+            "dependsOn": [
+                {
+                    "category": "storage",
+                    "resourceName": "apikeytable",
+                    "attributes": [
+                        "Name",
+                        "Arn"
+                    ]
+                }
+            ],
+            "lastBuildTimeStamp": "2018-10-13T21:11:56.713Z",
+            "lastPackageTimeStamp": "2018-10-13T21:12:10.135Z",
+            "distZipFilename": "apikeys-1539465116-latest-build.zip",
+            "providerMetadata": {
+                "s3TemplateURL": "https://s3.amazonaws.com/mainsite-20181013074908-deployment/amplify-cfn-templates/function/apikeys-cloudformation-template.json",
+                "logicalId": "functionapikeys"
+            },
+            "lastPushTimeStamp": "2018-10-13T21:12:21.211Z"
+        },
+        "catalog": {
+            "service": "Lambda",
+            "providerPlugin": "awscloudformation",
+            "build": true,
+            "dependsOn": [
+                {
+                    "category": "storage",
+                    "resourceName": "apikeytable",
+                    "attributes": [
+                        "Name",
+                        "Arn"
+                    ]
+                }
+            ],
+            "lastBuildTimeStamp": "2018-10-13T21:12:02.201Z",
+            "lastPackageTimeStamp": "2018-10-13T21:12:10.316Z",
+            "distZipFilename": "catalog-1539465122-latest-build.zip",
+            "providerMetadata": {
+                "s3TemplateURL": "https://s3.amazonaws.com/mainsite-20181013074908-deployment/amplify-cfn-templates/function/catalog-cloudformation-template.json",
+                "logicalId": "functioncatalog"
+            },
+            "lastPushTimeStamp": "2018-10-13T21:12:21.232Z"
+        }
+    }
+}

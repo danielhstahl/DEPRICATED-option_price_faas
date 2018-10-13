@@ -1,0 +1,53 @@
+{
+    "paths": [
+        {
+            "name": "/keys",
+            "lambdaFunction": "apikeys",
+            "privacy": {
+                "private": true,
+                "auth": "rw"
+            }
+        },
+        {
+            "name": "/catalog",
+            "lambdaFunction": "catalog",
+            "privacy": {
+                "open": true
+            }
+        }
+    ],
+    "resourceName": "apikeys",
+    "apiName": "mainsite089a00cf",
+    "functionArns": [
+        {
+            "lambdaFunction": "apikeys"
+        },
+        {
+            "lambdaFunction": "catalog"
+        }
+    ],
+    "privacy": {
+        "auth": 1,
+        "unauth": 0,
+        "authRoleName": "mainsite-20181013074908-authRole",
+        "unAuthRoleName": "mainsite-20181013074908-unauthRole"
+    },
+    "dependsOn": [
+        {
+            "category": "function",
+            "resourceName": "apikeys",
+            "attributes": [
+                "Name",
+                "Arn"
+            ]
+        },
+        {
+            "category": "function",
+            "resourceName": "catalog",
+            "attributes": [
+                "Name",
+                "Arn"
+            ]
+        }
+    ]
+}
