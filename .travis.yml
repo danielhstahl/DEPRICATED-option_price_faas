@@ -24,6 +24,7 @@ before_script: #install pip3
 #- export PATH=$PATH:$USER_BASE_PATH/bin
 - pip install --user awscli
 - pip install --user aws-sam-cli
+- aws configure set region us-east-1
 - cd main_site
 - npm run copy-package
 - cd aws-api-gateway-developer-portal
@@ -34,7 +35,6 @@ before_script: #install pip3
 - cd ..
 
 script:
-  - pip --user install awscli ##needed to get configuration
   - cd main_site
   - cd aws-api-gateway-developer-portal
   - npm run stackresults
