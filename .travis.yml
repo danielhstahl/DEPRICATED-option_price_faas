@@ -16,10 +16,10 @@ before_install:
 - git fetch --all # intended for getting tags
 
 before_script: #install pip3
-- sudo apt-get update
-- sudo apt-get install python3-setuptools
-- sudo easy_install3 'pip<8' # avoid problems with 3.2 compatibility
-- pip3 install aws-sam-cli #to deploy website functions
+#- sudo apt-get update
+#- sudo apt-get install python3-setuptools
+#- sudo easy_install3 'pip<8' # avoid problems with 3.2 compatibility
+- pip install aws-sam-cli #to deploy website functions
 - cd main_site
 - npm run copy-package
 - cd aws-api-gateway-developer-portal
