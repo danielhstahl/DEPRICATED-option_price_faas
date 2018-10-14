@@ -24,7 +24,6 @@ const SubscribeButton=({subscribe, usagePlanId, client, ...props})=>(
 )
 const ChooseButton=({
     isSubscribed, unsubscribe, 
-    stage,
     subscribe, usagePlanId, client,
     ...props
 })=>isSubscribed?
@@ -32,14 +31,12 @@ const ChooseButton=({
         unsubscribe={unsubscribe} 
         usagePlanId={usagePlanId} 
         client={client}
-        stage={stage}
         {...props}
     />:
     <SubscribeButton
         subscribe={subscribe} 
         usagePlanId={usagePlanId} 
         client={client}
-        stage={stage}
         {...props}
     />
 

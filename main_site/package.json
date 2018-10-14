@@ -29,7 +29,8 @@
     "deploy": "gh-pages -d build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "copy-package": "cp ./package.json ./aws-api-gateway-developer-portal/lambdas/backend/pckg.json"
   },
   "lint-staged": {
     "src/**/*.{js,jsx,json,css}": [

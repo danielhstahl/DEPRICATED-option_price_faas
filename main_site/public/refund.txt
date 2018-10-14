@@ -1,0 +1,5 @@
+Refund Policy
+
+If you are unsatisfied with the product for any reason, you are entitled to a refund for the previous month's charges.  If you only use the product for a month, then the month's costs will be re-imbursed.  
+
+However, Finside is not responsible for what you do with your keys.  If someone steals your keys and proceeds to use the API, the cost may not be refunded.  

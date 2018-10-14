@@ -6,15 +6,15 @@ const cors = require('cors')
 const util = require('util')
 const AWS = require('aws-sdk')
 const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware')
-const catalog = require('./catalog/index.js')
+//const catalog = require('./catalog/index.js')
 const customersController = require('./_common/customers-controller.js')
-
+const {homepage}=require('./pckg.json')
 const app = express()
 const apigateway = new AWS.APIGateway()
 
 // replace these to match your site URL. Note: Use TLS, not plain HTTP, for your production site!
-const domain = `${process.env.CLIENT_BUCKET_NAME}.s3-website-${process.env.AWS_DEFAULT_REGION}.amazonaws.com`
-const baseUrl = `http://${domain}/`
+//const domain = `${process.env.CLIENT_BUCKET_NAME}.s3-website-${process.env.AWS_DEFAULT_REGION}.amazonaws.com`
+const baseUrl = homepage
 
 app.use(cors())
 app.use(bodyParser.json())
