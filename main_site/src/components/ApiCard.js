@@ -1,26 +1,20 @@
 import React from 'react'
 import {
     Card, Button, CardBody, 
-    CardTitle, CardText,
-    CardSubtitle
+    CardTitle, CardText
 } from 'reactstrap'
-import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import Loading from '../components/Loading'
-import ApiModal from '../components/ApiModal'
 import AsyncLoad from '../components/AsyncLoad'
 import {
     addSubscription, removeSubscription, 
     getSubscriptions
 } from '../services/api-catalog'
-import {
-    APIEXTENSION
-} from '../routes/names'
 
 const marginRight={marginRight:10}
 const UnsubscribeButton=({unsubscribe, usagePlanId, client, ...props})=>(
     <Button onClick={()=>unsubscribe(usagePlanId, client)} {...props}>
-        Unsubscribe
+        Unsubscribe"
     </Button>
 )
 const SubscribeButton=({subscribe, usagePlanId, client, ...props})=>(
@@ -30,6 +24,7 @@ const SubscribeButton=({subscribe, usagePlanId, client, ...props})=>(
 )
 const ChooseButton=({
     isSubscribed, unsubscribe, 
+    stage,
     subscribe, usagePlanId, client,
     ...props
 })=>isSubscribed?
@@ -37,52 +32,56 @@ const ChooseButton=({
         unsubscribe={unsubscribe} 
         usagePlanId={usagePlanId} 
         client={client}
+        stage={stage}
         {...props}
     />:
     <SubscribeButton
         subscribe={subscribe} 
         usagePlanId={usagePlanId} 
         client={client}
+        stage={stage}
         {...props}
     />
 
 export const ApiCard=({
-    url, subscriptions, 
+    subscriptions, 
     getSubscriptions,
     name, isSignedIn,
     client, subscribe, 
-    description,
-    unsubscribe, usagePlanId
+    description, quota,
+    unsubscribe, stages
 })=>(
     <Card title={name}>
         <CardBody>
             <CardTitle>{name}</CardTitle>
-            <CardSubtitle>
-                <Link to={url+APIEXTENSION}>Api Docs</Link>
-            </CardSubtitle>
+            <CardText>
+                {description}
+            </CardText>
+            <CardText>
+                {quota.limit} API calls per {quota.period.toLowerCase()}
+            </CardText>
             {
-                isSignedIn?[
-                    <CardText key='description'>
-                        {description}
-                    </CardText>,
+                isSignedIn?(
                     <AsyncLoad 
                         key='subscription'
                         requiredObject={subscriptions.length>0}
                         onLoad={()=>getSubscriptions(client)}
                         loading={Loading}
-                        render={()=>(
+                        render={()=>{
+                            const {apiId}=stages.find(({stage})=>stage==='prd')
+                            return (
                             <ChooseButton 
-                                isSubscribed={subscriptions.find(({id})=>id===usagePlanId)}
+                                isSubscribed={subscriptions.find(({id})=>id===apiId)}
                                 unsubscribe={unsubscribe}
                                 style={marginRight}
                                 subscribe={subscribe}
-                                usagePlanId={usagePlanId}
+                                usagePlanId={apiId}
                                 client={client}
+                                key={apiId}
                             />
-                        )}
-                    />,
-                    <ApiModal key='apimodal'/>
-                ]:<CardText>Log in to view subscriptions</CardText>
+                        )}}
+                    />
+                ):<CardText>Log in to view subscriptions</CardText>
             }
         </CardBody>
     </Card>

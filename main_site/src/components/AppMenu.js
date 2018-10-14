@@ -13,7 +13,7 @@ import {
 import Logo from '../Logo.js'
 import {
     HOME, DEVELOPERS, PRODUCTS, 
-    REGISTER, LOGIN
+    REGISTER, LOGIN, NODOCS
 } from '../routes/names'
 import {logout} from '../services/auth'
 import {menuBarHeight} from '../styles/menu'
@@ -44,7 +44,7 @@ const AppMenu=({
                 <NavLink to={PRODUCTS} tag={Link}  >Products</NavLink>
             </NavItem>
             <NavItem>
-                <NavLink to={DEVELOPERS} tag={Link} >Developers</NavLink>
+                <NavLink to={DEVELOPERS+NODOCS} tag={Link} >Developers</NavLink>
             </NavItem>
             <NavItem>
                 <NavLink to='/purchase' tag={Link} >Purchase</NavLink>

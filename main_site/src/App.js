@@ -1,5 +1,5 @@
 import React from 'react'
-import Swagger from './pages/Swagger'
+//import Swagger from './pages/Swagger'
 import FrontPage from './pages/FrontPage'
 import Developers from './pages/Developers'
 import Login from './pages/Login'
@@ -12,7 +12,7 @@ import { createStore } from 'redux'
 import awsApp from './reducers'
 import Products from './pages/Products'
 import {
-  HOME, PRODUCTS, APIDOCS, 
+  HOME, PRODUCTS, 
   DEVELOPERS, LOGIN, REGISTER
 } from './routes/names'
 
@@ -39,7 +39,7 @@ const App = () => (
           component={Products} 
         />
         <Route 
-          path={DEVELOPERS}
+          path={DEVELOPERS+'/:showswagger'}
           component={Developers} 
         />
         <Route 
@@ -49,10 +49,6 @@ const App = () => (
         <Route 
           path={LOGIN}
           component={Login} 
-        />
-        <Route 
-          path={APIDOCS} 
-          component={Swagger} 
         />
       </div>
     </Router>
