@@ -20,10 +20,10 @@ before_script: #install pip3
 #- sudo apt-get update
 #- sudo apt-get install python3-setuptools
 #- sudo easy_install3 'pip<8' # avoid problems with 3.2 compatibility
-- USER_BASE_PATH=$(python -m site --user-base)
-- export PATH=$PATH:$USER_BASE_PATH/bin
+#- USER_BASE_PATH=$(python -m site --user-base)
+#- export PATH=$PATH:$USER_BASE_PATH/bin
+- pip install --user awscli
 - pip install --user aws-sam-cli
-#- pip install aws-sam-cli #to deploy website functions
 - cd main_site
 - npm run copy-package
 - cd aws-api-gateway-developer-portal
