@@ -15,10 +15,13 @@ before_install:
 - rustup target add x86_64-unknown-linux-musl
 - git fetch --all # intended for getting tags
 
+
 before_script: #install pip3
 #- sudo apt-get update
 #- sudo apt-get install python3-setuptools
 #- sudo easy_install3 'pip<8' # avoid problems with 3.2 compatibility
+- USER_BASE_PATH=$(python -m site --user-base)
+- export PATH=$PATH:$USER_BASE_PATH/bin
 - pip install --user aws-sam-cli
 #- pip install aws-sam-cli #to deploy website functions
 - cd main_site
