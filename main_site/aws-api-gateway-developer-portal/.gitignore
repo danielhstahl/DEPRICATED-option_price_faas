@@ -1,0 +1,18 @@
+# devportal specific
+# we're committing the artifacts, don't need the modules
+/dev-portal/node_modules
+/dev-portal/coverage
+/dev-portal/build
+/dev-portal/build.config.js
+/dev-portal/public/config.js
+
+# misc
+npm-debug.log
+.DS_Store
+packaged-sam.yaml
+cognito.js
+.idea
+
+node_modules
+*/node_modules
+.env
