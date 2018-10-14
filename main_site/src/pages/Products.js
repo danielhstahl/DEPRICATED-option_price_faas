@@ -23,7 +23,7 @@ export default ()=>(
         </Col>
         <Col xs={12} sm={6}>
             <h3>Easy to use</h3>
-            <p><Link to={REGISTER}>Obtain an API key</Link> and start making API calls!</p>
+            <p><Link to={REGISTER}>Register</Link> to obtain an API key and start making API calls!</p>
         </Col>
     </Row>
     <Row>

@@ -9,8 +9,11 @@ import ApiCard from '../components/ApiCard'
 import {
     getCatalog
 } from '../services/api-catalog'
-
-
+import {
+    APIEXTENSION
+} from '../routes/names'
+import ApiModal from '../components/ApiModal'
+import { Link } from 'react-router-dom'
 const padding={paddingTop:20}
 
 export const Developers=({
@@ -24,17 +27,27 @@ export const Developers=({
                 onLoad={getCatalog} 
                 loading={Loading} 
                 render={()=>catalog
-                    .map(({id:usagePlanId, name, apis})=>apis
-                    .map(({id:apiId})=>(
+                    .map(({
+                            id:usagePlanId, 
+                            name, apiStages,
+                            description,
+                            quota
+                        })=>apiStages
+                    .map(({apiId})=>(
                     <Col xs={12} md={6} lg={4} key={apiId} style={padding}>
                         <ApiCard 
-                            url={match.url} 
+                            //url={match.url} 
                             usagePlanId={usagePlanId} 
                             name={name}
-                            description='Option Pricing API: RealOptions'
+                            description={description}
+                            quota={quota}
                         />
                     </Col>
             )))}/>
+        </Row>
+        <Row>
+            <ApiModal/>
+            <Link to={match.url+APIEXTENSION}>Api Docs</Link>
         </Row>
     </Container>
 )

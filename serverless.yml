@@ -4,14 +4,14 @@ provider:
   name: aws
   runtime: nodejs8.10
   stage: prd
-  usagePlan: # Optional usage plan configuration
-    quota:
-      limit: 5000
-      offset: 2
-      period: MONTH
-    throttle:
-      burstLimit: 200
-      rateLimit: 100
+  #usagePlan: # Optional usage plan configuration
+  #  quota:
+  #    limit: 5000
+  #    offset: 2
+  #    period: MONTH
+  #  throttle:
+  #    burstLimit: 200
+  #    rateLimit: 100
   #UsagePlanKey:
   #    Type: "AWS::ApiGateway::UsagePlanKey"
   #    Properties:

@@ -12,7 +12,10 @@ import {
 const convertJson=res=>res.json()
 export const getCatalog=dispatch=>()=>fetch(`${url}/catalog`)
 .then(convertJson)
-.then(data=>dispatch({type:UPDATE_CATALOG, value:data}))
+.then(({items})=>{
+    console.log(items)
+    dispatch({type:UPDATE_CATALOG, value:items})
+})
 .catch(err=>dispatch({type:CATALOG_ERROR, err}))
 
 

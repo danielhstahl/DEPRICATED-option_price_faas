@@ -1,7 +1,7 @@
 const { exec } = require('child_process')
 const {writeFile} = require('fs') 
 const stackName=process.argv[2]
-const reactOutput=(key, value)=>'REACT_'+key+':'+value
+const reactOutput=(key, value)=>`REACT_APP_${key}="${value}"`
 exec(
     `aws cloudformation describe-stacks --stack-name "${stackName}"`, 
     (err, stdout, stderr)=>{
