@@ -1,9 +1,0 @@
-{
-  "Records": [
-    {
-      "Sns" : {
-        "Message" : "{\"action\" : \"subscribe-success\", \"customer-identifier\" : \"[CUSTOMER_ID]\", \"product-code\" : \"[PRODUCT_CODE]\"}"
-      }
-    }
-  ]
-}
