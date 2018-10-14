@@ -19,7 +19,7 @@ before_script: #install pip3
 #- sudo apt-get update
 #- sudo apt-get install python3-setuptools
 #- sudo easy_install3 'pip<8' # avoid problems with 3.2 compatibility
-- pip3 install aws-sam-cli
+- pip install --user aws-sam-cli
 #- pip install aws-sam-cli #to deploy website functions
 - cd main_site
 - npm run copy-package
@@ -31,7 +31,7 @@ before_script: #install pip3
 - cd ..
 
 script:
-  - pip3 install awscli ##needed to get configuration
+  - pip --user install awscli ##needed to get configuration
   - cd main_site
   - cd aws-api-gateway-developer-portal
   - npm run stackresults
@@ -74,7 +74,7 @@ addons:
     - gcc
     - binutils-dev
     - libiberty-dev
-    - python3
+    #- python3
 after_success:
   - cd main_site
   - bash <(curl -s https://codecov.io/bash)
