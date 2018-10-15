@@ -46,7 +46,8 @@ export const ApiCard=({
     name, isSignedIn,
     client, subscribe, 
     description, quota,
-    unsubscribe, stages
+    unsubscribe, 
+    usagePlanId
 })=>(
     <Card title={name}>
         <CardBody>
@@ -64,19 +65,16 @@ export const ApiCard=({
                         requiredObject={subscriptions.length>0}
                         onLoad={()=>getSubscriptions(client)}
                         loading={Loading}
-                        render={()=>{
-                            const {apiId}=stages.find(({stage})=>stage==='prd')
-                            return (
+                        render={()=>(
                             <ChooseButton 
-                                isSubscribed={subscriptions.find(({id})=>id===apiId)}
+                                isSubscribed={subscriptions.find(({id})=>id===usagePlanId)}
                                 unsubscribe={unsubscribe}
                                 style={marginRight}
                                 subscribe={subscribe}
-                                usagePlanId={apiId}
+                                usagePlanId={usagePlanId}
                                 client={client}
-                                key={apiId}
                             />
-                        )}}
+                        )}
                     />
                 ):<CardText>Log in to view subscriptions</CardText>
             }

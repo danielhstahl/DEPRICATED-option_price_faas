@@ -16,6 +16,9 @@ import {
     NODOCS,
     DOCS
 } from '../routes/names'
+import {
+    SHOW_SWAGGER
+} from '../routes/params'
 import ApiModal from '../components/ApiModal'
 import { Link } from 'react-router-dom'
 
@@ -50,6 +53,7 @@ export const Developers=({
                                 description={description}
                                 stages={apiStages}
                                 quota={quota}
+                                usagePlanId={usagePlanId}
                             />
                         </Col>
                 ))}/>
@@ -57,7 +61,7 @@ export const Developers=({
         <Row>
             <Col style={paddingTop}>
                 <Link 
-                    to={DEVELOPERS+linkToOther(match.params.showswagger)}
+                    to={DEVELOPERS+linkToOther(match.params[SHOW_SWAGGER])}
                     style={paddingRight}
                 ><Button color='primary'>Api Docs</Button></Link>
                 <ApiModal/>
@@ -65,7 +69,7 @@ export const Developers=({
             
         </Row>
     </Container>,
-    <Collapse key='collapse' isOpen={!matchDocs(match.params.showswagger)}>
+    <Collapse key='collapse' isOpen={!matchDocs(match.params[SHOW_SWAGGER])}>
         <Swagger/>
     </Collapse>
 ]}

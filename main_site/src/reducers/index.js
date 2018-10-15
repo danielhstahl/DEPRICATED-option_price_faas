@@ -5,6 +5,7 @@ import menu from './menu'
 import client from './client'
 import loading from './loading'
 import modal from './modal'
+import marketplaceAuth from './marketplaceAuth'
 import {combineReducers} from 'redux'
 export default combineReducers({
     auth,
@@ -13,5 +14,6 @@ export default combineReducers({
     menu,
     subscriptions,
     loading,
-    modal
+    modal,
+    marketplaceAuth
 })

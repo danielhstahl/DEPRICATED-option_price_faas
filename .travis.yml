@@ -16,14 +16,19 @@ before_install:
 - git fetch --all # intended for getting tags
 
 before_script: #install pip3
+- apt-get update #to install python 3.6
+- apt-get install build-essential libpq-dev libssl-dev openssl libffi-dev zlib1g-dev
+- apt-get install python3-pip python3-dev
+- add-apt-repository ppa:jonathonf/python-3.6
+- apt-get update
+- apt-get install python3.6
 #- sudo apt-get update
 #- sudo apt-get install python3-setuptools
 #- sudo easy_install3 'pip<8' # avoid problems with 3.2 compatibility
 #- USER_BASE_PATH=$(python -m site --user-base)
 #- export PATH=$PATH:$USER_BASE_PATH/bin
-- pip install --upgrade ndg-httpsclient
-- pip install --user awscli
-- pip install --user aws-sam-cli
+- pip3 install --user awscli
+- pip3 install --user aws-sam-cli
 - aws configure set region us-east-1
 - cd main_site
 - npm run copy-package

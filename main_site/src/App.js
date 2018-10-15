@@ -15,6 +15,9 @@ import {
   HOME, PRODUCTS, 
   DEVELOPERS, LOGIN, REGISTER
 } from './routes/names'
+import {
+  SHOW_SWAGGER
+} from './routes/params'
 
 const store=createStore(awsApp)
 
@@ -39,7 +42,7 @@ const App = () => (
           component={Products} 
         />
         <Route 
-          path={DEVELOPERS+'/:showswagger'}
+          path={DEVELOPERS+'/:'+SHOW_SWAGGER}
           component={Developers} 
         />
         <Route 
