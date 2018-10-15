@@ -5,7 +5,7 @@ import {
     Button
 } from 'reactstrap'
 import {Link} from 'react-router-dom'
-import {REGISTER} from '../routes/names'
+import {REGISTER, DEVELOPERS, MARKETPLACE} from '../routes/names'
 const freeTier=[
     '10 API calls free per month',
     'No Credit Card required',
@@ -21,8 +21,7 @@ const paidTier=[
 const paddingTop={paddingTop:20}
 
 const PricingCard=({
-    title, price, attributes,
-    buttonText, outline, link
+    title, price, quota
 })=>(
 <Card className='text-center'>
     <CardHeader>
@@ -32,38 +31,55 @@ const PricingCard=({
         <CardTitle tag='h1'>
             ${price} <small className="text-muted">/ API call</small>
         </CardTitle>
-        <ul className="list-unstyled">
-            {attributes.map(v=><li key={v}>{v}</li>)}
-        </ul>
-        <Link to={link}><Button color='primary' outline={outline}>{buttonText}</Button></Link>
+        <p>{quota.limit} API calls per {quota.period.toLowerCase()}</p>
+        {children}
     </CardBody>
 </Card>
 )
 
-export default ({style})=>(
+const ButtonToDeveloperPortal=()=><Link to={DEVELOPERS}><Button color='primary'>Sandbox</Button></Link>
+
+const ButtonToRegister=()=><Link to={REGISTER}><Button color='primary'>Register Now!</Button></Link>
+
+const ButtonToMarketPlace=()=><Link to={MARKETPLACE}><Button color='primary' outline>Get Started!</Button></Link>
+//need to update Paid Tier to also check for subscription.  I think that they should automatically be subscribed to the free tier.  
+//TODO!! add "async" to the entire app to get the usage plans
+//If redirected from the marketplace, go straight to registration.  
+//All "purchase" links should go to the marketplace at this point
+//Then when registering, automatically register for the free plan
+//Even after registering, all "purchase" links need to go to the
+//marketplace to get a token.
+//The question is, what to do when redirected AND registered?  How
+//should the user "choose" to purchase?  Also, how does the API
+//know which usage plan?  I think I'll need to unregister
+//from the free plan when moving to the paid plan.  
+export const Pricing=({style, paid, free, isSignedIn})=>(
 <Row style={style} className='dark-text'>
     <Col xs={12} md={6} style={paddingTop}>
         <PricingCard
             title='Free Tier'
             price='0'
-            attributes={freeTier}
-            buttonText='Sign up for free!'
-            outline={false}
-            link={REGISTER}
-        />
-        
+            quota={free.quota}
+        >
+            <p>No credit card required</p>
+            {isSignedIn?<ButtonToDeveloperPortal/>:<ButtonToRegister/>}
+        </PricingCard>
     </Col>
     <Col xs={12} md={6} style={paddingTop}>
         <PricingCard
             title='Paid Tier'
             price='1'
-            attributes={paidTier}
-            buttonText='Get Started!'
-            outline={true}
-            link={REGISTER}
-        />
-        
+            quota={paid.quota}
+        >
+            <p>Email support</p>
+            {isSignedIn?<ButtonToDeveloperPortal/>:<ButtonToMarketPlace/>}
+        </PricingCard>
     </Col>
-
 </Row>
 )
+
+const mapStateToProps=({auth:{isSignedIn}, catalog:{paid, free}})=>({
+    isSignedIn,
+    paid,
+    free
+})
