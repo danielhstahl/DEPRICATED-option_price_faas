@@ -18,15 +18,15 @@ import {
     authenticateUser,
     getSession
 } from './helpers/promisifyAuth'
-import {
-    UPDATE_API_KEY,
-    API_ERROR,
-} from '../actions/constants'
 
 import {
     updateSignIn,
-    updateLogOut
+    updateLogOut,
+    repeatVisitor,
+    updateApiKey,
+    apiError
 } from '../actions/signIn'
+import { addSubscription } from './api-catalog';
 
 const POOL_DATA = {
   UserPoolId: cognitoUserPoolId,
@@ -35,9 +35,9 @@ const POOL_DATA = {
 
 const COGNITO_LOGIN_KEY=`cognito-idp.${cognitoRegion}.amazonaws.com/${cognitoUserPoolId}`
 
-const updateCredentials=(token, cognitoUser, dispatch)=>{
+const updateCredentials=(jwtToken, cognitoUser, usagePlanId, token, dispatch)=>{
     const Logins={
-        [COGNITO_LOGIN_KEY]:token
+        [COGNITO_LOGIN_KEY]:jwtToken
     }
     AWS.config.credentials = new AWS.CognitoIdentityCredentials({
         IdentityPoolId: cognitoIdentityPoolId,
@@ -57,12 +57,16 @@ const updateCredentials=(token, cognitoUser, dispatch)=>{
                 region:awsRegion, 
                 invokeUrl:url
             })
+            /*if(token&&usagePlanId){
+                removeSubscription
+                addSubscription(dispatch)(usagePlanId, )
+            }*/
             return signIn(apigClient)
                 .then(()=>updateSignIn(dispatch, apigClient, cognitoUser))
         })
 }
 
-export const login=dispatch=>(email, password)=>{
+const login=dispatch=>(email, password, usagePlanId, token)=>{
     const authenticationData = {
         Username: email,
         Password: password
@@ -76,20 +80,24 @@ export const login=dispatch=>(email, password)=>{
     const cognitoUser = new CognitoUser(userData)
     return authenticateUser(cognitoUser, authDetails)
         .then(result=>{
-            const token=result
+            const jwtToken=result
                 .getIdToken()
                 .getJwtToken()
-            return updateCredentials(token, cognitoUser, dispatch)
+            return updateCredentials(jwtToken, cognitoUser, usagePlanId, token, dispatch)
         })
 }
-
-export const register=dispatch=>(email, password)=>{
+/**Always "register" instead of logging in.  Login will just fail on already registered and then login */
+export const register=dispatch=>(usagePlanId, token)=>(email, password)=>{
     const userPool=new CognitoUserPool(POOL_DATA)
     return signUp(userPool, email, password)
-        .then(()=>login(dispatch)(email, password))
+        .catch(err=>{
+            console.log(err)
+            repeatVisitor(dispatch)
+        }) //todo!! re throw any non-duplicate user error
+        .then(()=>login(dispatch)(email, password, usagePlanId, token))
 }
 
-export const init=dispatch=>()=>{
+export const init=dispatch=>(usagePlanId, token)=>{
     const userPool = new CognitoUserPool(POOL_DATA)
     const cognitoUser = userPool.getCurrentUser()
     return cognitoUser?getSession(cognitoUser).then(session=>{
@@ -111,14 +119,8 @@ export const showApiKey=dispatch=>client=>client.invokeApi(
     'GET',
     {}, {}
 )
-.then(({data:{value}}) => dispatch({
-    type:UPDATE_API_KEY,
-    value
-}))
-.catch(err=>dispatch({
-    type:API_ERROR,
-    err
-}))
+.then(({data:{value}}) => updateApiKey(dispatch, value))
+.catch(apiError(dispatch))
 
 const signIn=client=>client.invokeApi(
     {},

@@ -5,15 +5,13 @@ import menu from './menu'
 import client from './client'
 import loading from './loading'
 import modal from './modal'
-import marketplaceAuth from './marketplaceAuth'
 import {combineReducers} from 'redux'
 export default combineReducers({
     auth,
     catalog,
     client,
     menu,
-    subscriptions,
+    //subscriptions,
     loading,
-    modal,
-    marketplaceAuth
+    modal
 })

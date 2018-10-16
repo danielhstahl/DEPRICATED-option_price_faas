@@ -4,9 +4,9 @@ import { connect } from 'react-redux'
 import {
     toggleOpen
 } from '../actions/modal'
-import AsyncLoad from '../components/AsyncLoad'
+import AsyncLoad from './AsyncLoad'
 import {showApiKey} from '../services/auth'
-import Loading from '../components/Loading'
+import Loading from './Loading'
 
 const mapStateToProps=({modal:{isOpen}, auth:{apiKey}, client})=>({
     isOpen, apiKey, client

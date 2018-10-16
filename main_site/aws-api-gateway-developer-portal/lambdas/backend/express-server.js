@@ -14,7 +14,7 @@ const apigateway = new AWS.APIGateway()
 
 // replace these to match your site URL. Note: Use TLS, not plain HTTP, for your production site!
 //const domain = `${process.env.CLIENT_BUCKET_NAME}.s3-website-${process.env.AWS_DEFAULT_REGION}.amazonaws.com`
-const baseUrl = homepage
+const baseUrl = homepage+'/register'
 
 app.use(cors())
 app.use(bodyParser.json())

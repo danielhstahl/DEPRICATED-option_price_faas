@@ -4,6 +4,8 @@ import {
     CardHeader, CardTitle, 
     Button
 } from 'reactstrap'
+import AsyncLoad from './AsyncLoad'
+import Loading from './Loading'
 import {Link} from 'react-router-dom'
 import {REGISTER, DEVELOPERS, MARKETPLACE} from '../routes/names'
 const freeTier=[
@@ -43,8 +45,8 @@ const ButtonToRegister=()=><Link to={REGISTER}><Button color='primary'>Register 
 
 const ButtonToMarketPlace=()=><Link to={MARKETPLACE}><Button color='primary' outline>Get Started!</Button></Link>
 //need to update Paid Tier to also check for subscription.  I think that they should automatically be subscribed to the free tier.  
-//TODO!! add "async" to the entire app to get the usage plans
-//If redirected from the marketplace, go straight to registration.  
+//TODO!! 
+//If redirected from the marketplace, go straight to registration.  Need to wrap registration with Async for catalog...or do I...I think I just need marketplaceAuth?
 //All "purchase" links should go to the marketplace at this point
 //Then when registering, automatically register for the free plan
 //Even after registering, all "purchase" links need to go to the
@@ -54,32 +56,44 @@ const ButtonToMarketPlace=()=><Link to={MARKETPLACE}><Button color='primary' out
 //know which usage plan?  I think I'll need to unregister
 //from the free plan when moving to the paid plan.  
 export const Pricing=({style, paid, free, isSignedIn})=>(
-<Row style={style} className='dark-text'>
-    <Col xs={12} md={6} style={paddingTop}>
-        <PricingCard
-            title='Free Tier'
-            price='0'
-            quota={free.quota}
-        >
-            <p>No credit card required</p>
-            {isSignedIn?<ButtonToDeveloperPortal/>:<ButtonToRegister/>}
-        </PricingCard>
-    </Col>
-    <Col xs={12} md={6} style={paddingTop}>
-        <PricingCard
-            title='Paid Tier'
-            price='1'
-            quota={paid.quota}
-        >
-            <p>Email support</p>
-            {isSignedIn?<ButtonToDeveloperPortal/>:<ButtonToMarketPlace/>}
-        </PricingCard>
-    </Col>
-</Row>
+<AsyncLoad 
+    requiredObject={paid}
+    onLoad={()=>}
+    loading={Loading}
+    render={()=>(
+        <Row style={style} className='dark-text'>
+            <Col xs={12} md={6} style={paddingTop}>
+                <PricingCard
+                    title='Free Tier'
+                    price='0'
+                    quota={free.quota}
+                >
+                    <p>No credit card required</p>
+                    {isSignedIn?<ButtonToDeveloperPortal/>:<ButtonToRegister/>}
+                </PricingCard>
+            </Col>
+            <Col xs={12} md={6} style={paddingTop}>
+                <PricingCard
+                    title='Paid Tier'
+                    price='1'
+                    quota={paid.quota}
+                >
+                    <p>Email support</p>
+                    {isSignedIn?<ButtonToDeveloperPortal/>:<ButtonToMarketPlace/>}
+                </PricingCard>
+            </Col>
+        </Row>
+    )}
+/>
 )
 
-const mapStateToProps=({auth:{isSignedIn}, catalog:{paid, free}})=>({
+const mapStateToProps=({auth:{isSignedIn}, catalog:{paid, free}, marketplaceAuth})=>({
     isSignedIn,
     paid,
-    free
+    free,
+    marketplaceAuth
 })
+
+export default connect(
+    mapStateToProps
+)(Pricing)

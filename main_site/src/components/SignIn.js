@@ -4,7 +4,7 @@ import {
     Label, Input, Alert
 } from 'reactstrap'
 import { connect } from 'react-redux'
-import { register, login } from '../services/auth'
+import { register } from '../services/auth'
 import {loginError, updateLoggingIn} from '../actions/signIn'
 import Loading from '../components/Loading'
 import {HOME} from '../routes/names'
@@ -16,15 +16,16 @@ const goToPreviousPageOrHome=(fn, history, loginError, updateLoggingIn)=>{
         fn(e).then(navigate).catch(loginError).finally(()=>updateLoggingIn(false))
     }
 }
+
 export const SignIn=({
-    isRegistration, login, register, 
-    isLoggingIn, history, loginError,
-    error, updateLoggingIn
+    register, isLoggingIn, history, 
+    loginError, error, 
+    updateLoggingIn, token
 })=>(
     <Form 
         onSubmit={goToPreviousPageOrHome(
-            isRegistration?register:login, 
-            history, loginError, updateLoggingIn
+            register, history, 
+            loginError, updateLoggingIn
         )}
     >
         {error&&<Alert color='danger'>{error.message}</Alert>}
@@ -42,10 +43,9 @@ export const SignIn=({
                 color='primary'
                 className="login-form-button"
             >
-                {isRegistration?'Register':'Log In'}
+                Register/Log In
             </Button>
         }
-        
     </Form>
 )
 const getForm=(fn, dispatch)=>e=>{
@@ -55,7 +55,6 @@ const getForm=(fn, dispatch)=>e=>{
 }
 const mapDispatchToProps=dispatch=>({
     register:getForm(register, dispatch),
-    login:getForm(login, dispatch),
     loginError:loginError(dispatch),
     updateLoggingIn:isLoggingIn=>updateLoggingIn(dispatch, isLoggingIn)
 })

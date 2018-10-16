@@ -18,7 +18,7 @@ export const getCatalog=dispatch=>()=>fetch(`${url}/catalog`)
 })
 .catch(err=>dispatch({type:CATALOG_ERROR, err}))
 
-
+/*
 export const getSubscriptions=dispatch=>client=>client.invokeApi(
     {},
     '/subscriptions', 
@@ -26,21 +26,19 @@ export const getSubscriptions=dispatch=>client=>client.invokeApi(
     {}, {}
 )
 .then(({data})=>dispatch({type:UPDATE_SUBSCRIPTIONS, value:data}))
-.catch(err=>dispatch({type:SUBSCRIPTION_ERROR, err}))
+.catch(err=>dispatch({type:SUBSCRIPTION_ERROR, err}))*/
 
-//TODO!! This should only be used for the free tier.  For paid, 
-//need to use the marketplace subscription
-export const addSubscription=dispatch=>(usagePlanId, client)=>client.invokeApi(
+export const registerFree=dispatch=>(usagePlanId, client)=>client.invokeApi(
     {},
     `/subscriptions/${usagePlanId}`,
     'PUT',
     {}, {}
 )
-.then(()=>getSubscriptions(dispatch)(client))
-.catch(err=>dispatch({type:SUBSCRIPTION_ERROR, err}))
+//.then(()=>getSubscriptions(dispatch)(client))
+//.catch(err=>dispatch({type:SUBSCRIPTION_ERROR, err}))
 
 
-export const confirmMarketplaceSubscription=dispatch=>(
+const marketPlaceSubscribe=dispatch=>(
     usagePlanId, token, client
 )=>client.invokeApi(
     {},
@@ -48,8 +46,14 @@ export const confirmMarketplaceSubscription=dispatch=>(
     'PUT',
     {}, {token}
 )
-.then(({data})=>dispatch({type:CONFIRM_SUBSCRIPTION, value:data}))
-.catch(err=>dispatch({type:SUBSCRIPTION_ERROR, err}))
+//.then(({data})=>dispatch({type:CONFIRM_SUBSCRIPTION, value:data}))
+//.catch(err=>dispatch({type:SUBSCRIPTION_ERROR, err}))
+
+export const registerPaid=dispatch=>(paidUsagePlanId, freeUsagePlanId, token, client)=>Promise.all([
+    removeSubscription(dispatch)(freeUsagePlanId, client),
+    marketPlaceSubscribe(dispatch)(paidUsagePlanId, token, client)
+]).then(data=>console.log(data)).catch(err=>dispatch({type:SUBSCRIPTION_ERROR, err}))
+
 
 export const removeSubscription=dispatch=>(
     usagePlanId, client
@@ -59,8 +63,8 @@ export const removeSubscription=dispatch=>(
     'DELETE',
     {}, {}
 )
-.then(()=>dispatch({type:DELETE_SUBSCRIPTION, value:usagePlanId}))
-.catch(err=>dispatch({type:SUBSCRIPTION_ERROR, err}))
+//.then(()=>dispatch({type:DELETE_SUBSCRIPTION, value:usagePlanId}))
+//.catch(err=>dispatch({type:SUBSCRIPTION_ERROR, err}))
 
 export const getUsage=dispatch=>(
     usagePlanId, client
