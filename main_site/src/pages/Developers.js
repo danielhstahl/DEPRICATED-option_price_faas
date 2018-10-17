@@ -3,14 +3,7 @@ import {
      Row, Col, Container,
      Collapse, Button,
 } from 'reactstrap'
-import { connect } from 'react-redux'
-import Loading from '../components/Loading'
-import AsyncLoad from '../components/AsyncLoad'
-import ApiCard from '../components/ApiCard'
 import Swagger from './Swagger'
-import {
-    getCatalog
-} from '../services/api-catalog'
 import {
     DEVELOPERS,
     NODOCS,
@@ -27,37 +20,10 @@ const paddingRight={paddingRight:20}
 
 const matchDocs=showswagger=>'/'+showswagger===NODOCS
 const linkToOther=showswagger=>matchDocs(showswagger)?DOCS:NODOCS
-export const Developers=({
-    catalog, getCatalog, 
+export default ({
     match
-})=>{
-    console.log(catalog)
-    return [
-    <Container key='container'>
-        <Row>
-            <AsyncLoad 
-                requiredObject={catalog.length>0} 
-                onLoad={getCatalog} 
-                loading={Loading} 
-                render={
-                    ()=>catalog
-                        .map(({
-                                id:usagePlanId, 
-                                name, apiStages,
-                                description,
-                                quota
-                            })=>(
-                        <Col xs={12} md={6} lg={4} key={usagePlanId} style={paddingTop}>
-                            <ApiCard 
-                                name={name}
-                                description={description}
-                                stages={apiStages}
-                                quota={quota}
-                                usagePlanId={usagePlanId}
-                            />
-                        </Col>
-                ))}/>
-        </Row>
+})=>[
+    <Container key='container'>           
         <Row>
             <Col style={paddingTop}>
                 <Link 
@@ -72,16 +38,4 @@ export const Developers=({
     <Collapse key='collapse' isOpen={!matchDocs(match.params[SHOW_SWAGGER])}>
         <Swagger/>
     </Collapse>
-]}
-const mapStateToProps=({catalog})=>({
-    catalog
-})
-
-const mapDispatchToProps=dispatch=>({
-    getCatalog:getCatalog(dispatch)
-})
-
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(Developers)
+]

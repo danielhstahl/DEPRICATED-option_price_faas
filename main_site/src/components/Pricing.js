@@ -4,26 +4,13 @@ import {
     CardHeader, CardTitle, 
     Button
 } from 'reactstrap'
-import AsyncLoad from './AsyncLoad'
-import Loading from './Loading'
+import { connect } from 'react-redux'
 import {Link} from 'react-router-dom'
 import {REGISTER, DEVELOPERS, MARKETPLACE} from '../routes/names'
-const freeTier=[
-    '10 API calls free per month',
-    'No Credit Card required',
-]
-const paidTier=[
-    'Nearly unlimited API calls',
-    'Email support'
-]
-/*const getMinHeight=()=>{
-    const maxLength=Math.max(freeTier.length, paidTier.length)
-    return 180+maxLength*24
-}*/
-const paddingTop={paddingTop:20}
 
+const paddingTop={paddingTop:20}
 const PricingCard=({
-    title, price, quota
+    title, price, quota, children
 })=>(
 <Card className='text-center'>
     <CardHeader>
@@ -55,36 +42,29 @@ const ButtonToMarketPlace=()=><Link to={MARKETPLACE}><Button color='primary' out
 //should the user "choose" to purchase?  Also, how does the API
 //know which usage plan?  I think I'll need to unregister
 //from the free plan when moving to the paid plan.  
-export const Pricing=({style, paid, free, isSignedIn})=>(
-<AsyncLoad 
-    requiredObject={paid}
-    onLoad={()=>}
-    loading={Loading}
-    render={()=>(
-        <Row style={style} className='dark-text'>
-            <Col xs={12} md={6} style={paddingTop}>
-                <PricingCard
-                    title='Free Tier'
-                    price='0'
-                    quota={free.quota}
-                >
-                    <p>No credit card required</p>
-                    {isSignedIn?<ButtonToDeveloperPortal/>:<ButtonToRegister/>}
-                </PricingCard>
-            </Col>
-            <Col xs={12} md={6} style={paddingTop}>
-                <PricingCard
-                    title='Paid Tier'
-                    price='1'
-                    quota={paid.quota}
-                >
-                    <p>Email support</p>
-                    {isSignedIn?<ButtonToDeveloperPortal/>:<ButtonToMarketPlace/>}
-                </PricingCard>
-            </Col>
-        </Row>
-    )}
-/>
+export const Pricing=({style, paid={}, free={}, isSignedIn})=>(
+    <Row style={style} className='dark-text'>
+        <Col xs={12} md={6} style={paddingTop}>
+            <PricingCard
+                title='Free Tier'
+                price='0'
+                quota={free.quota}
+            >
+                <p>No credit card required</p>
+                {isSignedIn?<ButtonToDeveloperPortal/>:<ButtonToRegister/>}
+            </PricingCard>
+        </Col>
+        <Col xs={12} md={6} style={paddingTop}>
+            <PricingCard
+                title='Paid Tier'
+                price='1'
+                quota={paid.quota}
+            >
+                <p>Email support</p>
+                <ButtonToMarketPlace/>
+            </PricingCard>
+        </Col>
+    </Row>
 )
 
 const mapStateToProps=({auth:{isSignedIn}, catalog:{paid, free}, marketplaceAuth})=>({

@@ -4,8 +4,12 @@ import {UPDATE_CATALOG} from '../actions/constants'
 //const {usagePlanId, token}=queryString.parse(location.search)
 const containsString=(match, string)=>string.toLowerCase().includes(match)
 const checkKey=keys=>name=>keys.find(key=>containsString(name, key))
-const keys=["free", "paid"]
-export default (state={}, action)=>{
+const defaultState={
+    free:{quota:{period:'month'}},
+    paid:{quota:{period:'month'}}
+}
+const keys=Object.keys(defaultState)
+export default (state=defaultState, action)=>{
     switch(action.type){
         case UPDATE_CATALOG:
             return action.value.reduce((aggr, curr)=>{

@@ -18,13 +18,18 @@ const goToPreviousPageOrHome=(fn, history, loginError, updateLoggingIn)=>{
 }
 
 export const SignIn=({
-    register, isLoggingIn, history, 
-    loginError, error, 
-    updateLoggingIn, token
+    register, isLoggingIn, 
+    history, loginError, 
+    error, updateLoggingIn, 
+    token, paidUsagePlanId, 
+    freeUsagePlanId
 })=>(
     <Form 
         onSubmit={goToPreviousPageOrHome(
-            register, history, 
+            register({
+                paidUsagePlanId, freeUsagePlanId, 
+                token, fromMarketPlace:paidUsagePlanId&&token
+            }), history, 
             loginError, updateLoggingIn
         )}
     >
@@ -48,17 +53,20 @@ export const SignIn=({
         }
     </Form>
 )
-const getForm=(fn, dispatch)=>e=>{
+const getForm=fn=>e=>{
     e.preventDefault()
     const [{value:email}, {value:password}]=e.target
-    return fn(dispatch)(email, password)
+    return register(email, password)
 }
 const mapDispatchToProps=dispatch=>({
-    register:getForm(register, dispatch),
+    register:getForm(register(dispatch)),
     loginError:loginError(dispatch),
     updateLoggingIn:isLoggingIn=>updateLoggingIn(dispatch, isLoggingIn)
 })
-const mapStateToProps=({loading:{isLoggingIn}, auth:{error}})=>({isLoggingIn, error})
+const mapStateToProps=({
+    loading:{isLoggingIn}, auth:{error, token, usagePlanId:paidUsagePlanId},
+    catalog:{free:{usagePlanId:freeUsagePlanId}}
+})=>({isLoggingIn, error, token, paidUsagePlanId, freeUsagePlanId})
 
 export default connect(
     mapStateToProps, 

@@ -1,11 +1,8 @@
 import {url} from './aws'
 import {
     UPDATE_CATALOG, 
-    UPDATE_SUBSCRIPTIONS,
     SUBSCRIPTION_ERROR,
     CATALOG_ERROR,
-    CONFIRM_SUBSCRIPTION,
-    DELETE_SUBSCRIPTION,
     UPDATE_USAGE
 } from '../actions/constants'
 
@@ -28,7 +25,7 @@ export const getSubscriptions=dispatch=>client=>client.invokeApi(
 .then(({data})=>dispatch({type:UPDATE_SUBSCRIPTIONS, value:data}))
 .catch(err=>dispatch({type:SUBSCRIPTION_ERROR, err}))*/
 
-export const registerFree=dispatch=>(usagePlanId, client)=>client.invokeApi(
+export const registerFree=(usagePlanId, client)=>client.invokeApi(
     {},
     `/subscriptions/${usagePlanId}`,
     'PUT',
@@ -38,7 +35,7 @@ export const registerFree=dispatch=>(usagePlanId, client)=>client.invokeApi(
 //.catch(err=>dispatch({type:SUBSCRIPTION_ERROR, err}))
 
 
-const marketPlaceSubscribe=dispatch=>(
+const marketPlaceSubscribe=(
     usagePlanId, token, client
 )=>client.invokeApi(
     {},
@@ -49,13 +46,18 @@ const marketPlaceSubscribe=dispatch=>(
 //.then(({data})=>dispatch({type:CONFIRM_SUBSCRIPTION, value:data}))
 //.catch(err=>dispatch({type:SUBSCRIPTION_ERROR, err}))
 
-export const registerPaid=dispatch=>(paidUsagePlanId, freeUsagePlanId, token, client)=>Promise.all([
-    removeSubscription(dispatch)(freeUsagePlanId, client),
-    marketPlaceSubscribe(dispatch)(paidUsagePlanId, token, client)
-]).then(data=>console.log(data)).catch(err=>dispatch({type:SUBSCRIPTION_ERROR, err}))
+export const registerPaid=(paidUsagePlanId, freeUsagePlanId, token, client)=>Promise.all([
+        removeSubscription(freeUsagePlanId, client),
+        marketPlaceSubscribe(paidUsagePlanId, token, client)
+    ]).then(data=>console.log(data))//.catch(err=>dispatch({type:SUBSCRIPTION_ERROR, err}))
+
+export const unregisterPaid=(paidUsagePlanId, freeUsagePlanId, token, client)=>Promise.all([
+        removeSubscription(paidUsagePlanId, client),
+        registerFree(freeUsagePlanId, client)
+    ]).then(data=>console.log(data))//.catch(err=>dispatch({type:SUBSCRIPTION_ERROR, err}))
 
 
-export const removeSubscription=dispatch=>(
+export const removeSubscription=(
     usagePlanId, client
 )=>client.invokeApi(
     {},

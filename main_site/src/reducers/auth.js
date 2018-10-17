@@ -3,10 +3,10 @@ import {
     UPDATE_API_KEY,
     UPDATE_AWS_CLIENT, 
     LOGIN_ERROR,
-    REPEAT_VISITOR
+    //REPEAT_VISITOR
 } from '../actions/constants'
 import queryString from 'query-string'
-const {token, usagePlanId}=queryString.parse(location.search)
+const {token, usagePlanId}=queryString.parse(window.location.search)
 const defaultQuery={
     repeatVisitor:false
 }
@@ -29,11 +29,11 @@ export default (state=stateWithQuery, action)=>{
                 cognitoUser:action.user, 
                 error:null
             }
-        case REPEAT_VISITOR:
+        /*case REPEAT_VISITOR: //do I need this??
             return {
                 ...state,
                 repeatVisitor:true
-            }
+            }*/
         case LOGIN_ERROR:
             return {...state, error:action.value}
         case LOGOUT:

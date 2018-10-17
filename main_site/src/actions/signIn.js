@@ -3,7 +3,7 @@ import {
     LOGOUT,
     IS_LOGGING_IN,
     LOGIN_ERROR,
-    REPEAT_VISITOR,
+    //REPEAT_VISITOR,
     UPDATE_API_KEY,
     API_ERROR
 } from './constants'
@@ -19,7 +19,7 @@ export const loginError=dispatch=>err=>dispatch({
     type:LOGIN_ERROR,
     value:err
 })
-export const repeatVisitor=dispatch=>dispatch({type:REPEAT_VISITOR})
+//export const repeatVisitor=dispatch=>dispatch({type:REPEAT_VISITOR})
 
 export const updateLoggingIn=(dispatch, value)=>dispatch({
     type:IS_LOGGING_IN,

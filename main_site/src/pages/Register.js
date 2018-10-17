@@ -10,7 +10,7 @@ export default ({history})=>(
         <Container>
             <Row >
                 <Col xs={12} md={6} lg={4} style={padding}>
-                    <SignIn isRegistration history={history}/>
+                    <SignIn history={history}/>
                 </Col>
             </Row>
         </Container>

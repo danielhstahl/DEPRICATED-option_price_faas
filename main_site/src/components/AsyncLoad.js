@@ -14,9 +14,10 @@ export default class AsyncLoad extends PureComponent {
     }
     render() {
         const {isLoading}=this.state
+        const {loading, render}=this.props
         return isLoading?
-            this.props.loading():
-            this.props.render(this.props)
+            loading?loading():null:
+            render?render(this.props):null
     }
 }
   

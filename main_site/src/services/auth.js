@@ -22,11 +22,11 @@ import {
 import {
     updateSignIn,
     updateLogOut,
-    repeatVisitor,
+    //repeatVisitor,
     updateApiKey,
     apiError
 } from '../actions/signIn'
-import { addSubscription } from './api-catalog';
+import { registerFree, registerPaid } from './api-catalog';
 
 const POOL_DATA = {
   UserPoolId: cognitoUserPoolId,
@@ -35,7 +35,7 @@ const POOL_DATA = {
 
 const COGNITO_LOGIN_KEY=`cognito-idp.${cognitoRegion}.amazonaws.com/${cognitoUserPoolId}`
 
-const updateCredentials=(jwtToken, cognitoUser, usagePlanId, token, dispatch)=>{
+const updateCredentials=(jwtToken, cognitoUser, dispatch)=>{
     const Logins={
         [COGNITO_LOGIN_KEY]:jwtToken
     }
@@ -57,16 +57,15 @@ const updateCredentials=(jwtToken, cognitoUser, usagePlanId, token, dispatch)=>{
                 region:awsRegion, 
                 invokeUrl:url
             })
-            /*if(token&&usagePlanId){
-                removeSubscription
-                addSubscription(dispatch)(usagePlanId, )
-            }*/
             return signIn(apigClient)
-                .then(()=>updateSignIn(dispatch, apigClient, cognitoUser))
+                .then(()=>{
+                    updateSignIn(dispatch, apigClient, cognitoUser)
+                    return apigClient
+                })
         })
 }
 
-const login=dispatch=>(email, password, usagePlanId, token)=>{
+const login=(email, password, dispatch)=>{
     const authenticationData = {
         Username: email,
         Password: password
@@ -83,26 +82,58 @@ const login=dispatch=>(email, password, usagePlanId, token)=>{
             const jwtToken=result
                 .getIdToken()
                 .getJwtToken()
-            return updateCredentials(jwtToken, cognitoUser, usagePlanId, token, dispatch)
+            return updateCredentials(jwtToken, cognitoUser, dispatch)
         })
 }
 /**Always "register" instead of logging in.  Login will just fail on already registered and then login */
-export const register=dispatch=>(usagePlanId, token)=>(email, password)=>{
+export const register=dispatch=>({
+    paidUsagePlanId, freeUsagePlanId, 
+    token, fromMarketplace
+})=>{
     const userPool=new CognitoUserPool(POOL_DATA)
-    return signUp(userPool, email, password)
-        .catch(err=>{
-            console.log(err)
-            repeatVisitor(dispatch)
-        }) //todo!! re throw any non-duplicate user error
-        .then(()=>login(dispatch)(email, password, usagePlanId, token))
+    return (email, password)=>{
+        let firstTimeRegistering=true
+        return signUp(userPool, email, password)
+            .catch(err=>{
+                console.log(err)
+                //repeatVisitor(dispatch)
+                firstTimeRegistering=false
+            }) //todo!! re throw any non-duplicate user error
+            .then(()=>login(email, password, dispatch))
+            .then(client=>{
+                if(fromMarketplace){
+                    return registerPaid(
+                        paidUsagePlanId, freeUsagePlanId, token, client
+                    )
+                }
+                else if(firstTimeRegistering) {
+                    return registerFree(freeUsagePlanId, client)
+                }
+                else {
+                    return Promise.resolve()
+                }            
+            })
+    }
 }
 
-export const init=dispatch=>(usagePlanId, token)=>{
+export const init=dispatch=>({
+    paidUsagePlanId, freeUsagePlanId, 
+    token, fromMarketplace
+})=>{
     const userPool = new CognitoUserPool(POOL_DATA)
     const cognitoUser = userPool.getCurrentUser()
     return cognitoUser?getSession(cognitoUser).then(session=>{
         const token=session.getIdToken().getJwtToken()
         return updateCredentials(token, cognitoUser, dispatch)
+    }).then(client=>{
+        if(fromMarketplace){
+            return registerPaid(
+                paidUsagePlanId, freeUsagePlanId, token, client
+            )
+        }
+        else {
+            return Promise.resolve()
+        }        
     }):Promise.resolve()
 }
 
@@ -112,7 +143,6 @@ export const logout=dispatch=>cognitoUser=>{
     updateLogOut(dispatch)
 }
 
-//I'm not enthused about the dispatches after showApiKey, consider refactoring
 export const showApiKey=dispatch=>client=>client.invokeApi(
     {},
     '/apikey', 

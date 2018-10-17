@@ -6,10 +6,14 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import AppMenu from './components/AppMenu'
 import './App.css'
+import { connect } from 'react-redux'
 import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom'
-import { Provider } from 'react-redux'
-import { createStore } from 'redux'
-import awsApp from './reducers'
+
+import AsyncLoad from './components/AsyncLoad'
+import {
+  getCatalog
+} from './services/api-catalog'
+
 import Products from './pages/Products'
 import {
   HOME, PRODUCTS, 
@@ -19,15 +23,15 @@ import {
   SHOW_SWAGGER
 } from './routes/params'
 
-const store=createStore(awsApp)
+
 
 //note that the route has to include AppMenu even those AppMenu doesn't use "page".
 //this is because AppMenu won't update the selected menu unless part of
 //a route
-const App = () => (
-  <Provider store={store}>
+const App = ({getCatalog, paid}) => (
     <Router basename={process.env.PUBLIC_URL}>
       <div>
+        <AsyncLoad onLoad={getCatalog} requiredObject={paid}/>
         <Switch>
           <Redirect from='/' exact to={HOME} />
           <Route path='/:page' component={AppMenu}/>    
@@ -55,7 +59,14 @@ const App = () => (
         />
       </div>
     </Router>
-  </Provider>
 )
-
-export default App
+const mapStateToProps=({catalog:{paid}})=>({
+  paid
+})
+const mapDispatchToProps=dispatch=>({
+  getCatalog:getCatalog(dispatch)
+})
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(App)
