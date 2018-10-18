@@ -6,6 +6,8 @@ import {
     UPDATE_USAGE
 } from '../actions/constants'
 import {keys} from '../reducers/catalog'
+const containsString=(match, string)=>string.toLowerCase().includes(match)
+const checkKey=keys=>name=>keys.find(key=>containsString(name, key))
 const convertJson=res=>res.json()
 export const getCatalog=dispatch=>fetch(`${url}/catalog`)
 .then(convertJson)

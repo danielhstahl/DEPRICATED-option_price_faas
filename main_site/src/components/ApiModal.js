@@ -16,7 +16,12 @@ const mapDispatchToProps=dispatch=>({
     onLoad:showApiKey(dispatch)
 })
 export const ApiModal=({isOpen, toggleOpen, apiKey, client, onLoad})=>[
-    <Button onClick={toggleOpen} key='button'>View API Key</Button>,
+    <Button 
+        onClick={toggleOpen} 
+        key='button'
+    >
+        View API Key
+    </Button>,
     <Modal 
         key='modal' isOpen={isOpen} 
         toggle={toggleOpen} 

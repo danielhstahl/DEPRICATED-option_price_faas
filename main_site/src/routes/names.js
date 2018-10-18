@@ -6,4 +6,5 @@ export const LOGIN='/login'
 export const NODOCS='/nodocs'
 export const DOCS='/showdocs'
 export const MARKETPLACE='/tmpmarketplace'
+export const SUCCESS_MARKETPLACE='/tmpsuccessmarketplace'
 

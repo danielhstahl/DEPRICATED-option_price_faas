@@ -32,7 +32,6 @@ export default ({
                 ><Button color='primary'>Api Docs</Button></Link>
                 <ApiModal/>
             </Col>
-            
         </Row>
     </Container>,
     <Collapse key='collapse' isOpen={!matchDocs(match.params[SHOW_SWAGGER])}>

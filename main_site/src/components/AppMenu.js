@@ -15,6 +15,7 @@ import {
     HOME, DEVELOPERS, PRODUCTS, 
     REGISTER, LOGIN, NODOCS
 } from '../routes/names'
+import {getCatalog} from '../services/api-catalog'
 import {logout} from '../services/auth'
 import {menuBarHeight} from '../styles/menu'
 import Loading from './Loading'
@@ -30,6 +31,7 @@ const AppMenu=({
     isOpen, logout, init, 
     cognitoUser,
     paidUsagePlanId, 
+    freeUsagePlanId,
     token, isFromMarketPlace
 })=>(
 <Navbar
@@ -52,7 +54,7 @@ const AppMenu=({
                 <NavLink to='/purchase' tag={Link} >Purchase</NavLink>
             </NavItem>
             <NavItem>
-                <AsyncLoad onLoad={()=>init({token, paidUsagePlanId, isFromMarketPlace})} loading={Loading} requiredObject={isSignedIn!==undefined} render={()=>isSignedIn?
+                <AsyncLoad onLoad={()=>init({token, paidUsagePlanId, isFromMarketPlace})} loading={Loading} requiredObject={freeUsagePlanId!==undefined} render={()=>isSignedIn?
                     <LogOut 
                         logout={logout} 
                         cognitoUser={cognitoUser}
@@ -68,12 +70,14 @@ const AppMenu=({
 </Navbar>
 )
 
-const mapStateToProps=({auth:{isSignedIn, cognitoUser, token, paidUsagePlanId, isFromMarketPlace}, menu})=>({
+
+const mapStateToProps=({auth:{isSignedIn, cognitoUser, token, paidUsagePlanId, isFromMarketPlace}, menu, catalog:{free:{usagePlanId:freeUsagePlanId}}})=>({
     isSignedIn,
     cognitoUser,
     isOpen:menu,
-    catalog, token,
+    token,
     paidUsagePlanId, 
+    freeUsagePlanId,
     isFromMarketPlace
 })
 //TODO!! this is too similar to mapStateToProps in SignIn...consider extracting into one function

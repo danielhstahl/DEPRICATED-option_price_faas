@@ -6,11 +6,11 @@ import RedirectToHomeIfLoggedIn from '../components/RedirectToHomeIfLoggedIn'
 const padding={paddingTop:20}
 
 export default ({history})=>(
-        <Container>
-            <Row >
-                <Col xs={12} md={6} lg={4} style={padding}>
-                    <SignIn history={history}/>
-                </Col>
-            </Row>
-        </Container>
+    <Container>
+        <Row >
+            <Col xs={12} md={6} lg={4} style={padding}>
+                <SignIn history={history}/>
+            </Col>
+        </Row>
+    </Container>
 )
