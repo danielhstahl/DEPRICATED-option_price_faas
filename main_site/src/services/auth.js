@@ -22,7 +22,6 @@ import {
 import {
     updateSignIn,
     updateLogOut,
-    //repeatVisitor,
     updateApiKey,
     apiError
 } from '../actions/signIn'
@@ -88,7 +87,7 @@ const login=(email, password, dispatch)=>{
 /**Always "register" instead of logging in.  Login will just fail on already registered and then login */
 export const register=dispatch=>({
     paidUsagePlanId, freeUsagePlanId, 
-    token, fromMarketplace
+    token, isFromMarketPlace
 })=>{
     const userPool=new CognitoUserPool(POOL_DATA)
     return (email, password)=>{
@@ -101,7 +100,7 @@ export const register=dispatch=>({
             }) //todo!! re throw any non-duplicate user error
             .then(()=>login(email, password, dispatch))
             .then(client=>{
-                if(fromMarketplace){
+                if(isFromMarketPlace){
                     return registerPaid(
                         paidUsagePlanId, freeUsagePlanId, token, client
                     )
@@ -116,25 +115,26 @@ export const register=dispatch=>({
     }
 }
 
-export const init=dispatch=>({
-    paidUsagePlanId, freeUsagePlanId, 
-    token, fromMarketplace
-})=>{
+export const init=dispatch=>{
     const userPool = new CognitoUserPool(POOL_DATA)
     const cognitoUser = userPool.getCurrentUser()
     return cognitoUser?getSession(cognitoUser).then(session=>{
         const token=session.getIdToken().getJwtToken()
         return updateCredentials(token, cognitoUser, dispatch)
-    }).then(client=>{
-        if(fromMarketplace){
-            return registerPaid(
-                paidUsagePlanId, freeUsagePlanId, token, client
-            )
-        }
-        else {
-            return Promise.resolve()
-        }        
     }):Promise.resolve()
+}
+export const conditionalRegistration=(client, {
+    paidUsagePlanId, freeUsagePlanId, 
+    token, isFromMarketPlace
+})=>{
+    if(client&&isFromMarketPlace){
+        return registerPaid(
+            paidUsagePlanId, freeUsagePlanId, token, client
+        )
+    }
+    else {
+        return Promise.resolve()
+    }
 }
 
 

@@ -42,7 +42,7 @@ const ButtonToMarketPlace=()=><Link to={MARKETPLACE}><Button color='primary' out
 //should the user "choose" to purchase?  Also, how does the API
 //know which usage plan?  I think I'll need to unregister
 //from the free plan when moving to the paid plan.  
-export const Pricing=({style, paid={}, free={}, isSignedIn})=>(
+export const Pricing=({style, paid, free, isSignedIn})=>(
     <Row style={style} className='dark-text'>
         <Col xs={12} md={6} style={paddingTop}>
             <PricingCard
@@ -67,11 +67,10 @@ export const Pricing=({style, paid={}, free={}, isSignedIn})=>(
     </Row>
 )
 
-const mapStateToProps=({auth:{isSignedIn}, catalog:{paid, free}, marketplaceAuth})=>({
+const mapStateToProps=({auth:{isSignedIn}, catalog:{paid, free}})=>({
     isSignedIn,
     paid,
-    free,
-    marketplaceAuth
+    free
 })
 
 export default connect(

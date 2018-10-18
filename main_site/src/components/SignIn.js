@@ -22,13 +22,13 @@ export const SignIn=({
     history, loginError, 
     error, updateLoggingIn, 
     token, paidUsagePlanId, 
-    freeUsagePlanId
+    freeUsagePlanId, isFromMarketPlace
 })=>(
     <Form 
         onSubmit={goToPreviousPageOrHome(
             register({
                 paidUsagePlanId, freeUsagePlanId, 
-                token, fromMarketPlace:paidUsagePlanId&&token
+                token, isFromMarketPlace
             }), history, 
             loginError, updateLoggingIn
         )}
@@ -64,9 +64,14 @@ const mapDispatchToProps=dispatch=>({
     updateLoggingIn:isLoggingIn=>updateLoggingIn(dispatch, isLoggingIn)
 })
 const mapStateToProps=({
-    loading:{isLoggingIn}, auth:{error, token, usagePlanId:paidUsagePlanId},
+    loading:{isLoggingIn}, auth:{error, token, paidUsagePlanId, isFromMarketPlace},
     catalog:{free:{usagePlanId:freeUsagePlanId}}
-})=>({isLoggingIn, error, token, paidUsagePlanId, freeUsagePlanId})
+})=>({
+    isLoggingIn, error, 
+    token, paidUsagePlanId, 
+    freeUsagePlanId, 
+    isFromMarketPlace
+})
 
 export default connect(
     mapStateToProps, 

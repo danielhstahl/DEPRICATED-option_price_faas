@@ -19,7 +19,7 @@ import {logout} from '../services/auth'
 import {menuBarHeight} from '../styles/menu'
 import Loading from './Loading'
 import AsyncLoad from './AsyncLoad'
-import {init} from '../services/auth'
+import {init, conditionalRegistration} from '../services/auth'
 import {toggleNavBar} from '../actions/menu'
 
 const LogOut=({logout, cognitoUser})=><NavLink href="#" onClick={()=>logout(cognitoUser)}>Log Out</NavLink>
@@ -27,8 +27,10 @@ const LogOut=({logout, cognitoUser})=><NavLink href="#" onClick={()=>logout(cogn
 //the "purchase" link will go to amazon web store
 const AppMenu=({
     toggleNavBar, isSignedIn, 
-    isOpen, 
-    logout, init, cognitoUser
+    isOpen, logout, init, 
+    cognitoUser,
+    paidUsagePlanId, 
+    token, isFromMarketPlace
 })=>(
 <Navbar
     color="light" light expand="md"
@@ -50,7 +52,7 @@ const AppMenu=({
                 <NavLink to='/purchase' tag={Link} >Purchase</NavLink>
             </NavItem>
             <NavItem>
-                <AsyncLoad onLoad={init} loading={Loading} render={()=>isSignedIn?
+                <AsyncLoad onLoad={()=>init({token, paidUsagePlanId, isFromMarketPlace})} loading={Loading} requiredObject={isSignedIn!==undefined} render={()=>isSignedIn?
                     <LogOut 
                         logout={logout} 
                         cognitoUser={cognitoUser}
@@ -66,14 +68,21 @@ const AppMenu=({
 </Navbar>
 )
 
-const mapStateToProps=({auth:{isSignedIn, cognitoUser}, menu})=>({
+const mapStateToProps=({auth:{isSignedIn, cognitoUser, token, paidUsagePlanId, isFromMarketPlace}, menu})=>({
     isSignedIn,
     cognitoUser,
-    isOpen:menu
+    isOpen:menu,
+    catalog, token,
+    paidUsagePlanId, 
+    isFromMarketPlace
 })
+//TODO!! this is too similar to mapStateToProps in SignIn...consider extracting into one function
 const mapDispatchToProps=dispatch=>({
     logout:logout(dispatch),
-    init:init(dispatch),
+    init:({paidUsagePlanId, token, isFromMarketPlace})=>Promise.all([
+        getCatalog(dispatch),
+        init(dispatch)
+    ]).then(([{free:{usagePlanId:freeUsagePlanId}}, client])=>conditionalRegistration(client, {paidUsagePlanId, token, freeUsagePlanId, isFromMarketPlace})),
     toggleNavBar:toggleNavBar(dispatch)
 })
 export default connect(

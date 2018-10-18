@@ -5,25 +5,24 @@ import {
     CATALOG_ERROR,
     UPDATE_USAGE
 } from '../actions/constants'
-
+import {keys} from '../reducers/catalog'
 const convertJson=res=>res.json()
-export const getCatalog=dispatch=>()=>fetch(`${url}/catalog`)
+export const getCatalog=dispatch=>fetch(`${url}/catalog`)
 .then(convertJson)
 .then(({items})=>{
     console.log(items)
-    dispatch({type:UPDATE_CATALOG, value:items})
+    const value=items.reduce((aggr, curr)=>{
+        const key=checkKey(keys, curr.name)
+        if(key){
+            return {...aggr, [key]:curr}
+        }
+        else {
+            return aggr
+        }
+    }, {})
+    return dispatch({type:UPDATE_CATALOG, value})
 })
-.catch(err=>dispatch({type:CATALOG_ERROR, err}))
-
-/*
-export const getSubscriptions=dispatch=>client=>client.invokeApi(
-    {},
-    '/subscriptions', 
-    'GET',
-    {}, {}
-)
-.then(({data})=>dispatch({type:UPDATE_SUBSCRIPTIONS, value:data}))
-.catch(err=>dispatch({type:SUBSCRIPTION_ERROR, err}))*/
+//.catch(err=>dispatch({type:CATALOG_ERROR, err}))
 
 export const registerFree=(usagePlanId, client)=>client.invokeApi(
     {},
@@ -31,9 +30,6 @@ export const registerFree=(usagePlanId, client)=>client.invokeApi(
     'PUT',
     {}, {}
 )
-//.then(()=>getSubscriptions(dispatch)(client))
-//.catch(err=>dispatch({type:SUBSCRIPTION_ERROR, err}))
-
 
 const marketPlaceSubscribe=(
     usagePlanId, token, client
@@ -43,18 +39,16 @@ const marketPlaceSubscribe=(
     'PUT',
     {}, {token}
 )
-//.then(({data})=>dispatch({type:CONFIRM_SUBSCRIPTION, value:data}))
-//.catch(err=>dispatch({type:SUBSCRIPTION_ERROR, err}))
 
 export const registerPaid=(paidUsagePlanId, freeUsagePlanId, token, client)=>Promise.all([
         removeSubscription(freeUsagePlanId, client),
         marketPlaceSubscribe(paidUsagePlanId, token, client)
-    ]).then(data=>console.log(data))//.catch(err=>dispatch({type:SUBSCRIPTION_ERROR, err}))
+    ]).then(data=>console.log(data))
 
 export const unregisterPaid=(paidUsagePlanId, freeUsagePlanId, token, client)=>Promise.all([
         removeSubscription(paidUsagePlanId, client),
         registerFree(freeUsagePlanId, client)
-    ]).then(data=>console.log(data))//.catch(err=>dispatch({type:SUBSCRIPTION_ERROR, err}))
+    ]).then(data=>console.log(data))
 
 
 export const removeSubscription=(
@@ -65,8 +59,6 @@ export const removeSubscription=(
     'DELETE',
     {}, {}
 )
-//.then(()=>dispatch({type:DELETE_SUBSCRIPTION, value:usagePlanId}))
-//.catch(err=>dispatch({type:SUBSCRIPTION_ERROR, err}))
 
 export const getUsage=dispatch=>(
     usagePlanId, client

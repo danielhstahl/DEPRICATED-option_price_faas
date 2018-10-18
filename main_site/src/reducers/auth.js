@@ -8,12 +8,15 @@ import {
 import queryString from 'query-string'
 const {token, usagePlanId}=queryString.parse(window.location.search)
 const defaultQuery={
-    repeatVisitor:false
+    repeatVisitor:false,
+    isSignedIn:false,
+    error:null
 }
 const stateWithQuery={
     ...defaultQuery,
     token,
-    usagePlanId
+    paidUsagePlanId:usagePlanId,
+    isFromMarketPlace:token&&usagePlanId
 }
 export default (state=stateWithQuery, action)=>{
     switch(action.type){

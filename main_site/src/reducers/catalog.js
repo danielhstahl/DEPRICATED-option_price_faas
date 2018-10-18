@@ -8,21 +8,11 @@ const defaultState={
     free:{quota:{period:'month'}},
     paid:{quota:{period:'month'}}
 }
-const keys=Object.keys(defaultState)
+export const keys=Object.keys(defaultState)
 export default (state=defaultState, action)=>{
     switch(action.type){
         case UPDATE_CATALOG:
-            return action.value.reduce((aggr, curr)=>{
-                const key=checkKey(keys, curr.name)
-                if(key){
-                    //const isMarketPlace=curr.id===usagePlanId
-                    //const tokenIfMarket=isMarketPlace?{token}:{}
-                    return {...aggr, [key]:curr}
-                }
-                else {
-                    return aggr
-                }
-            }, {})
+            return action.value
         default:
             return state
     }
