@@ -9,6 +9,9 @@ cache:
   - main_site/node_modules
 
 before_install:
+  #https://github.com/travis-ci/travis-ci/issues/8607
+- sudo rm -vf /etc/apt/sources.list.d/*riak*
+- sudo apt-get update
 - wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
 - nvm install 8
 - node --version
