@@ -14,7 +14,11 @@ export default (state=defaultState, action)=>{
             return action.value
         case UPDATE_USAGE:
             console.log(action)
-            return state
+            const {usagePlanId, ...rest}=action.value
+            console.log(state)
+            console.log(keys)
+            console.log(keys.reduce((aggr, key)=>state[key].id===usagePlanId?{...aggr, ...state, [key]:{...aggr[key], ...rest}}:{...aggr, ...state}, {}))
+            return keys.reduce((aggr, key)=>state[key].id===usagePlanId?{...aggr, [key]:{...aggr[key], ...rest}}:aggr, state)
         default:
             return state
     }

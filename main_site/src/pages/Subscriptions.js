@@ -31,7 +31,7 @@ export const Subscriptions=({style, paid, free, onLoad, client, isSignedIn, getU
                 <AsyncLoad
                     //requiredObject={free.usagePlanId!==undefined}
                     onLoad={()=>getUsage(free.id, client)}
-                    render={()=><div>Hello world</div>}
+                    render={()=><div>Usage since {free.startDate}: {free.items.x}</div>}
                     loading={Loading}
                 />:<Loading/>}
             </SubscriptionCard>
@@ -44,7 +44,7 @@ export const Subscriptions=({style, paid, free, onLoad, client, isSignedIn, getU
                 <AsyncLoad
                     //requiredObject={free.usagePlanId!==undefined}
                     onLoad={()=>getUsage(paid.id, client)}
-                    render={()=><div>Hello world</div>}
+                    render={()=><div>Usage since {paid.startDate}: {paid.items.x}</div>}
                     loading={Loading}
                 />:<Loading/>}
                 <Button>Unsubscribe</Button>
@@ -52,6 +52,7 @@ export const Subscriptions=({style, paid, free, onLoad, client, isSignedIn, getU
         </Col>
     </Row>
 )
+
 const mapStateToProps=({auth:{isSignedIn}, client, catalog:{paid, free}})=>({
     isSignedIn,
     paid,
