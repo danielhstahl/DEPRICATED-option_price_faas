@@ -8,20 +8,20 @@ import AsyncLoad from './AsyncLoad'
 import {showApiKey} from '../services/auth'
 import Loading from './Loading'
 
-const mapStateToProps=({modal:{isOpen}, auth:{apiKey}, client})=>({
+const mapStateToProps=({modal:{isOpen}, auth:{apiKey, isSignedIn}, client})=>({
     isOpen, apiKey, client
 })
 const mapDispatchToProps=dispatch=>({
     toggleOpen:toggleOpen(dispatch),
     onLoad:showApiKey(dispatch)
 })
-export const ApiModal=({isOpen, toggleOpen, apiKey, client, onLoad})=>[
-    <Button 
+export const ApiModal=({isOpen, toggleOpen, apiKey, client, onLoad, isSignedIn})=>[
+    isSignedIn?<Button 
         onClick={toggleOpen} 
         key='button'
     >
         View API Key
-    </Button>,
+    </Button>:null,
     <Modal 
         key='modal' isOpen={isOpen} 
         toggle={toggleOpen} 

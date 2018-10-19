@@ -8,21 +8,16 @@ import AppMenu from './components/AppMenu'
 import './App.css'
 import Loading from './components/Loading'
 import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom'
-import { connect } from 'react-redux'
-import AsyncLoad from './components/AsyncLoad'
-import {
-  getCatalog
-} from './services/api-catalog'
-
 import Products from './pages/Products'
 import {
   HOME, PRODUCTS, 
   DEVELOPERS, LOGIN, REGISTER,
-  SUCCESS_MARKETPLACE
+  SUCCESS_MARKETPLACE, SUBSCRIPTIONS
 } from './routes/names'
-import {
+import Subscriptions from './pages/Subscriptions'
+/*import {
   SHOW_SWAGGER
-} from './routes/params'
+} from './routes/params'*/
 const checkIfRegisteringFromMarketplace=(
   isFromMarketPlace, 
   isSignedIn, 
@@ -62,8 +57,12 @@ const App = ({
         component={Products} 
       />
       <Route 
-        path={DEVELOPERS+'/:'+SHOW_SWAGGER}
+        path={DEVELOPERS}
         component={Developers} 
+      />
+      <Route 
+        path={SUBSCRIPTIONS}
+        component={Subscriptions} 
       />
       <Route 
         path={REGISTER}

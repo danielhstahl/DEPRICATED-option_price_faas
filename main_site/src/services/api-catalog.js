@@ -2,19 +2,18 @@ import {url} from './aws'
 import {
     UPDATE_CATALOG, 
     SUBSCRIPTION_ERROR,
-    CATALOG_ERROR,
     UPDATE_USAGE
 } from '../actions/constants'
 import {keys} from '../reducers/catalog'
-const containsString=(match, string)=>string.toLowerCase().includes(match)
-const checkKey=keys=>name=>keys.find(key=>containsString(name, key))
+const containsString=(match, string)=>match.toLowerCase().includes(string)
+const checkKey=name=>keys.find(key=>containsString(name, key))
 const convertJson=res=>res.json()
 export const getCatalog=dispatch=>fetch(`${url}/catalog`)
 .then(convertJson)
 .then(({items})=>{
     console.log(items)
     const value=items.reduce((aggr, curr)=>{
-        const key=checkKey(keys, curr.name)
+        const key=checkKey(curr.name)
         if(key){
             return {...aggr, [key]:curr}
         }
@@ -22,6 +21,7 @@ export const getCatalog=dispatch=>fetch(`${url}/catalog`)
             return aggr
         }
     }, {})
+    //console.log(value)
     return dispatch({type:UPDATE_CATALOG, value})
 })
 //.catch(err=>dispatch({type:CATALOG_ERROR, err}))

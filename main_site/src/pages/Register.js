@@ -1,7 +1,7 @@
 import React from 'react'
 import {Row, Col, Container} from 'reactstrap'
 import SignIn from '../components/SignIn'
-import RedirectToHomeIfLoggedIn from '../components/RedirectToHomeIfLoggedIn'
+//import RedirectToHomeIfLoggedIn from '../components/RedirectToHomeIfLoggedIn'
 
 const padding={paddingTop:20}
 

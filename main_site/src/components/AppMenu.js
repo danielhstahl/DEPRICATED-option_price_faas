@@ -13,7 +13,7 @@ import {
 import Logo from '../Logo.js'
 import {
     HOME, DEVELOPERS, PRODUCTS, 
-    REGISTER, LOGIN, NODOCS
+    REGISTER, LOGIN, MARKETPLACE, SUBSCRIPTIONS
 } from '../routes/names'
 import {getCatalog} from '../services/api-catalog'
 import {logout} from '../services/auth'
@@ -48,11 +48,14 @@ const AppMenu=({
                 <NavLink to={PRODUCTS} tag={Link}  >Products</NavLink>
             </NavItem>
             <NavItem>
-                <NavLink to={DEVELOPERS+NODOCS} tag={Link} >Developers</NavLink>
+                <NavLink to={DEVELOPERS} tag={Link} >Developers</NavLink>
             </NavItem>
             <NavItem>
-                <NavLink to='/purchase' tag={Link} >Purchase</NavLink>
+                <NavLink to={MARKETPLACE} tag={Link} >Purchase</NavLink>
             </NavItem>
+            {isSignedIn?<NavItem>
+                <NavLink to={SUBSCRIPTIONS} tag={Link} >Subscriptions</NavLink>
+            </NavItem>:null}
             <NavItem>
                 <AsyncLoad onLoad={()=>init({token, paidUsagePlanId, isFromMarketPlace})} loading={Loading} requiredObject={freeUsagePlanId!==undefined} render={()=>isSignedIn?
                     <LogOut 
@@ -62,16 +65,17 @@ const AppMenu=({
                     <NavLink to={LOGIN} tag={Link}>Log In</NavLink>
                 }/>
             </NavItem>
-            {isSignedIn?'':<NavItem>
+            {isSignedIn?null:<NavItem>
                 <NavLink to={REGISTER} tag={Link} >Sign Up</NavLink>
             </NavItem>}
+            
         </Nav>
     </Collapse>
 </Navbar>
 )
 
 
-const mapStateToProps=({auth:{isSignedIn, cognitoUser, token, paidUsagePlanId, isFromMarketPlace}, menu, catalog:{free:{usagePlanId:freeUsagePlanId}}})=>({
+const mapStateToProps=({auth:{isSignedIn, cognitoUser, token, paidUsagePlanId, isFromMarketPlace}, menu, catalog:{free:{id:freeUsagePlanId}}})=>({
     isSignedIn,
     cognitoUser,
     isOpen:menu,
@@ -86,7 +90,7 @@ const mapDispatchToProps=dispatch=>({
     init:({paidUsagePlanId, token, isFromMarketPlace})=>Promise.all([
         getCatalog(dispatch),
         init(dispatch)
-    ]).then(([{free:{usagePlanId:freeUsagePlanId}}, client])=>conditionalRegistration(client, {paidUsagePlanId, token, freeUsagePlanId, isFromMarketPlace})),
+    ]).then(([{value:{free:{id:freeUsagePlanId}}}, client])=>conditionalRegistration(client, {paidUsagePlanId, token, freeUsagePlanId, isFromMarketPlace})),
     toggleNavBar:toggleNavBar(dispatch)
 })
 export default connect(

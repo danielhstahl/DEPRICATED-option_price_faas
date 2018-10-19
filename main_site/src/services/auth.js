@@ -84,6 +84,12 @@ const login=(email, password, dispatch)=>{
             return updateCredentials(jwtToken, cognitoUser, dispatch)
         })
 }
+
+const rethrowNoLoginError=err=>{
+    if(err.code!=="UsernameExistsException"){
+        throw(err)
+    }
+}
 /**Always "register" instead of logging in.  Login will just fail on already registered and then login */
 export const register=dispatch=>({
     paidUsagePlanId, freeUsagePlanId, 
@@ -94,10 +100,9 @@ export const register=dispatch=>({
         let firstTimeRegistering=true
         return signUp(userPool, email, password)
             .catch(err=>{
-                console.log(err)
-                //repeatVisitor(dispatch)
+                rethrowNoLoginError(err)
                 firstTimeRegistering=false
-            }) //todo!! re throw any non-duplicate user error
+            })
             .then(()=>login(email, password, dispatch))
             .then(client=>{
                 if(isFromMarketPlace){

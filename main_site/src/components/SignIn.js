@@ -53,10 +53,10 @@ export const SignIn=({
         }
     </Form>
 )
-const getForm=fn=>e=>{
+const getForm=fn=>aggr=>e=>{
     e.preventDefault()
     const [{value:email}, {value:password}]=e.target
-    return register(email, password)
+    return fn(aggr)(email, password)
 }
 const mapDispatchToProps=dispatch=>({
     register:getForm(register(dispatch)),
@@ -65,7 +65,7 @@ const mapDispatchToProps=dispatch=>({
 })
 const mapStateToProps=({
     loading:{isLoggingIn}, auth:{error, token, paidUsagePlanId, isFromMarketPlace},
-    catalog:{free:{usagePlanId:freeUsagePlanId}}
+    catalog:{free:{id:freeUsagePlanId}}
 })=>({
     isLoggingIn, error, 
     token, paidUsagePlanId, 
