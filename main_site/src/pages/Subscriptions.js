@@ -1,11 +1,10 @@
 import React from 'react'
 import {
     Row, Col, Card, CardBody,
-    CardHeader, CardTitle, 
+    CardHeader,  
     Button
 } from 'reactstrap'
 import { connect } from 'react-redux'
-import {Link} from 'react-router-dom'
 import {getUsage} from '../services/api-catalog'
 import AsyncLoad from '../components/AsyncLoad'
 import Loading from '../components/Loading'
