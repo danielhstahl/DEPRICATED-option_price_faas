@@ -61,6 +61,12 @@ export const removeSubscription=(
     'DELETE',
     {}, {}
 )
+const getCurrentMonth=()=>{
+    const date = new Date()
+    const start = new Date(date.getFullYear(), date.getMonth(), 1).toJSON().split('T')[0]
+    const end = new Date().toJSON().split('T')[0]
+    return {start, end}
+}
 
 export const getUsage=dispatch=>(
     usagePlanId, client
@@ -68,7 +74,7 @@ export const getUsage=dispatch=>(
     {},
     `/subscriptions/${usagePlanId}/usage`,
     'GET', 
-    {}, {}
+    {queryParams:getCurrentMonth()}, {}
 )
 .then(({data})=>dispatch({type:UPDATE_USAGE, value:data}))
 .catch(err=>dispatch({type:SUBSCRIPTION_ERROR, err}))

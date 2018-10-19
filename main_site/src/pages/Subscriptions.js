@@ -22,7 +22,7 @@ const SubscriptionCard=({
     </CardBody>
 </Card>
 )
-export const Subscriptions=({style, paid, free, onLoad, client, isSignedIn})=>(
+export const Subscriptions=({style, paid, free, onLoad, client, isSignedIn, getUsage})=>(
     <Row style={style} className='dark-text'>
         <Col xs={12} md={6} style={paddingTop}>
             <SubscriptionCard 
