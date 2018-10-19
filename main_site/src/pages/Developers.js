@@ -6,12 +6,12 @@ import Swagger from './Swagger'
 import ApiModal from '../components/ApiModal'
 
 const paddingTop={paddingTop:20}
-
+const style={float:'left'}
 export default ()=>[
     <Container key='container'>           
         <Row>
             <Col style={paddingTop}>
-                <ApiModal/>
+                <ApiModal style={style}/>
             </Col>
         </Row>
     </Container>,
