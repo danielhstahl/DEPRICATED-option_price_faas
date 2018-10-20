@@ -20,7 +20,7 @@ import {logout} from '../services/auth'
 import {menuBarHeight} from '../styles/menu'
 import Loading from './Loading'
 import AsyncLoad from './AsyncLoad'
-import {init, conditionalRegistration} from '../services/auth'
+import {init} from '../services/auth'
 import {toggleNavBar} from '../actions/menu'
 
 const LogOut=({logout, cognitoUser})=><NavLink href="#" onClick={()=>logout(cognitoUser)}>Log Out</NavLink>
@@ -87,10 +87,7 @@ const mapStateToProps=({auth:{isSignedIn, cognitoUser, token, paidUsagePlanId, i
 //TODO!! this is too similar to mapStateToProps in SignIn...consider extracting into one function
 const mapDispatchToProps=dispatch=>({
     logout:logout(dispatch),
-    init:({paidUsagePlanId, token, isFromMarketPlace})=>Promise.all([
-        getCatalog(dispatch),
-        init(dispatch)
-    ]).then(([{value:{free:{id:freeUsagePlanId}}}, client])=>conditionalRegistration(client, {paidUsagePlanId, token, freeUsagePlanId, isFromMarketPlace})),
+    init:({paidUsagePlanId, token, isFromMarketPlace})=>getCatalog(dispatch).then(({value:{free:{id:freeUsagePlanId}}})=>init(dispatch)({token, paidUsagePlanId, isFromMarketPlace, freeUsagePlanId})),
     toggleNavBar:toggleNavBar(dispatch)
 })
 export default connect(

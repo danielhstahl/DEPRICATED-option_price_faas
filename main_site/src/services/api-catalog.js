@@ -11,7 +11,6 @@ const convertJson=res=>res.json()
 export const getCatalog=dispatch=>fetch(`${url}/catalog`)
 .then(convertJson)
 .then(({items})=>{
-    console.log(items)
     const value=items.reduce((aggr, curr)=>{
         const key=checkKey(curr.name)
         if(key){
@@ -21,10 +20,8 @@ export const getCatalog=dispatch=>fetch(`${url}/catalog`)
             return aggr
         }
     }, {})
-    //console.log(value)
     return dispatch({type:UPDATE_CATALOG, value})
 })
-//.catch(err=>dispatch({type:CATALOG_ERROR, err}))
 
 export const registerFree=(usagePlanId, client)=>client.invokeApi(
     {},
@@ -47,7 +44,7 @@ export const registerPaid=(paidUsagePlanId, freeUsagePlanId, token, client)=>Pro
         marketPlaceSubscribe(paidUsagePlanId, token, client)
     ]).then(data=>console.log(data))
 
-export const unregisterPaid=(paidUsagePlanId, freeUsagePlanId, token, client)=>Promise.all([
+export const unregisterPaid=(paidUsagePlanId, freeUsagePlanId, client)=>Promise.all([
         removeSubscription(paidUsagePlanId, client),
         registerFree(freeUsagePlanId, client)
     ]).then(data=>console.log(data))
@@ -78,3 +75,10 @@ export const getUsage=dispatch=>(
 )
 .then(({data})=>dispatch({type:UPDATE_USAGE, value:data}))
 .catch(err=>dispatch({type:SUBSCRIPTION_ERROR, err}))
+
+export const getSubscriptions=client=>client.invokeApi(
+    {},
+    '/subscriptions', 
+    'GET',
+    {}, {}
+)

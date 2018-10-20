@@ -25,7 +25,8 @@ import {
     updateApiKey,
     apiError
 } from '../actions/signIn'
-import { registerFree, registerPaid } from './api-catalog';
+import { registerFree, registerPaid, getSubscriptions } from './api-catalog'
+import { deleteSubscriptionLocal, addSubscriptionLocal } from '../actions/subscriptions'
 
 const POOL_DATA = {
   UserPoolId: cognitoUserPoolId,
@@ -90,6 +91,54 @@ const rethrowNoLoginError=err=>{
         throw(err)
     }
 }
+const filterSubscriptions=({paidUsagePlanId, freeUsagePlanId})=>({data})=>data.reduce((aggr, {id})=>{
+    switch(id){
+        case paidUsagePlanId:{
+            return {...aggr, isSubscribedPaid:true}
+        }
+        case freeUsagePlanId:{
+            return {...aggr, isSubscribedFree:true}
+        }
+        default:{
+            return aggr
+        }       
+    }
+}, {isSubscribedPaid:false, isSubscribedFree:false})
+const conditionalRegistration=({
+    paidUsagePlanId, freeUsagePlanId, 
+    token, isFromMarketPlace
+}, dispatch)=>client=>{
+    if(!client){
+        return Promise.resolve()
+    }
+    return getSubscriptions(client)
+        .then(filterSubscriptions({
+            paidUsagePlanId, freeUsagePlanId
+        }))
+        .then(({isSubscribedFree, isSubscribedPaid})=>{
+            if(isSubscribedFree){
+                addSubscriptionLocal(dispatch)(freeUsagePlanId)
+            }
+            if(isSubscribedPaid){
+                addSubscriptionLocal(dispatch)(paidUsagePlanId)
+            }
+            if(isFromMarketPlace&!isSubscribedPaid){
+                addSubscriptionLocal(dispatch)(paidUsagePlanId)
+                deleteSubscriptionLocal(dispatch)(freeUsagePlanId)
+                return registerPaid(
+                    paidUsagePlanId, freeUsagePlanId, token, client
+                )
+            }
+            else if(!isSubscribedFree) {
+                addSubscriptionLocal(dispatch)(freeUsagePlanId)
+                return registerFree(freeUsagePlanId, client)
+            }
+            else {
+                return Promise.resolve()
+            }
+        })
+}
+
 /**Always "register" instead of logging in.  Login will just fail on already registered and then login */
 export const register=dispatch=>({
     paidUsagePlanId, freeUsagePlanId, 
@@ -97,50 +146,33 @@ export const register=dispatch=>({
 })=>{
     const userPool=new CognitoUserPool(POOL_DATA)
     return (email, password)=>{
-        let firstTimeRegistering=true
+        //let firstTimeRegistering=true
         return signUp(userPool, email, password)
-            .catch(err=>{
-                rethrowNoLoginError(err)
-                firstTimeRegistering=false
-            })
+            .catch(rethrowNoLoginError)
             .then(()=>login(email, password, dispatch))
-            .then(client=>{
-                if(isFromMarketPlace){
-                    return registerPaid(
-                        paidUsagePlanId, freeUsagePlanId, token, client
-                    )
-                }
-                else if(firstTimeRegistering) {
-                    return registerFree(freeUsagePlanId, client)
-                }
-                else {
-                    return Promise.resolve()
-                }            
-            })
+            .then(conditionalRegistration({
+                paidUsagePlanId, freeUsagePlanId, 
+                token, isFromMarketPlace
+            }, dispatch))
     }
 }
-
-export const init=dispatch=>{
-    const userPool = new CognitoUserPool(POOL_DATA)
-    const cognitoUser = userPool.getCurrentUser()
-    return cognitoUser?getSession(cognitoUser).then(session=>{
-        const token=session.getIdToken().getJwtToken()
-        return updateCredentials(token, cognitoUser, dispatch)
-    }):Promise.resolve()
-}
-export const conditionalRegistration=(client, {
+export const init=dispatch=>({
     paidUsagePlanId, freeUsagePlanId, 
     token, isFromMarketPlace
 })=>{
-    if(client&&isFromMarketPlace){
-        return registerPaid(
-            paidUsagePlanId, freeUsagePlanId, token, client
-        )
-    }
-    else {
-        return Promise.resolve()
-    }
+    const userPool = new CognitoUserPool(POOL_DATA)
+    const cognitoUser = userPool.getCurrentUser()
+    return (cognitoUser?getSession(cognitoUser).then(session=>{
+        const token=session.getIdToken().getJwtToken()
+        return updateCredentials(token, cognitoUser, dispatch)
+    }):Promise.resolve())
+    .then(conditionalRegistration({
+        paidUsagePlanId, freeUsagePlanId, 
+        token, isFromMarketPlace
+    }, dispatch))
 }
+
+
 
 
 export const logout=dispatch=>cognitoUser=>{

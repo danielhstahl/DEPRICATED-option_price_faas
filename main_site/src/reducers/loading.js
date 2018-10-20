@@ -1,9 +1,10 @@
 import {
-    IS_LOGGING_IN
+    IS_LOGGING_IN, 
+    IS_UNREGISTERING
 } from '../actions/constants'
 import {combineReducers} from 'redux'
 
-const genericLoggingIn=type=>(state=false, action)=>{
+const genericLoading=type=>(state=false, action)=>{
     switch(action.type){
         case type:
             return action.value
@@ -13,5 +14,6 @@ const genericLoggingIn=type=>(state=false, action)=>{
 }
 
 export default combineReducers({
-    isLoggingIn:genericLoggingIn(IS_LOGGING_IN)
+    isLoggingIn:genericLoading(IS_LOGGING_IN),
+    isUnRegistering:genericLoading(IS_UNREGISTERING)
 })
