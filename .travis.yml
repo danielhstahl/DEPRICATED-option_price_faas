@@ -25,7 +25,7 @@ before_script: #install pip3
 - sudo add-apt-repository ppa:jonathonf/python-3.6 -y ##y  is to stop asking to press enter
 - sudo apt-get update
 - sudo apt-get install python3.6
-- pip3 install -U setuptools
+- sudo pip3 install -U setuptools
 #- sudo apt-get update
 #- sudo apt-get install python3-setuptools
 #- sudo easy_install3 'pip<8' # avoid problems with 3.2 compatibility
