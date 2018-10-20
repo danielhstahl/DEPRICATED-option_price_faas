@@ -2,7 +2,7 @@ import React from 'react'
 import {
     Row, Col, Card, CardBody,
     CardHeader,  
-    Button
+    Button, Container
 } from 'reactstrap'
 import { connect } from 'react-redux'
 import {getUsage} from '../services/api-catalog'
@@ -21,7 +21,13 @@ const SubscriptionCard=({
     </CardBody>
 </Card>
 )
-export const Subscriptions=({style, paid, free, onLoad, client, isSignedIn, getUsage})=>(
+export const Subscriptions=({
+    style, paid, free,  
+    client, isSignedIn, getUsage
+})=>{
+    console.log(free)
+    return (
+<Container key='container'>
     <Row style={style} className='dark-text'>
         <Col xs={12} md={6} style={paddingTop}>
             <SubscriptionCard 
@@ -29,7 +35,6 @@ export const Subscriptions=({style, paid, free, onLoad, client, isSignedIn, getU
             >
                 {free.id&&isSignedIn?
                 <AsyncLoad
-                    //requiredObject={free.usagePlanId!==undefined}
                     onLoad={()=>getUsage(free.id, client)}
                     render={()=><div>Usage since {free.startDate}: {free.items.x}</div>}
                     loading={Loading}
@@ -42,7 +47,6 @@ export const Subscriptions=({style, paid, free, onLoad, client, isSignedIn, getU
             >
                 {paid.id&&isSignedIn?
                 <AsyncLoad
-                    //requiredObject={free.usagePlanId!==undefined}
                     onLoad={()=>getUsage(paid.id, client)}
                     render={()=><div>Usage since {paid.startDate}: {paid.items.x}</div>}
                     loading={Loading}
@@ -51,8 +55,9 @@ export const Subscriptions=({style, paid, free, onLoad, client, isSignedIn, getU
             </SubscriptionCard>
         </Col>
     </Row>
+</Container>
 )
-
+                }
 const mapStateToProps=({auth:{isSignedIn}, client, catalog:{paid, free}})=>({
     isSignedIn,
     paid,
