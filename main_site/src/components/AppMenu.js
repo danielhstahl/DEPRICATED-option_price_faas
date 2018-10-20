@@ -23,10 +23,10 @@ import AsyncLoad from './AsyncLoad'
 import {init} from '../services/auth'
 import {toggleNavBar} from '../actions/menu'
 
-const LogOut=({logout, cognitoUser})=><NavLink href="#" onClick={()=>logout(cognitoUser)}>Log Out</NavLink>
+export const LogOut=({logout, cognitoUser})=><NavLink href="#" onClick={()=>logout(cognitoUser)}>Log Out</NavLink>
 
 //the "purchase" link will go to amazon web store
-const AppMenu=({
+export const AppMenu=({
     toggleNavBar, isSignedIn, 
     isOpen, logout, init, 
     cognitoUser,
@@ -84,7 +84,7 @@ const mapStateToProps=({auth:{isSignedIn, cognitoUser, token, paidUsagePlanId, i
     freeUsagePlanId,
     isFromMarketPlace
 })
-//TODO!! this is too similar to mapStateToProps in SignIn...consider extracting into one function
+
 const mapDispatchToProps=dispatch=>({
     logout:logout(dispatch),
     init:({paidUsagePlanId, token, isFromMarketPlace})=>getCatalog(dispatch).then(({value:{free:{id:freeUsagePlanId}}})=>init(dispatch)({token, paidUsagePlanId, isFromMarketPlace, freeUsagePlanId})),

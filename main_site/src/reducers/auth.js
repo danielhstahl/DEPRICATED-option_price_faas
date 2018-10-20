@@ -32,11 +32,6 @@ export default (state=stateWithQuery, action)=>{
                 cognitoUser:action.user, 
                 error:null
             }
-        /*case REPEAT_VISITOR: //do I need this??
-            return {
-                ...state,
-                repeatVisitor:true
-            }*/
         case LOGIN_ERROR:
             return {...state, error:action.value}
         case LOGOUT:

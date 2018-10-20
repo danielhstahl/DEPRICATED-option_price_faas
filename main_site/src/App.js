@@ -2,6 +2,7 @@ import React from 'react'
 //import Swagger from './pages/Swagger'
 import FrontPage from './pages/FrontPage'
 import Developers from './pages/Developers'
+import SuccessMarketPlaceRegister from './pages/SuccessMarketPlaceRegister'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import AppMenu from './components/AppMenu'
@@ -15,14 +16,14 @@ import {
   SUCCESS_MARKETPLACE, SUBSCRIPTIONS
 } from './routes/names'
 import Subscriptions from './pages/Subscriptions'
-/*import {
-  SHOW_SWAGGER
-} from './routes/params'*/
+import { connect } from 'react-redux'
+
 const checkIfRegisteringFromMarketplace=(
   isFromMarketPlace, 
   isSignedIn, 
   freeUsagePlanId
-)=>isFromMarketPlace&&isSignedIn===undefined&&freeUsagePlanId===undefined
+)=>isFromMarketPlace&&(isSignedIn===undefined||freeUsagePlanId===undefined)
+
 const checkIfRegisteredPaid=(
   isFromMarketPlace, 
   isSignedIn
@@ -40,12 +41,18 @@ const App = ({
   <Router basename={process.env.PUBLIC_URL}>
     <div>
       <Switch>
+         <Route 
+          path={SUCCESS_MARKETPLACE}
+          component={SuccessMarketPlaceRegister} 
+        />
         {checkIfRegisteredPaid(
           isFromMarketPlace,   
           isSignedIn
         )?<Redirect to={SUCCESS_MARKETPLACE}/>:null}
+      </Switch>
+      <Switch>
         <Redirect from='/' exact to={HOME} />
-        <Route path='/:page' component={AppMenu}/>    
+        <Route path='/:page' component={AppMenu}/>
       </Switch>    
       <Route
         exact
@@ -64,6 +71,7 @@ const App = ({
         path={SUBSCRIPTIONS}
         component={Subscriptions} 
       />
+     
       <Route 
         path={REGISTER}
         component={Register} 
@@ -75,5 +83,13 @@ const App = ({
     </div>
   </Router>
 
+const mapStateToProps=({
+  auth:{isSignedIn, isFromMarketPlace},
+  catalog:{free:{id:freeUsagePlanId}}
+})=>({
+  isSignedIn,
+  isFromMarketPlace,
+  freeUsagePlanId
+})
 
-export default App
+export default connect(mapStateToProps)(App)

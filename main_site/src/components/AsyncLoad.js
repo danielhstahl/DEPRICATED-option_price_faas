@@ -1,5 +1,6 @@
 import {PureComponent} from 'react'
-export default class AsyncLoad extends PureComponent {
+import PropTypes from 'prop-types'
+class AsyncLoad extends PureComponent {
     state={isLoading:true}
     componentDidMount() {
         const setLoadingOff=()=>this.setState({
@@ -20,4 +21,10 @@ export default class AsyncLoad extends PureComponent {
             render?render(this.props):null
     }
 }
-  
+AsyncLoad.propTypes={
+    requiredObject:PropTypes.oneOfType([PropTypes.string, PropTypes.object, PropTypes.bool]),
+    onLoad:PropTypes.func.isRequired,
+    render:PropTypes.func,
+    loading:PropTypes.func
+}
+export default AsyncLoad

@@ -9,9 +9,6 @@ cache:
   - main_site/node_modules
 
 before_install:
-  #https://github.com/travis-ci/travis-ci/issues/8607
-#- sudo rm -vf /etc/apt/sources.list.d/*riak*
-#- sudo apt-get update
 - wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
 - nvm install 8
 - node --version
@@ -19,29 +16,28 @@ before_install:
 - git fetch --all # intended for getting tags
 
 before_script: #install pip3
-- sudo apt-get update #to install python 3.6
-- sudo apt-get install build-essential libpq-dev libssl-dev openssl libffi-dev zlib1g-dev
-- sudo apt-get install python3-pip python3-dev
-- sudo add-apt-repository ppa:jonathonf/python-3.6 -y ##y  is to stop asking to press enter
-- sudo apt-get update
-- sudo apt-get install python3.6
-- sudo pip3 install -U setuptools
-#- sudo apt-get update
-#- sudo apt-get install python3-setuptools
-#- sudo easy_install3 'pip<8' # avoid problems with 3.2 compatibility
-#- USER_BASE_PATH=$(python -m site --user-base)
-#- export PATH=$PATH:$USER_BASE_PATH/bin
-- pip3 install --user awscli
-- pip3 install --user aws-sam-cli
-- aws configure set region us-east-1
-- cd main_site
-- npm run copy-package
-- cd aws-api-gateway-developer-portal
-- npm run install
-- npm run package
-- npm run deploy
-- cd ..
-- cd ..
+- > #ensure only runs once :|
+    if ! [ "$BEFORE_SCRIPT_RUN" ]; then
+      export BEFORE_SCRIPT_RUN=1;
+      sudo apt-get update; #to install python 3.6
+      sudo apt-get install build-essential libpq-dev libssl-dev openssl; libffi-dev zlib1g-dev;
+      sudo apt-get install python3-pip python3-dev;
+      sudo add-apt-repository ppa:jonathonf/python-3.6 -y; ##y  is to stop asking to press enter
+      sudo apt-get update;
+      sudo apt-get install python3.6;
+      sudo pip3 install -U setuptools;
+      pip3 install --user awscli;
+      pip3 install --user aws-sam-cli;
+      aws configure set region us-east-1;
+      cd main_site;
+      npm run copy-package;
+      cd aws-api-gateway-developer-portal;
+      npm run install;
+      npm run package;
+      npm run deploy;
+      cd ..;
+      cd ..;
+    fi
 
 script:
   - cd main_site

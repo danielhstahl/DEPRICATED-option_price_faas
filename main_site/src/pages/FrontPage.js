@@ -58,11 +58,5 @@ export default ()=>[
             <h1 className="display-3">Pricing</h1>
             <Pricing style={paddingTop}/>
         </Container>
-    </Jumbotron>/*,
-    <Jumbotron 
-        style={heightStyle} key='about' 
-        fluid className='no-margin'
-    >
-        <h1 className="display-3">About: <Link to={APIDOCS}>Api Docs</Link></h1>
-    </Jumbotron>*/
+    </Jumbotron>
 ]
