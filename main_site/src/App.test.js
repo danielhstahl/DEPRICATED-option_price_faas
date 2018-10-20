@@ -7,18 +7,16 @@ import { Provider } from 'react-redux'
 import {  mount } from 'enzyme'
 import Loading from './components/Loading'
 import configureStore from 'redux-mock-store'
-import { BrowserRouter as Router } from 'react-router-dom'
+import { BrowserRouter as Router, MemoryRouter } from 'react-router-dom'
 import SuccessMarketPlaceRegister from './pages/SuccessMarketPlaceRegister'
+import Register from './pages/Register'
+
+import {
+  REGISTER
+} from './routes/names'
+
 
 const mockStore = configureStore([])
-/*
-it('renders without crashing', () => {
-  const store=createStore(awsApp)
-  const div = document.createElement('div')
-  ReactDOM.render(<Provider store={store}><App /></Provider>, div)
-  ReactDOM.unmountComponentAtNode(div)
-})*/
-
 //note that there will be not be any actual API calls if catalog.free.id is defined at this level
 it('renders loading if registering from marketplace', ()=>{
   const initialState={
@@ -32,13 +30,15 @@ it('renders loading if registering from marketplace', ()=>{
         quota:{period:'month'}
       },
       paid:{
-        quota:{period:'month'}
+        quota:{period:'month'},
+        isSubscribed:false
       }
-    }
+    },
+    menu:false
   }
   const store=mockStore(initialState)
-  const app=mount(<Provider store={store}><App /></Provider>)
-  expect(app.find(Router).length).toEqual(0)
+  const app=mount(<Provider store={store}><MemoryRouter><App /></MemoryRouter></Provider>)
+  expect(app.find('.app').length).toEqual(0)
   expect(app.find(Loading).length).toEqual(1)
 })
 it('renders loading if registering from marketplace, is signedIn, but no catalog', ()=>{
@@ -52,13 +52,15 @@ it('renders loading if registering from marketplace, is signedIn, but no catalog
         quota:{period:'month'}
       },
       paid:{
-        quota:{period:'month'}
+        quota:{period:'month'},
+        isSubscribed:false
       }
-    }
+    },
+    menu:false
   }
   const store=mockStore(initialState)
-  const app=mount(<Provider store={store}><App /></Provider>)
-  expect(app.find(Router).length).toEqual(0)
+  const app=mount(<Provider store={store}><MemoryRouter><App /></MemoryRouter></Provider>)
+  expect(app.find('.app').length).toEqual(0)
   expect(app.find(Loading).length).toEqual(1)
 })
 it('renders Router if not registering from marketplace', ()=>{
@@ -73,13 +75,15 @@ it('renders Router if not registering from marketplace', ()=>{
         quota:{period:'month'}
       },
       paid:{
-        quota:{period:'month'}
+        quota:{period:'month'},
+        isSubscribed:false
       }
-    }
+    },
+    menu:false
   }
   const store=mockStore(initialState)
-  const app=mount(<Provider store={store}><App /></Provider>)
-  expect(app.find(Router).length).toEqual(1)
+  const app=mount(<Provider store={store}><MemoryRouter><App /></MemoryRouter></Provider>)
+  expect(app.find('.app').length).toEqual(1)
   expect(app.find(Loading).length).toEqual(0)
 })
 it('renders Router if registering from marketplace and has signed in and has catalog', ()=>{
@@ -94,15 +98,18 @@ it('renders Router if registering from marketplace and has signed in and has cat
         quota:{period:'month'}
       },
       paid:{
-        quota:{period:'month'}
+        quota:{period:'month'},
+        isSubscribed:false
       }
-    }
+    },
+    menu:false
   }
   const store=mockStore(initialState)
-  const app=mount(<Provider store={store}><App /></Provider>)
-  expect(app.find(Router).length).toEqual(1)
+  const app=mount(<Provider store={store}><MemoryRouter><App /></MemoryRouter></Provider>)
+  expect(app.find('.app').length).toEqual(1)
   expect(app.find(Loading).length).toEqual(0)
 })
+
 it('renders SuccessMarketPlaceRegister if registering from marketplace and has signed in and has catalog', ()=>{
   const initialState={
     auth:{
@@ -115,11 +122,57 @@ it('renders SuccessMarketPlaceRegister if registering from marketplace and has s
         quota:{period:'month'}
       },
       paid:{
-        quota:{period:'month'}
+        quota:{period:'month'},
+        isSubscribed:false
       }
+    },
+    menu:false
+  }
+  const store=mockStore(initialState)
+  const app=mount(<Provider store={store}><Router><App /></Router></Provider>)
+  
+  //console.log(app.html())
+  expect(app.find(SuccessMarketPlaceRegister).length).toEqual(1)
+  /*setTimeout(()=>{
+    //app.update()
+    console.log(app.html())
+    expect(app.find(SuccessMarketPlaceRegister).length).toEqual(1)
+    done()
+  }, 30)*/
+  /*const store=mockStore(initialState)
+  const app=mount(<Provider store={store}><Router><App /></Router></Provider>)
+  setTimeout(()=>{
+    app.update()
+    console.log(app.html())
+    expect(app.find(SuccessMarketPlaceRegister).length).toEqual(1)
+    done()
+  }, 30)*/
+  
+})
+
+it('renders register if not signed in and initial path is to register', ()=>{
+  const initialState={
+    auth:{
+      isFromMarketPlace:true,
+      isSignedIn:false,
+    },
+    catalog:{
+      free:{
+        id:'123',
+        quota:{period:'month'}
+      },
+      paid:{
+        quota:{period:'month'},
+        isSubscribed:false
+      }      
+    },
+    menu:false,
+    loading:{
+      isLoggingIn:false
     }
   }
   const store=mockStore(initialState)
-  const app=mount(<Provider store={store}><App /></Provider>)
-  expect(app.find(SuccessMarketPlaceRegister).length).toEqual(1)
+  const app=mount(<Provider store={store}><MemoryRouter initialEntries={[REGISTER]}><App /></MemoryRouter></Provider>)
+  
+  expect(app.find(Register).length).toEqual(1)
 })

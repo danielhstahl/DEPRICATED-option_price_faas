@@ -5,8 +5,7 @@ import {
     Button, Container
 } from 'reactstrap'
 import { connect } from 'react-redux'
-import {getUsage} from '../services/api-catalog'
-import {removePaidSubscription} from '../actions/subscriptions'
+import {removePaidSubscription, getSubscriptionUsage} from '../actions/subscriptions'
 import AsyncLoad from '../components/AsyncLoad'
 import Loading from '../components/Loading'
 const paddingTop={paddingTop:20}
@@ -88,7 +87,7 @@ const mapStateToProps=({
 })
 
 const mapDispatchToProps=dispatch=>({
-    getUsage:getUsage(dispatch),
+    getUsage:getSubscriptionUsage(dispatch),
     removePaidSubscription:removePaidSubscription(dispatch)
 })
 

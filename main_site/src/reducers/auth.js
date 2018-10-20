@@ -16,7 +16,7 @@ const stateWithQuery={
     ...defaultQuery,
     token,
     paidUsagePlanId:usagePlanId,
-    isFromMarketPlace:token&&usagePlanId
+    isFromMarketPlace:!!(token&&usagePlanId)
 }
 export default (state=stateWithQuery, action)=>{
     switch(action.type){

@@ -1,6 +1,7 @@
 import React from 'react'
 import { NavLink as Link } from 'react-router-dom'
 import {connect} from 'react-redux'
+import PropTypes from 'prop-types'
 import {
     Collapse,
     Navbar,
@@ -15,13 +16,13 @@ import {
     HOME, DEVELOPERS, PRODUCTS, 
     REGISTER, LOGIN, MARKETPLACE, SUBSCRIPTIONS
 } from '../routes/names'
-import {getCatalog} from '../services/api-catalog'
 import {logout} from '../services/auth'
 import {menuBarHeight} from '../styles/menu'
 import Loading from './Loading'
 import AsyncLoad from './AsyncLoad'
 import {init} from '../services/auth'
 import {toggleNavBar} from '../actions/menu'
+import { getPossibleSubscriptions } from '../actions/subscriptions.js'
 
 export const LogOut=({logout, cognitoUser})=><NavLink href="#" onClick={()=>logout(cognitoUser)}>Log Out</NavLink>
 
@@ -73,7 +74,22 @@ export const AppMenu=({
     </Collapse>
 </Navbar>
 )
-
+AppMenu.propTypes={
+    toggleNavBar:PropTypes.func.isRequired,
+    isSignedIn:PropTypes.bool,
+    isOpen:PropTypes.bool.isRequired,
+    logout:PropTypes.func.isRequired,
+    init:PropTypes.func.isRequired,
+    cognitoUser:PropTypes.shape({
+        authenticateUser:PropTypes.func.isRequired,
+        getSession:PropTypes.func.isRequired,
+        signOut:PropTypes.func.isRequired
+    }),
+    paidUsagePlanId:PropTypes.string,
+    freeUsagePlanId:PropTypes.string,
+    token:PropTypes.string,
+    isFromMarketPlace:PropTypes.bool.isRequired
+}
 
 const mapStateToProps=({auth:{isSignedIn, cognitoUser, token, paidUsagePlanId, isFromMarketPlace}, menu, catalog:{free:{id:freeUsagePlanId}}})=>({
     isSignedIn,
@@ -87,7 +103,7 @@ const mapStateToProps=({auth:{isSignedIn, cognitoUser, token, paidUsagePlanId, i
 
 const mapDispatchToProps=dispatch=>({
     logout:logout(dispatch),
-    init:({paidUsagePlanId, token, isFromMarketPlace})=>getCatalog(dispatch).then(({value:{free:{id:freeUsagePlanId}}})=>init(dispatch)({token, paidUsagePlanId, isFromMarketPlace, freeUsagePlanId})),
+    init:({paidUsagePlanId, token, isFromMarketPlace})=>getPossibleSubscriptions(dispatch).then(({value:{free:{id:freeUsagePlanId}}})=>init(dispatch)({token, paidUsagePlanId, isFromMarketPlace, freeUsagePlanId})),
     toggleNavBar:toggleNavBar(dispatch)
 })
 export default connect(

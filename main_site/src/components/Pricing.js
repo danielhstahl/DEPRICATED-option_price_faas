@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import {
     Row, Col, Card, CardBody,
     CardHeader, CardTitle, 
@@ -25,6 +26,15 @@ const PricingCard=({
     </CardBody>
 </Card>
 )
+PricingCard.propTypes={
+    title:PropTypes.string.isRequired,
+    price:PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    quota:PropTypes.shape({
+        limit:PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+        period:PropTypes.string.isRequired
+    }).isRequired,
+    children:PropTypes.node
+}
 
 const ButtonToDeveloperPortal=()=><Link to={DEVELOPERS}><Button color='primary'>Sandbox</Button></Link>
 
@@ -56,6 +66,24 @@ export const Pricing=({style, paid, free, isSignedIn})=>(
         </Col>
     </Row>
 )
+Pricing.propTypes={
+    style:PropTypes.object,
+    paid:PropTypes.shape({
+        quota:PropTypes.shape({
+            limit:PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+            period:PropTypes.string.isRequired
+        }).isRequired,
+        isSubscribed:PropTypes.bool
+    }),
+    free:PropTypes.shape({
+        quota:PropTypes.shape({
+            limit:PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+            period:PropTypes.string.isRequired
+        }).isRequired
+    }),
+    isSignedIn:PropTypes.bool
+}
+
 
 const mapStateToProps=({auth:{isSignedIn}, catalog:{paid, free}})=>({
     isSignedIn,

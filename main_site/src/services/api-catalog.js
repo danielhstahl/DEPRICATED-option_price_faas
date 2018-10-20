@@ -1,17 +1,11 @@
 import {url} from './aws'
-import {
-    UPDATE_CATALOG, 
-    SUBSCRIPTION_ERROR,
-    UPDATE_USAGE
-} from '../actions/constants'
 import {keys} from '../reducers/catalog'
 const containsString=(match, string)=>match.toLowerCase().includes(string)
 const checkKey=name=>keys.find(key=>containsString(name, key))
 const convertJson=res=>res.json()
-export const getCatalog=dispatch=>fetch(`${url}/catalog`)
+export const getCatalog=()=>fetch(`${url}/catalog`)
 .then(convertJson)
-.then(({items})=>{
-    const value=items.reduce((aggr, curr)=>{
+.then(({items})=>items.reduce((aggr, curr)=>{
         const key=checkKey(curr.name)
         if(key){
             return {...aggr, [key]:curr}
@@ -20,8 +14,7 @@ export const getCatalog=dispatch=>fetch(`${url}/catalog`)
             return aggr
         }
     }, {})
-    return dispatch({type:UPDATE_CATALOG, value})
-})
+)
 
 export const registerFree=(usagePlanId, client)=>client.invokeApi(
     {},
@@ -65,7 +58,7 @@ const getCurrentMonth=()=>{
     return {start, end}
 }
 
-export const getUsage=dispatch=>(
+export const getUsage=(
     usagePlanId, client
 )=>client.invokeApi(
     {},
@@ -73,8 +66,7 @@ export const getUsage=dispatch=>(
     'GET', 
     {queryParams:getCurrentMonth()}, {}
 )
-.then(({data})=>dispatch({type:UPDATE_USAGE, value:data}))
-.catch(err=>dispatch({type:SUBSCRIPTION_ERROR, err}))
+
 
 export const getSubscriptions=client=>client.invokeApi(
     {},

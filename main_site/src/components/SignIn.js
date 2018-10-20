@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import {
     Button, Form, FormGroup,
     Label, Input, Alert
@@ -13,7 +14,7 @@ const goToPreviousPageOrHome=(fn, history, loginError, updateLoggingIn)=>{
     const navigate=history.length>0?history.goBack:()=>history.push(HOME)
     return e=>{
         updateLoggingIn(true)
-        fn(e).then(navigate).catch(loginError).finally(()=>updateLoggingIn(false))
+        fn(e).then(navigate).catch(loginError).then(()=>updateLoggingIn(false))
     }
 }
 
@@ -53,6 +54,24 @@ export const SignIn=({
         }
     </Form>
 )
+SignIn.propTypes={
+    register:PropTypes.func.isRequired,
+    isLoggingIn:PropTypes.bool.isRequired,
+    history:PropTypes.shape({
+        goBack:PropTypes.func.isRequired,
+        push:PropTypes.func.isRequired,
+        length:PropTypes.number.isRequired
+    }).isRequired,
+    loginError:PropTypes.func.isRequired,
+    error:PropTypes.shape({
+        message:PropTypes.string.isRequired,
+    }),
+    updateLoggingIn:PropTypes.func.isRequired,
+    token:PropTypes.string,
+    paidUsagePlanId:PropTypes.string,
+    freeUsagePlanId:PropTypes.string,
+    isFromMarketPlace:PropTypes.bool.isRequired
+}
 const getForm=fn=>aggr=>e=>{
     e.preventDefault()
     const [{value:email}, {value:password}]=e.target

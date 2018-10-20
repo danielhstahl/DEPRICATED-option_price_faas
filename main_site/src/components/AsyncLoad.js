@@ -7,7 +7,7 @@ class AsyncLoad extends PureComponent {
             isLoading:false
         })
         if(!this.props.requiredObject){
-            this.props.onLoad(this.props).finally(setLoadingOff)
+            this.props.onLoad(this.props).catch(err=>err).then(setLoadingOff)
         }
         else{
             setLoadingOff()

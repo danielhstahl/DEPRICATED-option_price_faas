@@ -3,13 +3,22 @@ import React from 'react'
 import { NavLink } from 'reactstrap'
 import { shallow, mount } from 'enzyme'
 import { BrowserRouter as Router} from 'react-router-dom'
-
+const genericFn=()=>{}
 it('renders with signedIn and isOpen', ()=>{
 
     const appMenu=shallow(<AppMenu
         isOpen={true}
         isSignedIn={true}
         freeUsagePlanId='hello'
+        toggleNavBar={genericFn}
+        logout={genericFn}
+        init={genericFn}
+        cognitoUser={{
+            authenticateUser:genericFn,
+            getSession:genericFn,
+            signOut:genericFn
+        }}
+        isFromMarketPlace={true}
     />)
     expect(appMenu).toBeDefined()
 })
@@ -19,6 +28,15 @@ it('renders with signedIn and isOpen=false', ()=>{
         isOpen={true}
         isSignedIn={false}
         freeUsagePlanId='hello'
+        toggleNavBar={genericFn}
+        logout={genericFn}
+        init={genericFn}
+        cognitoUser={{
+            authenticateUser:genericFn,
+            getSession:genericFn,
+            signOut:genericFn
+        }}
+        isFromMarketPlace={true}
     />)
     expect(appMenu).toBeDefined()
 })
@@ -28,6 +46,15 @@ it('renders with signedIn=false and isOpen=false', ()=>{
         isOpen={false}
         isSignedIn={false}
         freeUsagePlanId='hello'
+        toggleNavBar={genericFn}
+        logout={genericFn}
+        init={genericFn}
+        cognitoUser={{
+            authenticateUser:genericFn,
+            getSession:genericFn,
+            signOut:genericFn
+        }}
+        isFromMarketPlace={true}
     />)
     expect(appMenu).toBeDefined()
 })
@@ -36,6 +63,15 @@ it('renders with signedIn=false and isOpen', ()=>{
         isOpen={true}
         isSignedIn={false}
         freeUsagePlanId='hello'
+        toggleNavBar={genericFn}
+        logout={genericFn}
+        init={genericFn}
+        cognitoUser={{
+            authenticateUser:genericFn,
+            getSession:genericFn,
+            signOut:genericFn
+        }}
+        isFromMarketPlace={true}
     />)
     expect(appMenu).toBeDefined()
 })
@@ -44,6 +80,15 @@ it('has subscription link when signed in', ()=>{
         isOpen={true}
         isSignedIn={true}
         freeUsagePlanId='hello'
+        toggleNavBar={genericFn}
+        logout={genericFn}
+        init={genericFn}
+        cognitoUser={{
+            authenticateUser:genericFn,
+            getSession:genericFn,
+            signOut:genericFn
+        }}
+        isFromMarketPlace={true}
     />)
     expect(appMenu.find(NavLink).findWhere(link=>link.text()==='Subscriptions').length).toEqual(1)
 })
@@ -52,6 +97,15 @@ it('has LogOut link when signed in', ()=>{
         isOpen={true}
         isSignedIn={true}
         freeUsagePlanId='hello'
+        toggleNavBar={genericFn}
+        logout={genericFn}
+        init={genericFn}
+        cognitoUser={{
+            authenticateUser:genericFn,
+            getSession:genericFn,
+            signOut:genericFn
+        }}
+        isFromMarketPlace={true}
     /></Router>)
     expect(appMenu.find(LogOut).length).toEqual(1)
 })
@@ -60,6 +114,15 @@ it('has log in link when not signed in', ()=>{
         isOpen={true}
         isSignedIn={false}
         freeUsagePlanId='hello'
+        toggleNavBar={genericFn}
+        logout={genericFn}
+        init={genericFn}
+        cognitoUser={{
+            authenticateUser:genericFn,
+            getSession:genericFn,
+            signOut:genericFn
+        }}
+        isFromMarketPlace={true}
     /></Router>)
     expect(appMenu.find(NavLink).findWhere(link=>link.text()==='Log In').length).toBeGreaterThan(0)
 })
@@ -68,6 +131,15 @@ it('has register link when not signed in', ()=>{
         isOpen={true}
         isSignedIn={false}
         freeUsagePlanId='hello'
+        toggleNavBar={genericFn}
+        logout={genericFn}
+        init={genericFn}
+        cognitoUser={{
+            authenticateUser:genericFn,
+            getSession:genericFn,
+            signOut:genericFn
+        }}
+        isFromMarketPlace={true}
     />)
     expect(appMenu.find(NavLink).findWhere(link=>link.text()==='Sign Up').length).toEqual(1)
 })

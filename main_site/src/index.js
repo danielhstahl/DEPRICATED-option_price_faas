@@ -7,6 +7,15 @@ import registerServiceWorker from './registerServiceWorker'
 import { createStore } from 'redux'
 import { Provider } from 'react-redux'
 import awsApp from './reducers'
+import { BrowserRouter as Router } from 'react-router-dom'
 const store=createStore(awsApp)
-ReactDOM.render(<Provider store={store}><App /></Provider>, document.getElementById('root'))
+
+ReactDOM.render(
+    <Provider store={store}>
+        <Router basename={process.env.PUBLIC_URL}>
+            <App/>
+        </Router>
+    </Provider>, 
+    document.getElementById('root')
+)
 registerServiceWorker()

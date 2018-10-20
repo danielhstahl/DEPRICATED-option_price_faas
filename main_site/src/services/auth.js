@@ -146,7 +146,6 @@ export const register=dispatch=>({
 })=>{
     const userPool=new CognitoUserPool(POOL_DATA)
     return (email, password)=>{
-        //let firstTimeRegistering=true
         return signUp(userPool, email, password)
             .catch(rethrowNoLoginError)
             .then(()=>login(email, password, dispatch))
