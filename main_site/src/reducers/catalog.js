@@ -10,10 +10,16 @@ const defaultState={
 }
 export const keys=Object.keys(defaultState)
 const updateCatalog=(usagePlanId, obj, state)=>keys.reduce((aggr, key)=>state[key].id===usagePlanId?{...aggr, [key]:{...aggr[key], ...obj}}:aggr, state)
+
+const mergeKeys=(newObj, state)=>keys.reduce((aggr, curr)=>({
+    ...aggr, 
+    [curr]:newObj[curr]||state[curr]
+}), {})
 export default (state=defaultState, action)=>{
     switch(action.type){
         case UPDATE_CATALOG:
-            return action.value
+            console.log(action.value)
+            return mergeKeys(action.value, state)
         case UPDATE_USAGE:
             const {usagePlanId, ...rest}=action.value
             return updateCatalog(usagePlanId, rest, state)

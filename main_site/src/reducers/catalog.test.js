@@ -6,8 +6,11 @@ import {
 } from '../actions/constants'
 
 it('returns updated state', ()=>{
-    const action={type:UPDATE_CATALOG, value:'hello world'}
-    expect(catalog(undefined, action)).toEqual('hello world')
+    const action={type:UPDATE_CATALOG, value:{free:'hello world'}}
+    expect(catalog(undefined, action)).toEqual({
+        free:'hello world',
+        paid:{quota:{period:'month'}}
+    })
 })
 it('returns state with usage plan', ()=>{
     const action={
@@ -123,6 +126,28 @@ it('returns state with add subscription and subscription', ()=>{
         free:{
             id:'hi',
             isSubscribed:true
+        },
+        paid:{
+            id:'something'
+        }
+    })
+})
+it('returns both paid and free even with action.value only having free', ()=>{
+    const action={
+        type:UPDATE_CATALOG, 
+        value:{free:{something:'else'}}
+    }
+    const initState={
+        free:{
+            id:'hi'  
+        },
+        paid:{
+            id:'something'
+        }
+    }
+    expect(catalog(initState, action)).toEqual({
+        free:{
+            something:'else'
         },
         paid:{
             id:'something'
