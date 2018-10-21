@@ -3,6 +3,7 @@ import {
     DELETE_SUBSCRIPTION, 
     IS_UNREGISTERING,
     UPDATE_CATALOG, 
+    NO_SUBSCRIPTION_ERROR,
     SUBSCRIPTION_ERROR,
     UPDATE_USAGE
 } from './constants'
@@ -23,14 +24,18 @@ export const removePaidSubscription=dispatch=>(paidUsagePlanId, freeUsagePlanId,
         type:IS_UNREGISTERING,
         value:true
     })
-    unregisterPaid(paidUsagePlanId, freeUsagePlanId, client).then(()=>{
+    unregisterPaid(paidUsagePlanId, freeUsagePlanId, client)
+    .then(()=>{
         addSubscriptionLocal(dispatch)(freeUsagePlanId)
         deleteSubscriptionLocal(dispatch)(paidUsagePlanId)
-        dispatch({
+        dispatch({type:NO_SUBSCRIPTION_ERROR})
+    })
+    .catch(err=>dispatch({type:SUBSCRIPTION_ERROR, err}))
+    .then(()=>dispatch({
             type:IS_UNREGISTERING,
             value:false
         })
-    })
+    )
 }
 
 export const getSubscriptionUsage=dispatch=>(usagePlanId, client)=>getUsage(
@@ -38,6 +43,7 @@ export const getSubscriptionUsage=dispatch=>(usagePlanId, client)=>getUsage(
     client
 )
 .then(({data})=>dispatch({type:UPDATE_USAGE, value:data}))
+.then(()=>dispatch({type:NO_SUBSCRIPTION_ERROR}))
 .catch(err=>dispatch({type:SUBSCRIPTION_ERROR, err}))
 
 export const getPossibleSubscriptions=dispatch=>getCatalog()

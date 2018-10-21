@@ -16,14 +16,14 @@ import {
 import Subscriptions from './pages/Subscriptions'
 import { connect } from 'react-redux'
 
-const checkIfRegisteringFromMarketplace=(
+export const checkIfRegisteringFromMarketplace=(
   isFromMarketPlace, 
   isSignedIn, 
   freeUsagePlanId
 )=>isFromMarketPlace&&(isSignedIn===undefined||freeUsagePlanId===undefined)
 
 ///TODO!! Consider using isSubscribed instead of isSignedIn
-const checkIfRegisteredPaid=(
+export const checkIfRegisteredPaid=(
   isFromMarketPlace, 
   isSignedIn
 )=>isFromMarketPlace&&isSignedIn

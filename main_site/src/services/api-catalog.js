@@ -6,7 +6,6 @@ const convertJson=res=>res.json()
 export const getCatalog=()=>fetch(`${url}/catalog`)
 .then(convertJson)
 .then(({items})=>items.reduce((aggr, curr)=>{
-        console.log(items)
         const key=checkKey(curr.name)
         if(key){
             return {...aggr, [key]:curr}

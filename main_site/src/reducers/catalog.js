@@ -18,7 +18,6 @@ const mergeKeys=(newObj, state)=>keys.reduce((aggr, curr)=>({
 export default (state=defaultState, action)=>{
     switch(action.type){
         case UPDATE_CATALOG:
-            console.log(action.value)
             return mergeKeys(action.value, state)
         case UPDATE_USAGE:
             const {usagePlanId, ...rest}=action.value

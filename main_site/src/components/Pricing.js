@@ -74,13 +74,13 @@ Pricing.propTypes={
             period:PropTypes.string.isRequired
         }).isRequired,
         isSubscribed:PropTypes.bool
-    }),
+    }).isRequired,
     free:PropTypes.shape({
         quota:PropTypes.shape({
             limit:PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
             period:PropTypes.string.isRequired
         }).isRequired
-    }),
+    }).isRequired,
     isSignedIn:PropTypes.bool
 }
 

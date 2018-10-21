@@ -6,21 +6,22 @@ import {
 } from 'reactstrap'
 import { connect } from 'react-redux'
 import { register } from '../services/auth'
-import {loginError, updateLoggingIn} from '../actions/signIn'
+import {loginError, updateLoggingIn, noLoginError} from '../actions/signIn'
 import Loading from '../components/Loading'
 import {HOME} from '../routes/names'
 
-const goToPreviousPageOrHome=(fn, history, loginError, updateLoggingIn)=>{
+const goToPreviousPageOrHome=(fn, history, loginError, noLoginError, updateLoggingIn)=>{
     const navigate=history.length>0?history.goBack:()=>history.push(HOME)
     return e=>{
         updateLoggingIn(true)
-        fn(e).then(navigate).catch(loginError).then(()=>updateLoggingIn(false))
+        fn(e).then(navigate).then(noLoginError).catch(loginError).then(()=>updateLoggingIn(false))
     }
 }
 
 export const SignIn=({
     register, isLoggingIn, 
     history, loginError, 
+    noLoginError,
     error, updateLoggingIn, 
     token, paidUsagePlanId, 
     freeUsagePlanId, isFromMarketPlace
@@ -31,7 +32,7 @@ export const SignIn=({
                 paidUsagePlanId, freeUsagePlanId, 
                 token, isFromMarketPlace
             }), history, 
-            loginError, updateLoggingIn
+            loginError, noLoginError, updateLoggingIn
         )}
     >
         {error&&<Alert color='danger'>{error.message}</Alert>}
@@ -80,10 +81,12 @@ const getForm=fn=>aggr=>e=>{
 const mapDispatchToProps=dispatch=>({
     register:getForm(register(dispatch)),
     loginError:loginError(dispatch),
+    noLoginError:noLoginError(dispatch),
     updateLoggingIn:isLoggingIn=>updateLoggingIn(dispatch, isLoggingIn)
 })
 const mapStateToProps=({
-    loading:{isLoggingIn}, auth:{error, token, paidUsagePlanId, isFromMarketPlace},
+    loading:{isLoggingIn}, auth:{token, paidUsagePlanId, isFromMarketPlace},
+    errors:{loginError:error},
     catalog:{free:{id:freeUsagePlanId}}
 })=>({
     isLoggingIn, error, 

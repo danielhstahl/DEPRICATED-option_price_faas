@@ -33,7 +33,7 @@ export const AppMenu=({
     cognitoUser,
     paidUsagePlanId, 
     freeUsagePlanId,
-    token, isFromMarketPlace
+    token, isFromMarketPlace, match
 })=>(
 <Navbar
     color="light" light expand="md"

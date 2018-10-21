@@ -1,15 +1,16 @@
 import React from 'react'
 import {
     Row, Col, Card, CardBody,
-    CardHeader,  
+    CardHeader,  Alert,
     Button, Container
 } from 'reactstrap'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import {removePaidSubscription, getSubscriptionUsage} from '../actions/subscriptions'
 import AsyncLoad from '../components/AsyncLoad'
 import Loading from '../components/Loading'
 const paddingTop={paddingTop:20}
-const SubscriptionCard=({
+export const SubscriptionCard=({
     title, children
 })=>(
 <Card className='text-center'>
@@ -22,23 +23,26 @@ const SubscriptionCard=({
 </Card>
 )
 
-const getFirstOfNestedOrNonsenseKey=arr=>arr&&arr.length>0?arr[0]:'key'
-const convertUsage=items=>{
+export const getFirstOfNestedOrNonsenseKey=arr=>arr&&arr.length>0?arr[0]:'key'
+
+export const convertUsage=items=>{
     const usage=items[getFirstOfNestedOrNonsenseKey(Object.keys(items))]||[[]]
     return usage.reduce((aggr, [dailyUsage])=>aggr+dailyUsage, 0)||0
 }
 
-const renderUsage=(subscriptionObject, isSubscribed, onUnsubscribe, isUnRegistering)=>()=>{
+export const renderUsage=(subscriptionObject, isSubscribed, onUnsubscribe, isUnRegistering, error)=>()=>{
     const {items, quota, startDate}=subscriptionObject
     return <div>
         Usage since {startDate}: {convertUsage(items)} out of {quota.limit}.
         {onUnsubscribe&&isSubscribed?(isUnRegistering?<Loading/>:<Button onClick={onUnsubscribe}>Unsubscribe</Button>):null}
+        {error&&<Alert color='danger'>{error.message}</Alert>}
     </div>
 }
 export const Subscriptions=({
     style, paid, free,  
     client, isSignedIn, getUsage,
-    isUnRegistering
+    isUnRegistering, error,
+    removePaidSubscription
 })=>(
 <Container key='container'>
     <Row style={style} className='dark-text'>
@@ -63,7 +67,7 @@ export const Subscriptions=({
                     onLoad={()=>getUsage(paid.id, client)}
                     render={renderUsage(
                         paid, paid.isSubscribed,  
-                        ()=>removePaidSubscription(paid.id, free.id, client), isUnRegistering
+                        ()=>removePaidSubscription(paid.id, free.id, client), isUnRegistering, error
                     )}
                     loading={Loading}
                 />:<Loading/>}
@@ -74,12 +78,42 @@ export const Subscriptions=({
 </Container>
 )
 
+Subscriptions.propTypes={
+    style:PropTypes.object,
+    paid:PropTypes.shape({
+        quota:PropTypes.shape({
+            limit:PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+            period:PropTypes.string.isRequired
+        }).isRequired,
+        id:PropTypes.string,
+        isSubscribed:PropTypes.bool
+    }).isRequired,
+    free:PropTypes.shape({
+        quota:PropTypes.shape({
+            limit:PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+            period:PropTypes.string.isRequired
+        }).isRequired,
+        id:PropTypes.string,
+        isSubscribed:PropTypes.bool
+    }).isRequired,
+    client:PropTypes.object,
+    isSignedIn:PropTypes.bool,
+    getUsage:PropTypes.func.isRequired,
+    isUnRegistering:PropTypes.bool.isRequired,
+    error:PropTypes.shape({
+        message:PropTypes.string.isRequired
+    }),
+    removePaidSubscription:PropTypes.func.isRequired
+}
+
 const mapStateToProps=({
     auth:{isSignedIn}, client, 
     catalog:{paid, free},
+    errors:{subscriptionError:error},
     loading:{isUnRegistering}
 })=>({
     isSignedIn,
+    error,
     paid,
     free,
     client,

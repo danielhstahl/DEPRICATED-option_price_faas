@@ -7,7 +7,7 @@ import {
 import AsyncLoad from './AsyncLoad'
 import {showApiKey} from '../services/auth'
 import Loading from './Loading'
-
+import PropTypes from 'prop-types'
 const mapStateToProps=({modal:{isOpen}, auth:{apiKey, isSignedIn}, client})=>({
     isOpen, apiKey, client, isSignedIn
 })
@@ -37,7 +37,15 @@ export const ApiModal=({
         )}/>
     </Modal>
 ]
-
+ApiModal.propTypes={
+    style:PropTypes.object,
+    isOpen:PropTypes.bool.isRequired,
+    toggleOpen:PropTypes.func.isRequired,
+    apiKey:PropTypes.string,
+    client:PropTypes.object,
+    onLoad:PropTypes.func.isRequired,
+    isSignedIn:PropTypes.bool
+}
 export default connect(
     mapStateToProps,
     mapDispatchToProps

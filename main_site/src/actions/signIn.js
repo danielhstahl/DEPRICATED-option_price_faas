@@ -4,7 +4,8 @@ import {
     IS_LOGGING_IN,
     LOGIN_ERROR,
     UPDATE_API_KEY,
-    API_ERROR
+    API_ERROR,
+    NO_LOGIN_ERROR
 } from './constants'
 
 export const updateSignIn=(dispatch, client, user)=>dispatch({
@@ -18,6 +19,9 @@ export const loginError=dispatch=>err=>dispatch({
     type:LOGIN_ERROR,
     value:err
 })
+export const noLoginError=dispatch=>()=>dispatch({
+    type:NO_LOGIN_ERROR
+})
 
 export const updateLoggingIn=(dispatch, value)=>dispatch({
     type:IS_LOGGING_IN,
@@ -25,4 +29,4 @@ export const updateLoggingIn=(dispatch, value)=>dispatch({
 })
 
 export const updateApiKey=(dispatch, value)=>dispatch({type:UPDATE_API_KEY, value})
-export const apiError=dispatch=>err=>dispatch({type:API_ERROR, err})
+export const apiError=dispatch=>err=>dispatch({type:API_ERROR, value:err})
