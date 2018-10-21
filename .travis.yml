@@ -18,7 +18,6 @@ before_install:
 before_script: 
 - > #ensure only runs once :|
     if  [ "$TRAVIS_RUST_VERSION" = "stable" ]; then
-      #export BEFORE_SCRIPT_RUN=1;
       sudo apt-get update; #to install python 3.6
       sudo apt-get install build-essential libpq-dev libssl-dev openssl; libffi-dev zlib1g-dev;
       sudo apt-get install python3-pip python3-dev;
@@ -69,8 +68,6 @@ script:
 before_deploy:
   - > #ensure only runs once :|
     if  [ "$TRAVIS_RUST_VERSION" = "stable" ]; then
-      #deploy option functions
-      #export BEFORE_DEPLOY_RUN=1;
       npm install -g serverless;
       sls deploy;
     fi
