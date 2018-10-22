@@ -1,8 +1,0 @@
-export const HOME='/home'
-export const PRODUCTS='/products'
-export const DEVELOPERS='/developers'
-export const REGISTER='/register'
-export const LOGIN='/login'
-export const MARKETPLACE='/tmpmarketplace'
-export const SUCCESS_MARKETPLACE='/marketplace_success'
-export const SUBSCRIPTIONS='/subscriptions'
