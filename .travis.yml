@@ -5,23 +5,45 @@ rust:
 - beta
 - nightly
 
+matrix:
+  allow_failures:
+    - rust: nightly
+
 before_install:
 - wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
 - nvm install 8
 - node --version
 - rustup target add x86_64-unknown-linux-musl
 
+before_cache: |
+  if [ "$TRAVIS_RUST_VERSION" = "stable" ]; then
+    RUSTFLAGS="--cfg procmacro2_semver_exempt" cargo install cargo-tarpaulin
+  fi
+
 script:
   - cd functions
+  - cargo clean
   - cargo build --release --target=x86_64-unknown-linux-musl
   - cargo test
   - cd ..
-before_deploy: ###ADD section for kicking off client build!
+  - npm test
+
+after_success: |
+  if [ "$TRAVIS_RUST_VERSION" = "stable" ]; then
+    bash <(curl -s https://codecov.io/bash) -cf javascript
+    cd functions
+    cargo tarpaulin --out Xml
+    bash <(curl -s https://codecov.io/bash) -cF rust
+    cd ..
+  fi
+
+before_deploy: 
   - > #ensure only runs once :|
     if  [ "$TRAVIS_RUST_VERSION" = "stable" ]; then
       npm install -g serverless;
       sls deploy;
     fi
+
 after_deploy:
   - > #ensure only runs once :|
     if  [ "$TRAVIS_RUST_VERSION" = "stable" ]; then
@@ -31,16 +53,20 @@ after_deploy:
         -H "Travis-API-Version: 3" \
         -H "Authorization: token ${TRAVIS_TOKEN}" \
         -d "'{\"request\":{\"branch\":\"master\"}}'" \
-        https://api.travis-ci.com/repo/realoptions/main_site/requests;
+        https://api.travis-ci.com/repo/realoptions%2Fmain_site/requests;
     fi
+
 addons:
   apt:
     packages:
     - libcurl4-openssl-dev
     - libelf-dev
     - libdw-dev
+    - libssl-dev #codecov
     - cmake
     - gcc
+    - pkg-config #codecov
+    - zlib1g-dev #codecov
     - binutils-dev
     - libiberty-dev
 

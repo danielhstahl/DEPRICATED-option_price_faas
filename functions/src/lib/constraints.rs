@@ -35,46 +35,6 @@ pub fn extend_strikes(
     strikes.push_front(x_max.exp()*asset);
     Vec::from(strikes)
 }
-/*
-#[derive(Serialize, Deserialize)]
-pub struct MertonParameters{
-    pub lambda:f64,
-    pub mu_l:f64,
-    pub sig_l:f64,
-    pub sigma:f64,
-    pub v0:f64,
-    pub speed:f64,
-    pub eta_v:f64,
-    pub rho:f64
-}
-#[derive(Serialize, Deserialize)]
-pub struct CgmyParameters{
-    pub c:f64,
-    pub g:f64,
-    pub m:f64,
-    pub y:f64,
-    pub sigma:f64,
-    pub v0:f64,
-    pub speed:f64,
-    pub eta_v:f64,
-    pub rho:f64
-}
-#[derive(Serialize, Deserialize)]
-pub struct HestonParameters{
-    pub sigma:f64,
-    pub v0:f64, //v0 is on variance, not time change
-    pub speed:f64,
-    pub eta_v:f64,
-    pub rho:f64
-}*/
-/*
-impl OptionParameters{
-    pub fn extend_strikes(&mut self, x_max:f64){
-        self.strikes.push_back((-x_max).exp()*self.asset);
-        self.strikes.push_front(x_max.exp()*self.asset);
-    }
-}
-*/
 
 #[derive(Serialize, Deserialize)] 
 pub struct ParameterConstraints{
@@ -84,38 +44,6 @@ pub struct ParameterConstraints{
     pub num_u:cuckoo::UpperLower,
     pub quantile:cuckoo::UpperLower
 }
-/*
-#[derive(Serialize, Deserialize)] 
-pub struct MertonConstraints{
-    pub lambda:cuckoo::UpperLower,
-    pub mu_l:cuckoo::UpperLower,
-    pub sig_l:cuckoo::UpperLower,
-    pub sigma:cuckoo::UpperLower,
-    pub v0:cuckoo::UpperLower,
-    pub speed:cuckoo::UpperLower,
-    pub eta_v:cuckoo::UpperLower,
-    pub rho:cuckoo::UpperLower
-}
-#[derive(Serialize, Deserialize)] 
-pub struct CgmyConstraints{
-    pub c:cuckoo::UpperLower,
-    pub g:cuckoo::UpperLower,
-    pub m:cuckoo::UpperLower,
-    pub y:cuckoo::UpperLower,
-    pub sigma:cuckoo::UpperLower,
-    pub v0:cuckoo::UpperLower,
-    pub speed:cuckoo::UpperLower,
-    pub eta_v:cuckoo::UpperLower,
-    pub rho:cuckoo::UpperLower
-}
-#[derive(Serialize, Deserialize)] 
-pub struct HestonConstraints{
-    pub sigma:cuckoo::UpperLower,
-    pub v0:cuckoo::UpperLower,
-    pub speed:cuckoo::UpperLower,
-    pub eta_v:cuckoo::UpperLower,
-    pub rho:cuckoo::UpperLower
-}*/
 
 pub fn get_constraints()->ParameterConstraints {
     ParameterConstraints{
@@ -126,16 +54,7 @@ pub fn get_constraints()->ParameterConstraints {
         quantile:cuckoo::UpperLower{lower:0.0, upper:1.0}
     }
 }
-/*
-pub fn get_constraints()->HashMap<String, cuckoo::UpperLower> {
-    vec![
-        ("rate", cuckoo::UpperLower{lower:0.0, upper:0.4}),
-        ("asset", cuckoo::UpperLower{lower:0.0, upper:1000000.0}),
-        ("maturity", cuckoo::UpperLower{lower:0.0, upper:1000000.0}),
-        ("num_u", cuckoo::UpperLower{lower:5.0, upper:10.0}),
-        ("quantile", cuckoo::UpperLower{lower:0.0, upper:1.0}),
-    ].into_iter().collect()
-}*/
+
 pub fn get_merton_constraints()->HashMap<String, cuckoo::UpperLower> {
     vec![
         ("lambda".to_string(), cuckoo::UpperLower{lower:0.0, upper:2.0}),

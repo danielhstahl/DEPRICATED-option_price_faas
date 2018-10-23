@@ -8,9 +8,10 @@
   },
   "jest": {
     "testPathIgnorePatterns": [
-      "node_modules",
-      "main_site"
-    ]
+      "node_modules"
+    ],
+    "coverageDirectory": "./coverage/",
+    "collectCoverage": true
   },
   "husky": {
     "hooks": {
