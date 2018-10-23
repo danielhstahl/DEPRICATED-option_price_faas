@@ -1,9 +1,7 @@
-const calibratorKeys={
-    spline:0,
-    calibrate:1
-}
-
-const calculatorKeys={
+const keys={
+    cgmy:0,
+    merton:1,
+    heston:2,
     putprice:0,
     callprice:1,
     putdelta:2,
@@ -16,7 +14,4 @@ const calculatorKeys={
     riskmetric:9
 }
 
-module.exports={
-    calibratorKeys,
-    calculatorKeys
-}
+module.exports=keys

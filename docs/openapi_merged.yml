@@ -1,0 +1,735 @@
+openapi: 3.0.0
+info:
+  title: Option Pricing and Sensitivities
+  description: >-
+    Option pricing using advanced models such as Heston, Extended Merton, and
+    Extended CGMY.
+  version: '1'
+servers:
+  - url: 'https://api.finside.org/realoptions'
+    description: Production server
+  - url: 'https://zcz8a5ch68.execute-api.us-east-1.amazonaws.com/prd'
+    description: Raw url
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-Key
+security:
+  - ApiKeyAuth: []
+paths:
+  '/v1/cgmy/calculator/{optionType}/{sensitivity}':
+    post:
+      summary: >-
+        Calculator for computing option prices and sensitivities for a CGMY
+        process
+      description: >-
+        Computes European option prices, implied volatilities, and sensitivities
+        at every strike price for an asset that follows an extended CGMY process
+      responses:
+        '200':
+          description: Option prices and sensitivites
+          content:
+            application/json:
+              schema: &ref_0
+                type: array
+                items:
+                  type: object
+                  properties:
+                    value:
+                      type: number
+                    at_point:
+                      type: number
+                    iv:
+                      type: number
+                  required:
+                    - value
+                    - at_point
+                  additionalProperties: false
+        '400':
+          description: Error for incorrect request
+          content:
+            application/json:
+              schema: &ref_1
+                type: object
+                properties:
+                  err:
+                    type: string
+                required:
+                  - err
+                additionalProperties: false
+      parameters:
+        - name: optionType
+          in: path
+          required: true
+          description: The type of option.
+          schema:
+            type: string
+            enum:
+              - call
+              - put
+        - name: sensitivity
+          in: path
+          required: true
+          description: Prices or Greeks
+          schema:
+            type: string
+            enum:
+              - price
+              - delta
+              - gamma
+              - theta
+        - name: includeImpliedVolatility
+          in: query
+          description: >-
+            Whether to include implied volatility in the results.  Defaults to
+            'false'.  Only applicable for sensitivity='price'
+          schema:
+            type: boolean
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: &ref_2
+              type: object
+              properties:
+                num_u:
+                  type: integer
+                  example: 8
+                rate:
+                  type: number
+                  example: 0.04
+                maturity:
+                  type: number
+                  example: 0.5
+                asset:
+                  type: number
+                  example: 50
+                cf_parameters:
+                  type: object
+                  properties:
+                    sigma:
+                      type: number
+                      example: 0.3
+                    c:
+                      type: number
+                      example: 0.3
+                    g:
+                      type: number
+                      example: 5
+                    m:
+                      type: number
+                      example: 5
+                    'y':
+                      type: number
+                      example: 1.2
+                    speed:
+                      type: number
+                      example: 0.2
+                    v0:
+                      type: number
+                      example: 0.9
+                    eta_v:
+                      type: number
+                      example: 0.2
+                    rho:
+                      type: number
+                      example: -0.5
+                  additionalProperties: false
+                strikes:
+                  type: array
+                  items:
+                    type: number
+                  example:
+                    - 50
+                quantile:
+                  type: number
+                  example: 0.01
+              required:
+                - num_u
+                - rate
+                - maturity
+                - asset
+                - cf_parameters
+                - strikes
+                - quantile
+              additionalProperties: false
+  '/v1/heston/calculator/{optionType}/{sensitivity}':
+    post:
+      summary: >-
+        Calculator for computing option prices and sensitivities for a Heston
+        model
+      description: >-
+        Computes European option prices, implied volatilities, and sensitivities
+        at every strike price for an asset that follows a Heston process
+      responses:
+        '200':
+          description: Option prices and sensitivites
+          content:
+            application/json:
+              schema: *ref_0
+        '400':
+          description: Error for incorrect request
+          content:
+            application/json:
+              schema: *ref_1
+      parameters:
+        - name: optionType
+          in: path
+          required: true
+          description: The type of option.
+          schema:
+            type: string
+            enum:
+              - call
+              - put
+        - name: sensitivity
+          in: path
+          required: true
+          description: Prices or Greeks
+          schema:
+            type: string
+            enum:
+              - price
+              - delta
+              - gamma
+              - theta
+        - name: includeImpliedVolatility
+          in: query
+          description: >-
+            Whether to include implied volatility in the results.  Defaults to
+            'false'.  Only applicable for sensitivity='price'
+          schema:
+            type: boolean
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: &ref_4
+              type: object
+              properties:
+                num_u:
+                  type: integer
+                  example: 8
+                rate:
+                  type: number
+                  example: 0.04
+                maturity:
+                  type: number
+                  example: 0.5
+                asset:
+                  type: number
+                  example: 50
+                cf_parameters:
+                  type: object
+                  properties:
+                    sigma:
+                      type: number
+                      example: 0.3
+                    speed:
+                      type: number
+                      example: 0.2
+                    v0:
+                      type: number
+                      example: 0.25
+                    eta_v:
+                      type: number
+                      example: 0.2
+                    rho:
+                      type: number
+                      example: -0.5
+                  additionalProperties: false
+                strikes:
+                  type: array
+                  items:
+                    type: number
+                  example:
+                    - 50
+                quantile:
+                  type: number
+                  example: 0.01
+              required:
+                - num_u
+                - rate
+                - maturity
+                - asset
+                - cf_parameters
+                - strikes
+                - quantile
+              additionalProperties: false
+  '/v1/merton/calculator/{optionType}/{sensitivity}':
+    post:
+      summary: >-
+        Calculator for computing option prices and sensitivities for a Merton
+        model
+      description: >-
+        Computes European option prices, implied volatilities, and sensitivities
+        at every strike price for an asset that follows an extended Merton
+        process
+      responses:
+        '200':
+          description: Option prices and sensitivites
+          content:
+            application/json:
+              schema: *ref_0
+        '400':
+          description: Error for incorrect request
+          content:
+            application/json:
+              schema: *ref_1
+      parameters:
+        - name: optionType
+          in: path
+          required: true
+          description: The type of option.
+          schema:
+            type: string
+            enum:
+              - call
+              - put
+        - name: sensitivity
+          in: path
+          required: true
+          description: Prices or Greeks
+          schema:
+            type: string
+            enum:
+              - price
+              - delta
+              - gamma
+              - theta
+        - name: includeImpliedVolatility
+          in: query
+          description: >-
+            Whether to include implied volatility in the results.  Defaults to
+            'false'.  Only applicable for sensitivity='price'
+          schema:
+            type: boolean
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: &ref_5
+              type: object
+              properties:
+                num_u:
+                  type: integer
+                  example: 8
+                rate:
+                  type: number
+                  example: 0.04
+                maturity:
+                  type: number
+                  example: 0.5
+                asset:
+                  type: number
+                  example: 50
+                cf_parameters:
+                  type: object
+                  properties:
+                    sigma:
+                      type: number
+                      example: 0.3
+                    mu_l:
+                      type: number
+                      example: -0.05
+                    sig_l:
+                      type: number
+                      example: 0.2
+                    lambda:
+                      type: number
+                      example: 1
+                    speed:
+                      type: number
+                      example: 0.2
+                    v0:
+                      type: number
+                      example: 0.9
+                    eta_v:
+                      type: number
+                      example: 0.2
+                    rho:
+                      type: number
+                      example: -0.5
+                  additionalProperties: false
+                strikes:
+                  type: array
+                  items:
+                    type: number
+                  example:
+                    - 50
+                quantile:
+                  type: number
+                  example: 0.01
+              required:
+                - num_u
+                - rate
+                - maturity
+                - asset
+                - cf_parameters
+                - strikes
+                - quantile
+              additionalProperties: false
+  /v1/cgmy/density:
+    post:
+      summary: Calculator for computing probability densities for CGMY process
+      description: Computes probability density for an extended CGMY process
+      responses:
+        '200':
+          description: Density
+          content:
+            application/json:
+              schema: &ref_3
+                type: array
+                items:
+                  type: object
+                  properties:
+                    value:
+                      type: number
+                    at_point:
+                      type: number
+                  required:
+                    - value
+                    - at_point
+                  additionalProperties: false
+        '400':
+          description: Error for incorrect request
+          content:
+            application/json:
+              schema: *ref_1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: *ref_2
+  /v1/heston/density:
+    post:
+      summary: Calculator for computing probability densities for Heston model
+      description: Computes probability density for a Heston model
+      responses:
+        '200':
+          description: Density
+          content:
+            application/json:
+              schema: *ref_3
+        '400':
+          description: Error for incorrect request
+          content:
+            application/json:
+              schema: *ref_1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: *ref_4
+  /v1/merton/density:
+    post:
+      summary: Calculator for computing probability densities for Merton model
+      description: Computes probability density for a Merton model
+      responses:
+        '200':
+          description: Density
+          content:
+            application/json:
+              schema: *ref_3
+        '400':
+          description: Error for incorrect request
+          content:
+            application/json:
+              schema: *ref_1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: *ref_5
+  /v1/cgmy/riskmetric:
+    post:
+      summary: Calculator for computing risk metrics for CGMY process
+      description: Computes value at risk and expected shortfall for extended CGMY process
+      responses:
+        '200':
+          description: Value at risk and expected shortfall
+          content:
+            application/json:
+              schema: &ref_6
+                type: object
+                properties:
+                  value_at_risk:
+                    type: number
+                  expected_shortfall:
+                    type: number
+                required:
+                  - value_at_risk
+                  - expected_shortfall
+                additionalProperties: false
+        '400':
+          description: Error for incorrect request
+          content:
+            application/json:
+              schema: *ref_1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: *ref_2
+  /v1/heston/riskmetric:
+    post:
+      summary: Calculator for computing risk metrics for Heston model
+      description: Computes value at risk and expected shortfall for a Heston model
+      responses:
+        '200':
+          description: Value at risk and expected shortfall
+          content:
+            application/json:
+              schema: *ref_6
+        '400':
+          description: Error for incorrect request
+          content:
+            application/json:
+              schema: *ref_1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: *ref_4
+  /v1/merton/riskmetric:
+    post:
+      summary: Calculator for computing risk metrics for Merton model
+      description: >-
+        Computes value at risk and expected shortfall for an extended Merton
+        model
+      responses:
+        '200':
+          description: Value at risk and expected shortfall
+          content:
+            application/json:
+              schema: *ref_6
+        '400':
+          description: Error for incorrect request
+          content:
+            application/json:
+              schema: *ref_1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: *ref_5
+  '/v1/{model}/parameters/parameter_ranges':
+    get:
+      summary: Parameter Constraints
+      description: >-
+        Obtains the constraints that the parameters in the post requests are
+        required to conform to.
+      responses:
+        '200':
+          description: Constraints
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rate:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  asset:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  maturity:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  num_u:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  quantile:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  lambda:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  mu_l:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  sig_l:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  c:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  g:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  m:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  'y':
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  v0:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  speed:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  eta_v:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  sigma:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  rho:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                additionalProperties: false
+        '400':
+          description: Error for incorrect request
+          content:
+            application/json:
+              schema: *ref_1
+      parameters:
+        - name: model
+          in: path
+          required: true
+          description: The model to use.
+          schema:
+            type: string
+            enum:
+              - cgmy
+              - merton
+              - heston
