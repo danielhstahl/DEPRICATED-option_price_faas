@@ -16,7 +16,7 @@ before_install:
 - rustup target add x86_64-unknown-linux-musl
 
 before_cache: |
-  if [ "$TRAVIS_RUST_VERSION" = "stable" ]; then
+  if [ "$TRAVIS_RUST_VERSION" = "nightly" ]; then
     RUSTFLAGS="--cfg procmacro2_semver_exempt" cargo install cargo-tarpaulin
   fi
 
@@ -30,11 +30,11 @@ script:
   - npm test
 
 after_success: |
-  if [ "$TRAVIS_RUST_VERSION" = "stable" ]; then
-    bash <(curl -s https://codecov.io/bash) -cf javascript
+  if [ "$TRAVIS_RUST_VERSION" = "nightly" ]; then
+    bash <(curl -s https://codecov.io/bash) 
     cd functions
     cargo tarpaulin --out Xml
-    bash <(curl -s https://codecov.io/bash) -cF rust
+    bash <(curl -s https://codecov.io/bash)
     cd ..
   fi
 
