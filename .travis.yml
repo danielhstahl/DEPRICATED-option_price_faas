@@ -10,7 +10,6 @@ before_install:
 - nvm install 8
 - node --version
 - rustup target add x86_64-unknown-linux-musl
-- git fetch --all # intended for getting tags
 
 script:
   - cd functions
