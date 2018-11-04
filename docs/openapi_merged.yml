@@ -47,11 +47,14 @@ paths:
                     - value
                     - at_point
                   additionalProperties: false
+              examples: &ref_1
+                - value: 4
+                  at_point: 50
         '400':
           description: Error for incorrect request
           content:
             application/json:
-              schema: &ref_1
+              schema: &ref_2
                 type: object
                 properties:
                   err:
@@ -91,7 +94,7 @@ paths:
         required: true
         content:
           application/json:
-            schema: &ref_2
+            schema: &ref_3
               type: object
               properties:
                 num_u:
@@ -169,11 +172,12 @@ paths:
           content:
             application/json:
               schema: *ref_0
+              examples: *ref_1
         '400':
           description: Error for incorrect request
           content:
             application/json:
-              schema: *ref_1
+              schema: *ref_2
       parameters:
         - name: optionType
           in: path
@@ -206,7 +210,7 @@ paths:
         required: true
         content:
           application/json:
-            schema: &ref_4
+            schema: &ref_5
               type: object
               properties:
                 num_u:
@@ -273,11 +277,12 @@ paths:
           content:
             application/json:
               schema: *ref_0
+              examples: *ref_1
         '400':
           description: Error for incorrect request
           content:
             application/json:
-              schema: *ref_1
+              schema: *ref_2
       parameters:
         - name: optionType
           in: path
@@ -310,7 +315,7 @@ paths:
         required: true
         content:
           application/json:
-            schema: &ref_5
+            schema: &ref_6
               type: object
               properties:
                 num_u:
@@ -380,7 +385,7 @@ paths:
           description: Density
           content:
             application/json:
-              schema: &ref_3
+              schema: &ref_4
                 type: array
                 items:
                   type: object
@@ -393,16 +398,17 @@ paths:
                     - value
                     - at_point
                   additionalProperties: false
+              examples: *ref_1
         '400':
           description: Error for incorrect request
           content:
             application/json:
-              schema: *ref_1
+              schema: *ref_2
       requestBody:
         required: true
         content:
           application/json:
-            schema: *ref_2
+            schema: *ref_3
   /v1/heston/density:
     post:
       summary: Calculator for computing probability densities for Heston model
@@ -412,17 +418,18 @@ paths:
           description: Density
           content:
             application/json:
-              schema: *ref_3
+              schema: *ref_4
+              examples: *ref_1
         '400':
           description: Error for incorrect request
           content:
             application/json:
-              schema: *ref_1
+              schema: *ref_2
       requestBody:
         required: true
         content:
           application/json:
-            schema: *ref_4
+            schema: *ref_5
   /v1/merton/density:
     post:
       summary: Calculator for computing probability densities for Merton model
@@ -432,17 +439,18 @@ paths:
           description: Density
           content:
             application/json:
-              schema: *ref_3
+              schema: *ref_4
+              examples: *ref_1
         '400':
           description: Error for incorrect request
           content:
             application/json:
-              schema: *ref_1
+              schema: *ref_2
       requestBody:
         required: true
         content:
           application/json:
-            schema: *ref_5
+            schema: *ref_6
   /v1/cgmy/riskmetric:
     post:
       summary: Calculator for computing risk metrics for CGMY process
@@ -452,7 +460,7 @@ paths:
           description: Value at risk and expected shortfall
           content:
             application/json:
-              schema: &ref_6
+              schema: &ref_7
                 type: object
                 properties:
                   value_at_risk:
@@ -463,16 +471,19 @@ paths:
                   - value_at_risk
                   - expected_shortfall
                 additionalProperties: false
+              examples: &ref_8
+                value_at_risk: 5
+                expected_shortfall: 5
         '400':
           description: Error for incorrect request
           content:
             application/json:
-              schema: *ref_1
+              schema: *ref_2
       requestBody:
         required: true
         content:
           application/json:
-            schema: *ref_2
+            schema: *ref_3
   /v1/heston/riskmetric:
     post:
       summary: Calculator for computing risk metrics for Heston model
@@ -482,17 +493,18 @@ paths:
           description: Value at risk and expected shortfall
           content:
             application/json:
-              schema: *ref_6
+              schema: *ref_7
+              examples: *ref_8
         '400':
           description: Error for incorrect request
           content:
             application/json:
-              schema: *ref_1
+              schema: *ref_2
       requestBody:
         required: true
         content:
           application/json:
-            schema: *ref_4
+            schema: *ref_5
   /v1/merton/riskmetric:
     post:
       summary: Calculator for computing risk metrics for Merton model
@@ -504,17 +516,18 @@ paths:
           description: Value at risk and expected shortfall
           content:
             application/json:
-              schema: *ref_6
+              schema: *ref_7
+              examples: *ref_8
         '400':
           description: Error for incorrect request
           content:
             application/json:
-              schema: *ref_1
+              schema: *ref_2
       requestBody:
         required: true
         content:
           application/json:
-            schema: *ref_5
+            schema: *ref_6
   '/v1/{model}/parameters/parameter_ranges':
     get:
       summary: Parameter Constraints
@@ -717,11 +730,63 @@ paths:
                       - upper
                     additionalProperties: false
                 additionalProperties: false
+              examples:
+                rate:
+                  lower: 0
+                  upper: 0
+                asset:
+                  lower: 0
+                  upper: 0
+                maturity:
+                  lower: 0
+                  upper: 0
+                num_u:
+                  lower: 0
+                  upper: 0
+                quantile:
+                  lower: 0
+                  upper: 0
+                lambda:
+                  lower: 0
+                  upper: 0
+                mu_l:
+                  lower: 0
+                  upper: 0
+                sig_l:
+                  lower: 0
+                  upper: 0
+                c:
+                  lower: 0
+                  upper: 0
+                g:
+                  lower: 0
+                  upper: 0
+                m:
+                  lower: 0
+                  upper: 0
+                'y':
+                  lower: 0
+                  upper: 0
+                v0:
+                  lower: 0
+                  upper: 0
+                speed:
+                  lower: 0
+                  upper: 0
+                eta_v:
+                  lower: 0
+                  upper: 0
+                sigma:
+                  lower: 0
+                  upper: 0
+                rho:
+                  lower: 0
+                  upper: 0
         '400':
           description: Error for incorrect request
           content:
             application/json:
-              schema: *ref_1
+              schema: *ref_2
       parameters:
         - name: model
           in: path

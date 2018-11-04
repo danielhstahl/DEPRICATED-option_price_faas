@@ -32,12 +32,15 @@ paths:
             application/json: 
               schema:
                 $ref: './PostOptionsResponse.json'
+              examples:
+                $ref: './PostOptionsExampleResponse.json'
         '400':
           description: Error for incorrect request
           content:
             application/json: 
               schema:
                 $ref: './ErrorResponse.json'
+             
       parameters:
         - name: optionType
           in: path
@@ -75,6 +78,8 @@ paths:
             application/json: 
               schema:
                 $ref: './PostOptionsResponse.json'
+              examples:
+                $ref: './PostOptionsExampleResponse.json'
         '400':
           description: Error for incorrect request
           content:
@@ -119,6 +124,8 @@ paths:
             application/json: 
               schema:
                 $ref: './PostOptionsResponse.json'
+              examples:
+                $ref: './PostOptionsExampleResponse.json'
         '400':
           description: Error for incorrect request
           content:
@@ -163,6 +170,8 @@ paths:
             application/json: 
               schema:
                 $ref: './PostDensityResponse.json'
+              examples:
+                $ref: './PostOptionsExampleResponse.json'
         '400':
           description: Error for incorrect request
           content:
@@ -187,6 +196,8 @@ paths:
             application/json: 
               schema:
                 $ref: './PostDensityResponse.json'
+              examples:
+                $ref: './PostOptionsExampleResponse.json'
         '400':
           description: Error for incorrect request
           content:
@@ -211,6 +222,8 @@ paths:
             application/json: 
               schema:
                 $ref: './PostDensityResponse.json'
+              examples:
+                $ref: './PostOptionsExampleResponse.json'
         '400':
           description: Error for incorrect request
           content:
@@ -235,6 +248,8 @@ paths:
             application/json: 
               schema:
                 $ref: './PostRiskMetricResponse.json'
+              examples:
+                $ref: './PostRiskMetricExampleResponse.json'
         '400':
           description: Error for incorrect request
           content:
@@ -258,6 +273,8 @@ paths:
             application/json: 
               schema:
                 $ref: './PostRiskMetricResponse.json'
+              examples:
+                $ref: './PostRiskMetricExampleResponse.json'
         '400':
           description: Error for incorrect request
           content:
@@ -281,6 +298,8 @@ paths:
             application/json: 
               schema:
                 $ref: './PostRiskMetricResponse.json'
+              examples:
+                $ref: './PostRiskMetricExampleResponse.json'
         '400':
           description: Error for incorrect request
           content:
@@ -305,6 +324,8 @@ paths:
             application/json: 
               schema:
                 $ref: './GetConstraintsResponse.json'
+              examples:
+                $ref: './GetConstraintsExampleResponse.json'
         '400':
           description: Error for incorrect request
           content:

@@ -1,0 +1,70 @@
+{
+    "rate": {
+      "lower": 0,
+      "upper": 0
+    },
+    "asset": {
+      "lower": 0,
+      "upper": 0
+    },
+    "maturity": {
+      "lower": 0,
+      "upper": 0
+    },
+    "num_u": {
+      "lower": 0,
+      "upper": 0
+    },
+    "quantile": {
+      "lower": 0,
+      "upper": 0
+    },
+    "lambda": {
+      "lower": 0,
+      "upper": 0
+    },
+    "mu_l": {
+      "lower": 0,
+      "upper": 0
+    },
+    "sig_l": {
+      "lower": 0,
+      "upper": 0
+    },
+    "c": {
+      "lower": 0,
+      "upper": 0
+    },
+    "g": {
+      "lower": 0,
+      "upper": 0
+    },
+    "m": {
+      "lower": 0,
+      "upper": 0
+    },
+    "y": {
+      "lower": 0,
+      "upper": 0
+    },
+    "v0": {
+      "lower": 0,
+      "upper": 0
+    },
+    "speed": {
+      "lower": 0,
+      "upper": 0
+    },
+    "eta_v": {
+      "lower": 0,
+      "upper": 0
+    },
+    "sigma": {
+      "lower": 0,
+      "upper": 0
+    },
+    "rho": {
+      "lower": 0,
+      "upper": 0
+    }
+  }
