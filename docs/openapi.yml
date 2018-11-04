@@ -32,7 +32,7 @@ paths:
             application/json: 
               schema:
                 $ref: './PostOptionsResponse.json'
-              examples:
+              example:
                 $ref: './PostOptionsExampleResponse.json'
         '400':
           description: Error for incorrect request
@@ -78,7 +78,7 @@ paths:
             application/json: 
               schema:
                 $ref: './PostOptionsResponse.json'
-              examples:
+              example:
                 $ref: './PostOptionsExampleResponse.json'
         '400':
           description: Error for incorrect request
@@ -124,7 +124,7 @@ paths:
             application/json: 
               schema:
                 $ref: './PostOptionsResponse.json'
-              examples:
+              example:
                 $ref: './PostOptionsExampleResponse.json'
         '400':
           description: Error for incorrect request
@@ -170,7 +170,7 @@ paths:
             application/json: 
               schema:
                 $ref: './PostDensityResponse.json'
-              examples:
+              example:
                 $ref: './PostOptionsExampleResponse.json'
         '400':
           description: Error for incorrect request
@@ -196,7 +196,7 @@ paths:
             application/json: 
               schema:
                 $ref: './PostDensityResponse.json'
-              examples:
+              example:
                 $ref: './PostOptionsExampleResponse.json'
         '400':
           description: Error for incorrect request
@@ -222,7 +222,7 @@ paths:
             application/json: 
               schema:
                 $ref: './PostDensityResponse.json'
-              examples:
+              example:
                 $ref: './PostOptionsExampleResponse.json'
         '400':
           description: Error for incorrect request
@@ -248,7 +248,7 @@ paths:
             application/json: 
               schema:
                 $ref: './PostRiskMetricResponse.json'
-              examples:
+              example:
                 $ref: './PostRiskMetricExampleResponse.json'
         '400':
           description: Error for incorrect request
@@ -273,7 +273,7 @@ paths:
             application/json: 
               schema:
                 $ref: './PostRiskMetricResponse.json'
-              examples:
+              example:
                 $ref: './PostRiskMetricExampleResponse.json'
         '400':
           description: Error for incorrect request
@@ -298,7 +298,7 @@ paths:
             application/json: 
               schema:
                 $ref: './PostRiskMetricResponse.json'
-              examples:
+              example:
                 $ref: './PostRiskMetricExampleResponse.json'
         '400':
           description: Error for incorrect request
@@ -324,7 +324,7 @@ paths:
             application/json: 
               schema:
                 $ref: './GetConstraintsResponse.json'
-              examples:
+              example:
                 $ref: './GetConstraintsExampleResponse.json'
         '400':
           description: Error for incorrect request

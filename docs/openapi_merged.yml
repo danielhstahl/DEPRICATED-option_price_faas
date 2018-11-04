@@ -47,7 +47,7 @@ paths:
                     - value
                     - at_point
                   additionalProperties: false
-              examples: &ref_1
+              example: &ref_1
                 - value: 4
                   at_point: 50
         '400':
@@ -172,7 +172,7 @@ paths:
           content:
             application/json:
               schema: *ref_0
-              examples: *ref_1
+              example: *ref_1
         '400':
           description: Error for incorrect request
           content:
@@ -277,7 +277,7 @@ paths:
           content:
             application/json:
               schema: *ref_0
-              examples: *ref_1
+              example: *ref_1
         '400':
           description: Error for incorrect request
           content:
@@ -398,7 +398,7 @@ paths:
                     - value
                     - at_point
                   additionalProperties: false
-              examples: *ref_1
+              example: *ref_1
         '400':
           description: Error for incorrect request
           content:
@@ -419,7 +419,7 @@ paths:
           content:
             application/json:
               schema: *ref_4
-              examples: *ref_1
+              example: *ref_1
         '400':
           description: Error for incorrect request
           content:
@@ -440,7 +440,7 @@ paths:
           content:
             application/json:
               schema: *ref_4
-              examples: *ref_1
+              example: *ref_1
         '400':
           description: Error for incorrect request
           content:
@@ -471,7 +471,7 @@ paths:
                   - value_at_risk
                   - expected_shortfall
                 additionalProperties: false
-              examples: &ref_8
+              example: &ref_8
                 value_at_risk: 5
                 expected_shortfall: 5
         '400':
@@ -494,7 +494,7 @@ paths:
           content:
             application/json:
               schema: *ref_7
-              examples: *ref_8
+              example: *ref_8
         '400':
           description: Error for incorrect request
           content:
@@ -517,7 +517,7 @@ paths:
           content:
             application/json:
               schema: *ref_7
-              examples: *ref_8
+              example: *ref_8
         '400':
           description: Error for incorrect request
           content:
@@ -730,7 +730,7 @@ paths:
                       - upper
                     additionalProperties: false
                 additionalProperties: false
-              examples:
+              example:
                 rate:
                   lower: 0
                   upper: 0
