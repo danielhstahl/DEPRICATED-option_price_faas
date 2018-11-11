@@ -313,30 +313,61 @@ paths:
             schema:
               $ref: './PostMertonRequest.json'
 
-  /v1/{model}/parameters/parameter_ranges:
+  /v1/heston/parameters/parameter_ranges:
     get:
       summary: Parameter Constraints
-      description: Obtains the constraints that the parameters in the post requests are required to conform to.
+      description: Obtains the constraints that the parameters in the post requests are required to conform to for Heston.
       responses: 
         '200':
           description: Constraints
           content:
             application/json: 
               schema:
-                $ref: './GetConstraintsResponse.json'
+                $ref: './GetHestonConstraintsResponse.json'
               example:
-                $ref: './GetConstraintsExampleResponse.json'
+                $ref: './GetHestonConstraintsExampleResponse.json'
         '400':
           description: Error for incorrect request
           content:
             application/json: 
               schema:
                 $ref: './ErrorResponse.json'
-      parameters:
-        - name: model
-          in: path
-          required: true
-          description: The model to use.
-          schema:
-            type: string
-            enum: [cgmy, merton, heston]
+  /v1/cgmy/parameters/parameter_ranges:
+    get:
+      summary: Parameter Constraints
+      description: Obtains the constraints that the parameters in the post requests are required to conform to for CGMY.
+      responses: 
+        '200':
+          description: Constraints
+          content:
+            application/json: 
+              schema:
+                $ref: './GetCGMYConstraintsResponse.json'
+              example:
+                $ref: './GetCGMYConstraintsExampleResponse.json'
+        '400':
+          description: Error for incorrect request
+          content:
+            application/json: 
+              schema:
+                $ref: './ErrorResponse.json'
+
+  /v1/merton/parameters/parameter_ranges:
+    get:
+      summary: Parameter Constraints
+      description: Obtains the constraints that the parameters in the post requests are required to conform to for Merton.
+      responses: 
+        '200':
+          description: Constraints
+          content:
+            application/json: 
+              schema:
+                $ref: './GetMertonConstraintsResponse.json'
+              example:
+                $ref: './GetMertonConstraintsExampleResponse.json'
+        '400':
+          description: Error for incorrect request
+          content:
+            application/json: 
+              schema:
+                $ref: './ErrorResponse.json'

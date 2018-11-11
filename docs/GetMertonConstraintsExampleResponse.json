@@ -1,70 +1,54 @@
 {
     "rate": {
       "lower": 0,
-      "upper": 0
+      "upper": 0.2
     },
     "asset": {
       "lower": 0,
-      "upper": 0
+      "upper": 100
     },
     "maturity": {
       "lower": 0,
-      "upper": 0
+      "upper": 10
     },
     "num_u": {
-      "lower": 0,
-      "upper": 0
+      "lower": 6,
+      "upper": 12
     },
     "quantile": {
       "lower": 0,
-      "upper": 0
+      "upper": 1
     },
     "lambda": {
       "lower": 0,
-      "upper": 0
+      "upper": 4
     },
     "mu_l": {
       "lower": 0,
-      "upper": 0
+      "upper": 1
     },
     "sig_l": {
       "lower": 0,
-      "upper": 0
-    },
-    "c": {
-      "lower": 0,
-      "upper": 0
-    },
-    "g": {
-      "lower": 0,
-      "upper": 0
-    },
-    "m": {
-      "lower": 0,
-      "upper": 0
-    },
-    "y": {
-      "lower": 0,
-      "upper": 0
+      "upper": 0.6
     },
     "v0": {
       "lower": 0,
-      "upper": 0
+      "upper": 2
     },
     "speed": {
       "lower": 0,
-      "upper": 0
+      "upper": 2
     },
     "eta_v": {
       "lower": 0,
-      "upper": 0
+      "upper": 0.5
     },
     "sigma": {
       "lower": 0,
-      "upper": 0
+      "upper": 1
     },
     "rho": {
-      "lower": 0,
-      "upper": 0
+      "lower": -1,
+      "upper": 1
     }
   }

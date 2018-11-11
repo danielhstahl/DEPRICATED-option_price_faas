@@ -532,12 +532,12 @@ paths:
         content:
           application/json:
             schema: *ref_6
-  '/v1/{model}/parameters/parameter_ranges':
+  /v1/heston/parameters/parameter_ranges:
     get:
       summary: Parameter Constraints
       description: >-
         Obtains the constraints that the parameters in the post requests are
-        required to conform to.
+        required to conform to for Heston.
       responses:
         '200':
           description: Constraints
@@ -601,7 +601,7 @@ paths:
                       - lower
                       - upper
                     additionalProperties: false
-                  lambda:
+                  v0:
                     type: object
                     properties:
                       lower:
@@ -612,7 +612,7 @@ paths:
                       - lower
                       - upper
                     additionalProperties: false
-                  mu_l:
+                  speed:
                     type: object
                     properties:
                       lower:
@@ -623,7 +623,135 @@ paths:
                       - lower
                       - upper
                     additionalProperties: false
-                  sig_l:
+                  eta_v:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  sigma:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  rho:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                additionalProperties: false
+              example:
+                rate:
+                  lower: 0
+                  upper: 0.2
+                asset:
+                  lower: 0
+                  upper: 100
+                maturity:
+                  lower: 0
+                  upper: 10
+                num_u:
+                  lower: 6
+                  upper: 12
+                quantile:
+                  lower: 0
+                  upper: 1
+                v0:
+                  lower: 0
+                  upper: 0.9
+                speed:
+                  lower: 0
+                  upper: 2
+                eta_v:
+                  lower: 0
+                  upper: 0.5
+                sigma:
+                  lower: 0
+                  upper: 1
+                rho:
+                  lower: -1
+                  upper: 1
+        '400':
+          description: Error for incorrect request
+          content:
+            application/json:
+              schema: *ref_2
+  /v1/cgmy/parameters/parameter_ranges:
+    get:
+      summary: Parameter Constraints
+      description: >-
+        Obtains the constraints that the parameters in the post requests are
+        required to conform to for CGMY.
+      responses:
+        '200':
+          description: Constraints
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rate:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  asset:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  maturity:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  num_u:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  quantile:
                     type: object
                     properties:
                       lower:
@@ -737,68 +865,251 @@ paths:
               example:
                 rate:
                   lower: 0
-                  upper: 0
+                  upper: 0.2
                 asset:
                   lower: 0
-                  upper: 0
+                  upper: 100
                 maturity:
                   lower: 0
-                  upper: 0
+                  upper: 10
                 num_u:
-                  lower: 0
-                  upper: 0
+                  lower: 6
+                  upper: 12
                 quantile:
                   lower: 0
-                  upper: 0
-                lambda:
-                  lower: 0
-                  upper: 0
-                mu_l:
-                  lower: 0
-                  upper: 0
-                sig_l:
-                  lower: 0
-                  upper: 0
+                  upper: 1
                 c:
                   lower: 0
-                  upper: 0
+                  upper: 10
                 g:
                   lower: 0
-                  upper: 0
+                  upper: 20
                 m:
                   lower: 0
-                  upper: 0
+                  upper: 20
                 'y':
-                  lower: 0
-                  upper: 0
+                  lower: -2
+                  upper: 2
                 v0:
                   lower: 0
-                  upper: 0
+                  upper: 2
                 speed:
                   lower: 0
-                  upper: 0
+                  upper: 2
                 eta_v:
                   lower: 0
-                  upper: 0
+                  upper: 0.5
                 sigma:
                   lower: 0
-                  upper: 0
+                  upper: 1
                 rho:
-                  lower: 0
-                  upper: 0
+                  lower: -1
+                  upper: 1
         '400':
           description: Error for incorrect request
           content:
             application/json:
               schema: *ref_2
-      parameters:
-        - name: model
-          in: path
-          required: true
-          description: The model to use.
-          schema:
-            type: string
-            enum:
-              - cgmy
-              - merton
-              - heston
+  /v1/merton/parameters/parameter_ranges:
+    get:
+      summary: Parameter Constraints
+      description: >-
+        Obtains the constraints that the parameters in the post requests are
+        required to conform to for Merton.
+      responses:
+        '200':
+          description: Constraints
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rate:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  asset:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  maturity:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  num_u:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  quantile:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  lambda:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  mu_l:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  sig_l:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  v0:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  speed:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  eta_v:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  sigma:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  rho:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                additionalProperties: false
+              example:
+                rate:
+                  lower: 0
+                  upper: 0.2
+                asset:
+                  lower: 0
+                  upper: 100
+                maturity:
+                  lower: 0
+                  upper: 10
+                num_u:
+                  lower: 6
+                  upper: 12
+                quantile:
+                  lower: 0
+                  upper: 1
+                lambda:
+                  lower: 0
+                  upper: 4
+                mu_l:
+                  lower: 0
+                  upper: 1
+                sig_l:
+                  lower: 0
+                  upper: 0.6
+                v0:
+                  lower: 0
+                  upper: 2
+                speed:
+                  lower: 0
+                  upper: 2
+                eta_v:
+                  lower: 0
+                  upper: 0.5
+                sigma:
+                  lower: 0
+                  upper: 1
+                rho:
+                  lower: -1
+                  upper: 1
+        '400':
+          description: Error for incorrect request
+          content:
+            application/json:
+              schema: *ref_2
