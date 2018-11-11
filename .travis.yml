@@ -44,12 +44,13 @@ before_deploy:
 after_deploy:
   - > #ensure only runs once :|
     if  [ "$TRAVIS_RUST_VERSION" = "stable" ]; then
+      body='{"request":{"branch":"master"}}';
       curl -s -X POST \
         -H "Content-Type: application/json" \
         -H "Accept: application/json" \
         -H "Travis-API-Version: 3" \
         -H "Authorization: token ${TRAVIS_TOKEN}" \
-        -d "'{\"request\":{\"branch\":\"master\"}}'" \
+        -d "$body" \
         https://api.travis-ci.com/repo/realoptions%2Fmain_site/requests;
     fi
 
