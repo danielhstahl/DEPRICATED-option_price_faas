@@ -5,3 +5,4 @@ node_modules
 quandlkey.txt
 *.log
 .serverless
+coverage

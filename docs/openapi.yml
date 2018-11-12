@@ -371,3 +371,22 @@ paths:
             application/json: 
               schema:
                 $ref: './ErrorResponse.json'
+  /v1/market/parameters/parameter_ranges:
+    get:
+      summary: Market Constraints
+      description: Obtains the constraints that correspond with the market.
+      responses: 
+        '200':
+          description: Constraints
+          content:
+            application/json: 
+              schema:
+                $ref: './GetMarketConstraintsResponse.json'
+              example:
+                $ref: './GetMarketConstraintsExampleResponse.json'
+        '400':
+          description: Error for incorrect request
+          content:
+            application/json: 
+              schema:
+                $ref: './ErrorResponse.json'

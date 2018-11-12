@@ -15,7 +15,7 @@ const genericSpawn=(binaryName, options, callback)=>{
   model.stderr.on('data', data=>{
     modelErr+=data
   })
-  model.on('close', code=>{
+  model.on('close', _=>{
     if(modelErr){
       return callback(modelErr, null)
     }

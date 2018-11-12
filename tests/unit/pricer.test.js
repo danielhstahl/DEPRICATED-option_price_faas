@@ -113,6 +113,23 @@ it('correctly calls constraints', (done)=>{
         done()
     })
 })
+it('correctly calls constraints', (done)=>{
+    const event=createEvent({
+        
+    }, {
+        model:'market'
+    })
+    handler.constraints(event, {}, (_err, val)=>{
+        const parsedVal=JSON.parse(val.body)
+        
+        expect(parsedVal.asset).toBeDefined()
+        expect(parsedVal.maturity).toBeDefined()
+        expect(parsedVal.num_u).toBeDefined()
+        expect(parsedVal.quantile).toBeDefined()
+        expect(parsedVal.rate).toBeDefined()
+        done()
+    })
+})
 
 it('correctly calls VaR', (done)=>{
     const event=createEvent({

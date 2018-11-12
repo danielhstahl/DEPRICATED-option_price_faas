@@ -546,61 +546,6 @@ paths:
               schema:
                 type: object
                 properties:
-                  rate:
-                    type: object
-                    properties:
-                      lower:
-                        type: number
-                      upper:
-                        type: number
-                    required:
-                      - lower
-                      - upper
-                    additionalProperties: false
-                  asset:
-                    type: object
-                    properties:
-                      lower:
-                        type: number
-                      upper:
-                        type: number
-                    required:
-                      - lower
-                      - upper
-                    additionalProperties: false
-                  maturity:
-                    type: object
-                    properties:
-                      lower:
-                        type: number
-                      upper:
-                        type: number
-                    required:
-                      - lower
-                      - upper
-                    additionalProperties: false
-                  num_u:
-                    type: object
-                    properties:
-                      lower:
-                        type: number
-                      upper:
-                        type: number
-                    required:
-                      - lower
-                      - upper
-                    additionalProperties: false
-                  quantile:
-                    type: object
-                    properties:
-                      lower:
-                        type: number
-                      upper:
-                        type: number
-                    required:
-                      - lower
-                      - upper
-                    additionalProperties: false
                   v0:
                     type: object
                     properties:
@@ -658,21 +603,6 @@ paths:
                     additionalProperties: false
                 additionalProperties: false
               example:
-                rate:
-                  lower: 0
-                  upper: 0.2
-                asset:
-                  lower: 0
-                  upper: 100
-                maturity:
-                  lower: 0
-                  upper: 10
-                num_u:
-                  lower: 6
-                  upper: 12
-                quantile:
-                  lower: 0
-                  upper: 1
                 v0:
                   lower: 0
                   upper: 0.9
@@ -707,61 +637,6 @@ paths:
               schema:
                 type: object
                 properties:
-                  rate:
-                    type: object
-                    properties:
-                      lower:
-                        type: number
-                      upper:
-                        type: number
-                    required:
-                      - lower
-                      - upper
-                    additionalProperties: false
-                  asset:
-                    type: object
-                    properties:
-                      lower:
-                        type: number
-                      upper:
-                        type: number
-                    required:
-                      - lower
-                      - upper
-                    additionalProperties: false
-                  maturity:
-                    type: object
-                    properties:
-                      lower:
-                        type: number
-                      upper:
-                        type: number
-                    required:
-                      - lower
-                      - upper
-                    additionalProperties: false
-                  num_u:
-                    type: object
-                    properties:
-                      lower:
-                        type: number
-                      upper:
-                        type: number
-                    required:
-                      - lower
-                      - upper
-                    additionalProperties: false
-                  quantile:
-                    type: object
-                    properties:
-                      lower:
-                        type: number
-                      upper:
-                        type: number
-                    required:
-                      - lower
-                      - upper
-                    additionalProperties: false
                   c:
                     type: object
                     properties:
@@ -863,21 +738,6 @@ paths:
                     additionalProperties: false
                 additionalProperties: false
               example:
-                rate:
-                  lower: 0
-                  upper: 0.2
-                asset:
-                  lower: 0
-                  upper: 100
-                maturity:
-                  lower: 0
-                  upper: 10
-                num_u:
-                  lower: 6
-                  upper: 12
-                quantile:
-                  lower: 0
-                  upper: 1
                 c:
                   lower: 0
                   upper: 10
@@ -924,61 +784,6 @@ paths:
               schema:
                 type: object
                 properties:
-                  rate:
-                    type: object
-                    properties:
-                      lower:
-                        type: number
-                      upper:
-                        type: number
-                    required:
-                      - lower
-                      - upper
-                    additionalProperties: false
-                  asset:
-                    type: object
-                    properties:
-                      lower:
-                        type: number
-                      upper:
-                        type: number
-                    required:
-                      - lower
-                      - upper
-                    additionalProperties: false
-                  maturity:
-                    type: object
-                    properties:
-                      lower:
-                        type: number
-                      upper:
-                        type: number
-                    required:
-                      - lower
-                      - upper
-                    additionalProperties: false
-                  num_u:
-                    type: object
-                    properties:
-                      lower:
-                        type: number
-                      upper:
-                        type: number
-                    required:
-                      - lower
-                      - upper
-                    additionalProperties: false
-                  quantile:
-                    type: object
-                    properties:
-                      lower:
-                        type: number
-                      upper:
-                        type: number
-                    required:
-                      - lower
-                      - upper
-                    additionalProperties: false
                   lambda:
                     type: object
                     properties:
@@ -1069,21 +874,6 @@ paths:
                     additionalProperties: false
                 additionalProperties: false
               example:
-                rate:
-                  lower: 0
-                  upper: 0.2
-                asset:
-                  lower: 0
-                  upper: 100
-                maturity:
-                  lower: 0
-                  upper: 10
-                num_u:
-                  lower: 6
-                  upper: 12
-                quantile:
-                  lower: 0
-                  upper: 1
                 lambda:
                   lower: 0
                   upper: 4
@@ -1108,6 +898,94 @@ paths:
                 rho:
                   lower: -1
                   upper: 1
+        '400':
+          description: Error for incorrect request
+          content:
+            application/json:
+              schema: *ref_2
+  /v1/market/parameters/parameter_ranges:
+    get:
+      summary: Market Constraints
+      description: Obtains the constraints that correspond with the market.
+      responses:
+        '200':
+          description: Constraints
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rate:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  asset:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  maturity:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  num_u:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+                  quantile:
+                    type: object
+                    properties:
+                      lower:
+                        type: number
+                      upper:
+                        type: number
+                    required:
+                      - lower
+                      - upper
+                    additionalProperties: false
+              example:
+                asset:
+                  lower: 0
+                  upper: 1000000
+                maturity:
+                  lower: 0
+                  upper: 1000000
+                num_u:
+                  lower: 5
+                  upper: 10
+                quantile:
+                  lower: 0
+                  upper: 1
+                rate:
+                  lower: 0
+                  upper: 0.4
         '400':
           description: Error for incorrect request
           content:

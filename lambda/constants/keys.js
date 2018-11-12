@@ -2,6 +2,7 @@ const keys={
     cgmy:0,
     merton:1,
     heston:2,
+    market:3,
     putprice:0,
     callprice:1,
     putdelta:2,

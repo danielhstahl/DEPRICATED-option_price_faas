@@ -1,24 +1,4 @@
 {
-    "rate": {
-      "lower": 0,
-      "upper": 0.2
-    },
-    "asset": {
-      "lower": 0,
-      "upper": 100
-    },
-    "maturity": {
-      "lower": 0,
-      "upper": 10
-    },
-    "num_u": {
-      "lower": 6,
-      "upper": 12
-    },
-    "quantile": {
-      "lower": 0,
-      "upper": 1
-    },
     "v0": {
       "lower": 0,
       "upper": 0.9
@@ -39,4 +19,4 @@
       "lower": -1,
       "upper": 1
     }
-  }
+}
