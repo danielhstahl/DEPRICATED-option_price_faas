@@ -553,9 +553,12 @@ paths:
                         type: number
                       upper:
                         type: number
+                      types:
+                        type: string
                     required:
                       - lower
                       - upper
+                      - types
                     additionalProperties: false
                   speed:
                     type: object
@@ -564,9 +567,12 @@ paths:
                         type: number
                       upper:
                         type: number
+                      types:
+                        type: string
                     required:
                       - lower
                       - upper
+                      - types
                     additionalProperties: false
                   eta_v:
                     type: object
@@ -575,9 +581,12 @@ paths:
                         type: number
                       upper:
                         type: number
+                      types:
+                        type: string
                     required:
                       - lower
                       - upper
+                      - types
                     additionalProperties: false
                   sigma:
                     type: object
@@ -586,9 +595,12 @@ paths:
                         type: number
                       upper:
                         type: number
+                      types:
+                        type: string
                     required:
                       - lower
                       - upper
+                      - types
                     additionalProperties: false
                   rho:
                     type: object
@@ -597,27 +609,35 @@ paths:
                         type: number
                       upper:
                         type: number
+                      types:
+                        type: string
                     required:
                       - lower
                       - upper
+                      - types
                     additionalProperties: false
                 additionalProperties: false
               example:
                 v0:
                   lower: 0
                   upper: 0.9
+                  types: float
                 speed:
                   lower: 0
                   upper: 2
+                  types: float
                 eta_v:
                   lower: 0
                   upper: 0.5
+                  types: float
                 sigma:
                   lower: 0
                   upper: 1
+                  types: float
                 rho:
                   lower: -1
                   upper: 1
+                  types: float
         '400':
           description: Error for incorrect request
           content:
@@ -644,9 +664,12 @@ paths:
                         type: number
                       upper:
                         type: number
+                      types:
+                        type: string
                     required:
                       - lower
                       - upper
+                      - types
                     additionalProperties: false
                   g:
                     type: object
@@ -655,9 +678,12 @@ paths:
                         type: number
                       upper:
                         type: number
+                      types:
+                        type: string
                     required:
                       - lower
                       - upper
+                      - types
                     additionalProperties: false
                   m:
                     type: object
@@ -666,9 +692,12 @@ paths:
                         type: number
                       upper:
                         type: number
+                      types:
+                        type: string
                     required:
                       - lower
                       - upper
+                      - types
                     additionalProperties: false
                   'y':
                     type: object
@@ -677,9 +706,12 @@ paths:
                         type: number
                       upper:
                         type: number
+                      types:
+                        type: string
                     required:
                       - lower
                       - upper
+                      - types
                     additionalProperties: false
                   v0:
                     type: object
@@ -688,9 +720,12 @@ paths:
                         type: number
                       upper:
                         type: number
+                      types:
+                        type: string
                     required:
                       - lower
                       - upper
+                      - types
                     additionalProperties: false
                   speed:
                     type: object
@@ -699,9 +734,12 @@ paths:
                         type: number
                       upper:
                         type: number
+                      types:
+                        type: string
                     required:
                       - lower
                       - upper
+                      - types
                     additionalProperties: false
                   eta_v:
                     type: object
@@ -710,9 +748,12 @@ paths:
                         type: number
                       upper:
                         type: number
+                      types:
+                        type: string
                     required:
                       - lower
                       - upper
+                      - types
                     additionalProperties: false
                   sigma:
                     type: object
@@ -721,9 +762,12 @@ paths:
                         type: number
                       upper:
                         type: number
+                      types:
+                        type: string
                     required:
                       - lower
                       - upper
+                      - types
                     additionalProperties: false
                   rho:
                     type: object
@@ -732,39 +776,51 @@ paths:
                         type: number
                       upper:
                         type: number
+                      types:
+                        type: string
                     required:
                       - lower
                       - upper
+                      - types
                     additionalProperties: false
                 additionalProperties: false
               example:
                 c:
                   lower: 0
                   upper: 10
+                  type: float
                 g:
                   lower: 0
                   upper: 20
+                  type: float
                 m:
                   lower: 0
                   upper: 20
+                  type: float
                 'y':
                   lower: -2
                   upper: 2
+                  type: float
                 v0:
                   lower: 0
                   upper: 2
+                  type: float
                 speed:
                   lower: 0
                   upper: 2
+                  type: float
                 eta_v:
                   lower: 0
                   upper: 0.5
+                  type: float
                 sigma:
                   lower: 0
                   upper: 1
+                  type: float
                 rho:
                   lower: -1
                   upper: 1
+                  type: float
         '400':
           description: Error for incorrect request
           content:
@@ -791,9 +847,12 @@ paths:
                         type: number
                       upper:
                         type: number
+                      types:
+                        type: string
                     required:
                       - lower
                       - upper
+                      - types
                     additionalProperties: false
                   mu_l:
                     type: object
@@ -802,9 +861,12 @@ paths:
                         type: number
                       upper:
                         type: number
+                      types:
+                        type: string
                     required:
                       - lower
                       - upper
+                      - types
                     additionalProperties: false
                   sig_l:
                     type: object
@@ -813,9 +875,12 @@ paths:
                         type: number
                       upper:
                         type: number
+                      types:
+                        type: string
                     required:
                       - lower
                       - upper
+                      - types
                     additionalProperties: false
                   v0:
                     type: object
@@ -824,9 +889,12 @@ paths:
                         type: number
                       upper:
                         type: number
+                      types:
+                        type: string
                     required:
                       - lower
                       - upper
+                      - types
                     additionalProperties: false
                   speed:
                     type: object
@@ -835,9 +903,12 @@ paths:
                         type: number
                       upper:
                         type: number
+                      types:
+                        type: string
                     required:
                       - lower
                       - upper
+                      - types
                     additionalProperties: false
                   eta_v:
                     type: object
@@ -846,9 +917,12 @@ paths:
                         type: number
                       upper:
                         type: number
+                      types:
+                        type: string
                     required:
                       - lower
                       - upper
+                      - types
                     additionalProperties: false
                   sigma:
                     type: object
@@ -857,9 +931,12 @@ paths:
                         type: number
                       upper:
                         type: number
+                      types:
+                        type: string
                     required:
                       - lower
                       - upper
+                      - types
                     additionalProperties: false
                   rho:
                     type: object
@@ -868,36 +945,47 @@ paths:
                         type: number
                       upper:
                         type: number
+                      types:
+                        type: string
                     required:
                       - lower
                       - upper
+                      - types
                     additionalProperties: false
                 additionalProperties: false
               example:
                 lambda:
                   lower: 0
                   upper: 4
+                  types: float
                 mu_l:
                   lower: 0
                   upper: 1
+                  types: float
                 sig_l:
                   lower: 0
                   upper: 0.6
+                  types: float
                 v0:
                   lower: 0
                   upper: 2
+                  types: float
                 speed:
                   lower: 0
                   upper: 2
+                  types: float
                 eta_v:
                   lower: 0
                   upper: 0.5
+                  types: float
                 sigma:
                   lower: 0
                   upper: 1
+                  types: float
                 rho:
                   lower: -1
                   upper: 1
+                  types: float
         '400':
           description: Error for incorrect request
           content:
@@ -922,9 +1010,12 @@ paths:
                         type: number
                       upper:
                         type: number
+                      types:
+                        type: string
                     required:
                       - lower
                       - upper
+                      - types
                     additionalProperties: false
                   asset:
                     type: object
@@ -933,9 +1024,12 @@ paths:
                         type: number
                       upper:
                         type: number
+                      types:
+                        type: string
                     required:
                       - lower
                       - upper
+                      - types
                     additionalProperties: false
                   maturity:
                     type: object
@@ -944,9 +1038,12 @@ paths:
                         type: number
                       upper:
                         type: number
+                      types:
+                        type: string
                     required:
                       - lower
                       - upper
+                      - types
                     additionalProperties: false
                   num_u:
                     type: object
@@ -955,9 +1052,12 @@ paths:
                         type: number
                       upper:
                         type: number
+                      types:
+                        type: string
                     required:
                       - lower
                       - upper
+                      - types
                     additionalProperties: false
                   quantile:
                     type: object
@@ -966,26 +1066,34 @@ paths:
                         type: number
                       upper:
                         type: number
+                      types:
+                        type: string
                     required:
                       - lower
                       - upper
+                      - types
                     additionalProperties: false
               example:
                 asset:
                   lower: 0
                   upper: 1000000
+                  types: float
                 maturity:
                   lower: 0
                   upper: 1000000
+                  types: float
                 num_u:
                   lower: 5
                   upper: 10
+                  types: int
                 quantile:
                   lower: 0
                   upper: 1
+                  types: float
                 rate:
                   lower: 0
                   upper: 0.4
+                  types: float
         '400':
           description: Error for incorrect request
           content:

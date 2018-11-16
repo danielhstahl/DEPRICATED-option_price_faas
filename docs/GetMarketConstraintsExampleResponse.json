@@ -1,1 +1,17 @@
-{"asset":{"lower":0.0,"upper":1000000.0},"maturity":{"lower":0.0,"upper":1000000.0},"num_u":{"lower":5.0,"upper":10.0},"quantile":{"lower":0.0,"upper":1.0},"rate":{"lower":0.0,"upper":0.4}}
+{
+    "asset":{
+        "lower":0.0,"upper":1000000.0,"types":"float"
+    },
+    "maturity":{
+        "lower":0.0,"upper":1000000.0,"types":"float"
+    },
+    "num_u":{
+        "lower":5.0,"upper":10.0,"types":"int"
+    },
+    "quantile":{
+        "lower":0.0,"upper":1.0,"types":"float"
+    },
+    "rate":{
+        "lower":0.0,"upper":0.4,"types":"float"
+    }
+}

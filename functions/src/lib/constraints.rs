@@ -1,7 +1,7 @@
 //Todo: consider writing a macro to iterate over structs
 //structs will allow for static typing and possibly speed
 //optimizations vs hashmaps
-extern crate cuckoo;
+//extern crate cuckoo;
 extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
@@ -14,6 +14,13 @@ use std::io::{Error, ErrorKind};
 pub const CGMY:i32=0;
 pub const MERTON:i32=1;
 pub const HESTON:i32=2;
+
+#[derive(Serialize, Deserialize)] 
+pub struct ConstraintsSchema {
+    pub lower:f64,
+    pub upper:f64,
+    pub types:String
+}
 
 #[derive(Serialize, Deserialize)]
 pub struct OptionParameters {
@@ -38,62 +45,62 @@ pub fn extend_strikes(
 
 #[derive(Serialize, Deserialize)] 
 pub struct ParameterConstraints{
-    pub rate:cuckoo::UpperLower,
-    pub asset:cuckoo::UpperLower,
-    pub maturity:cuckoo::UpperLower,
-    pub num_u:cuckoo::UpperLower,
-    pub quantile:cuckoo::UpperLower
+    pub rate:ConstraintsSchema,
+    pub asset:ConstraintsSchema,
+    pub maturity:ConstraintsSchema,
+    pub num_u:ConstraintsSchema,
+    pub quantile:ConstraintsSchema
 }
 
 pub fn get_constraints()->ParameterConstraints {
     ParameterConstraints{
-        rate:cuckoo::UpperLower{lower:0.0, upper:0.4},
-        asset:cuckoo::UpperLower{lower:0.0, upper:1000000.0},
-        maturity:cuckoo::UpperLower{lower:0.0, upper:1000000.0},
-        num_u:cuckoo::UpperLower{lower:5.0, upper:10.0},
-        quantile:cuckoo::UpperLower{lower:0.0, upper:1.0}
+        rate:ConstraintsSchema{lower:0.0, upper:0.4, types:"float".to_string()},
+        asset:ConstraintsSchema{lower:0.0, upper:1000000.0, types:"float".to_string()},
+        maturity:ConstraintsSchema{lower:0.0, upper:1000000.0, types:"float".to_string()},
+        num_u:ConstraintsSchema{lower:5.0, upper:10.0, types:"int".to_string()},
+        quantile:ConstraintsSchema{lower:0.0, upper:1.0, types:"float".to_string()}
     }
 }
 
-pub fn get_merton_constraints()->HashMap<String, cuckoo::UpperLower> {
+pub fn get_merton_constraints()->HashMap<String, ConstraintsSchema> {
     vec![
-        ("lambda".to_string(), cuckoo::UpperLower{lower:0.0, upper:2.0}),
-        ("mu_l".to_string(), cuckoo::UpperLower{lower:-1.0, upper:1.0}),
-        ("sig_l".to_string(), cuckoo::UpperLower{lower:0.0, upper:2.0}),
-        ("sigma".to_string(), cuckoo::UpperLower{lower:0.0, upper:1.0}),
-        ("v0".to_string(), cuckoo::UpperLower{lower:0.2, upper:1.8}),
-        ("speed".to_string(), cuckoo::UpperLower{lower:0.0, upper:3.0}),
-        ("eta_v".to_string(), cuckoo::UpperLower{lower:0.0, upper:3.0}),
-        ("rho".to_string(), cuckoo::UpperLower{lower:-1.0, upper:1.0}),
+        ("lambda".to_string(), ConstraintsSchema{lower:0.0, upper:2.0, types:"float".to_string()}),
+        ("mu_l".to_string(), ConstraintsSchema{lower:-1.0, upper:1.0, types:"float".to_string()}),
+        ("sig_l".to_string(), ConstraintsSchema{lower:0.0, upper:2.0, types:"float".to_string()}),
+        ("sigma".to_string(), ConstraintsSchema{lower:0.0, upper:1.0, types:"float".to_string()}),
+        ("v0".to_string(), ConstraintsSchema{lower:0.2, upper:1.8, types:"float".to_string()}),
+        ("speed".to_string(), ConstraintsSchema{lower:0.0, upper:3.0, types:"float".to_string()}),
+        ("eta_v".to_string(), ConstraintsSchema{lower:0.0, upper:3.0, types:"float".to_string()}),
+        ("rho".to_string(), ConstraintsSchema{lower:-1.0, upper:1.0, types:"float".to_string()}),
     ].into_iter().collect()
 }
-pub fn get_cgmy_constraints()->HashMap<String, cuckoo::UpperLower> {
+pub fn get_cgmy_constraints()->HashMap<String, ConstraintsSchema> {
     vec![
-        ("c".to_string(), cuckoo::UpperLower{lower:0.0, upper:2.0}),
-        ("g".to_string(), cuckoo::UpperLower{lower:0.0, upper:20.0}),
-        ("m".to_string(), cuckoo::UpperLower{lower:0.0, upper:20.0}),
-        ("y".to_string(), cuckoo::UpperLower{lower:-1.0, upper:2.0}),
-        ("sigma".to_string(), cuckoo::UpperLower{lower:0.0, upper:1.0}),
-        ("v0".to_string(), cuckoo::UpperLower{lower:0.2, upper:1.8}),
-        ("speed".to_string(), cuckoo::UpperLower{lower:0.0, upper:3.0}),
-        ("eta_v".to_string(), cuckoo::UpperLower{lower:0.0, upper:3.0}),
-        ("rho".to_string(), cuckoo::UpperLower{lower:-1.0, upper:1.0}),
+        ("c".to_string(), ConstraintsSchema{lower:0.0, upper:2.0, types:"float".to_string()}),
+        ("g".to_string(), ConstraintsSchema{lower:0.0, upper:20.0, types:"float".to_string()}),
+        ("m".to_string(), ConstraintsSchema{lower:0.0, upper:20.0, types:"float".to_string()}),
+        ("y".to_string(), ConstraintsSchema{lower:-1.0, upper:2.0, types:"float".to_string()}),
+        ("sigma".to_string(), ConstraintsSchema{lower:0.0, upper:1.0, types:"float".to_string()}),
+        ("v0".to_string(), ConstraintsSchema{lower:0.2, upper:1.8, types:"float".to_string()}),
+        ("speed".to_string(), ConstraintsSchema{lower:0.0, upper:3.0, types:"float".to_string()}),
+        ("eta_v".to_string(), ConstraintsSchema{lower:0.0, upper:3.0, types:"float".to_string()}),
+        ("rho".to_string(), ConstraintsSchema{lower:-1.0, upper:1.0, types:"float".to_string()}),
     ].into_iter().collect()
 }
-pub fn get_heston_constraints()->HashMap<String, cuckoo::UpperLower> {
+pub fn get_heston_constraints()->HashMap<String, ConstraintsSchema> {
     vec![
-        ("sigma".to_string(), cuckoo::UpperLower{lower:0.0, upper:1.0}),
-        ("v0".to_string(), cuckoo::UpperLower{lower:0.001, upper:1.5}),
-        ("speed".to_string(), cuckoo::UpperLower{lower:0.0, upper:3.0}),
-        ("eta_v".to_string(), cuckoo::UpperLower{lower:0.0, upper:3.0}),
-        ("rho".to_string(), cuckoo::UpperLower{lower:-1.0, upper:1.0}),
+        ("sigma".to_string(), ConstraintsSchema{lower:0.0, upper:1.0, types:"float".to_string()}),
+        ("v0".to_string(), ConstraintsSchema{lower:0.001, upper:1.5, types:"float".to_string()}),
+        ("speed".to_string(), ConstraintsSchema{lower:0.0, upper:3.0, types:"float".to_string()}),
+        ("eta_v".to_string(), ConstraintsSchema{lower:0.0, upper:3.0, types:"float".to_string()}),
+        ("rho".to_string(), ConstraintsSchema{lower:-1.0, upper:1.0, types:"float".to_string()}),
     ].into_iter().collect()
 }
 
 
 fn check_constraint<'a>(
     parameter:f64,
-    constraint:&'a cuckoo::UpperLower,
+    constraint:&'a ConstraintsSchema,
     parameter_name: &'a str
 )->Result<(), io::Error>{
     if parameter>=constraint.lower&&parameter<=constraint.upper{
@@ -119,7 +126,7 @@ fn get_parameter(
 fn constraint_fn(
     parameters:&HashMap<String, f64>,
     key:&String,
-    value:&cuckoo::UpperLower
+    value:&ConstraintsSchema
 )->Result<(), io::Error>{
     let parameter=get_parameter(parameters, key)?;
     check_constraint(parameter, value, key)?;
@@ -127,7 +134,7 @@ fn constraint_fn(
 }
 pub fn check_cf_parameters<'a>(
     parameters:&HashMap<String, f64>,
-    constraints:&HashMap<String, cuckoo::UpperLower>
+    constraints:&HashMap<String, ConstraintsSchema>
 )->Result<(), io::Error> {
     constraints.iter().try_for_each(|(key, value)|{
         constraint_fn(parameters, key, value)
