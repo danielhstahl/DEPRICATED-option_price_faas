@@ -19,7 +19,7 @@ rayon = "1.0.1"
 black_scholes = "0.3.0"
 cf_functions = "0.10"
 num-complex = "0.2"
-#cuckoo = "0.7"
+aws_lambda = { git = "https://github.com/srijs/rust-aws-lambda" }
 
 [dev-dependencies]
 rand = "0.5"

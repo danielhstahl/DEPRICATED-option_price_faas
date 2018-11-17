@@ -11,7 +11,7 @@ extern crate serde_json;
 extern crate serde_derive;
 
 extern crate constraints;
-
+extern crate aws_lambda as lambda;
 #[cfg(test)]
 extern crate rand;
 #[cfg(test)]
@@ -333,168 +333,181 @@ fn get_functions(
     }
 }
 
-fn main()-> Result<(), io::Error> {
-    let args: Vec<String> = env::args().collect();
+fn main() {
+    /*let args: Vec<String> = env::args().collect();
     let fn_choice:i32=args[1].parse().unwrap();
     let iv_choice:i32=args[2].parse().unwrap();
     let cf_choice:i32=args[3].parse().unwrap();
 
-    let include_iv:bool=if iv_choice==1 {true} else {false};
+    let include_iv:bool=if iv_choice==1 {true} else {false};*/
 
-    let parameters:constraints::OptionParameters=
-        serde_json::from_str(&args[4])?;
 
-    constraints::check_parameters(
-        &parameters, 
-        &constraints::get_constraints()
-    )?;
-    let density_scale=5.0;
-    let option_scale_over_density=2.0;
-    
-    
-    let constraints::OptionParameters {
-        maturity,
-        rate,
-        asset,
-        quantile,
-        num_u:num_u_base,
-        strikes,
-        cf_parameters,
-        ..
-    }=parameters; //destructure
-    
-    let num_u=(2 as usize).pow(num_u_base as u32);
-    match cf_choice {
-        constraints::CGMY=>{
-            constraints::check_cf_parameters(
-                &cf_parameters, 
-                &constraints::get_cgmy_constraints()
-            )?;
-            let c=cf_parameters["c"]; //guaranteed to exist from the check
-            let g=cf_parameters["g"];
-            let m=cf_parameters["m"];
-            let y=cf_parameters["y"];
-            let sigma=cf_parameters["sigma"];
-            let v0=cf_parameters["v0"];
-            let speed=cf_parameters["speed"];
-            let eta_v=cf_parameters["eta_v"];
-            let rho=cf_parameters["rho"];
+    lambda::gateway::start(|req| {
+        let fn_choice:i32=0;
+        let include_iv:bool=false;
+        let cf_choice:i32=2;
 
-            let x_max_density=cf_functions::cgmy_diffusion_vol(
-                sigma, c, g, m, y, maturity
-            )*density_scale;
-            let x_max_options=x_max_density*option_scale_over_density;
-            //parameters.extend_strikes(x_max_options);
+        println!("{}", req.uri().path());
+        //let query=req.uri().query();
+        //println!("{}", query);
+        let body=req.body().as_str()?;
+        println!("{}", body);
+        let parameters:constraints::OptionParameters=
+            serde_json::from_str(body)?;
 
-            let inst_cf=cf_functions::cgmy_time_change_cf(
-                maturity, rate, c, g, m, y, sigma, v0,
-                speed, eta_v, rho
-            );
-            get_functions(
-                fn_choice,
-                include_iv,
-                num_u,
-                asset,
-                rate,
-                maturity,
-                quantile,
-                x_max_density,
-                &constraints::extend_strikes(
-                    strikes,
-                    asset, 
-                    x_max_options
-                ),
-                &inst_cf
-            )
-        },
-        constraints::MERTON=>{
-            constraints::check_cf_parameters(
-                &cf_parameters, 
-                &constraints::get_merton_constraints()
-            )?;
-            let lambda=cf_parameters["lambda"];
-            let mu_l=cf_parameters["mu_l"];
-            let sig_l=cf_parameters["sig_l"];
-            let sigma=cf_parameters["sigma"];
-            let v0=cf_parameters["v0"];
-            let speed=cf_parameters["speed"];
-            let eta_v=cf_parameters["eta_v"];
-            let rho=cf_parameters["rho"];
-            let x_max_density=cf_functions::jump_diffusion_vol(
-                sigma,
-                lambda,
-                mu_l,
-                sig_l,
-                maturity
-            )*density_scale;
+        constraints::check_parameters(
+            &parameters, 
+            &constraints::get_constraints()
+        )?;
+        let density_scale=5.0;
+        let option_scale_over_density=2.0;
+        
+        
+        let constraints::OptionParameters {
+            maturity,
+            rate,
+            asset,
+            quantile,
+            num_u:num_u_base,
+            strikes,
+            cf_parameters,
+            ..
+        }=parameters; //destructure
+        
+        let num_u=(2 as usize).pow(num_u_base as u32);
+        match cf_choice {
+            constraints::CGMY=>{
+                constraints::check_cf_parameters(
+                    &cf_parameters, 
+                    &constraints::get_cgmy_constraints()
+                )?;
+                let c=cf_parameters["c"]; //guaranteed to exist from the check
+                let g=cf_parameters["g"];
+                let m=cf_parameters["m"];
+                let y=cf_parameters["y"];
+                let sigma=cf_parameters["sigma"];
+                let v0=cf_parameters["v0"];
+                let speed=cf_parameters["speed"];
+                let eta_v=cf_parameters["eta_v"];
+                let rho=cf_parameters["rho"];
 
-            let x_max_options=x_max_density*option_scale_over_density;
+                let x_max_density=cf_functions::cgmy_diffusion_vol(
+                    sigma, c, g, m, y, maturity
+                )*density_scale;
+                let x_max_options=x_max_density*option_scale_over_density;
+                let inst_cf=cf_functions::cgmy_time_change_cf(
+                    maturity, rate, c, g, m, y, sigma, v0,
+                    speed, eta_v, rho
+                );
+                get_functions(
+                    fn_choice,
+                    include_iv,
+                    num_u,
+                    asset,
+                    rate,
+                    maturity,
+                    quantile,
+                    x_max_density,
+                    &constraints::extend_strikes(
+                        strikes,
+                        asset, 
+                        x_max_options
+                    ),
+                    &inst_cf
+                )
+            },
+            constraints::MERTON=>{
+                constraints::check_cf_parameters(
+                    &cf_parameters, 
+                    &constraints::get_merton_constraints()
+                )?;
+                let lambda=cf_parameters["lambda"];
+                let mu_l=cf_parameters["mu_l"];
+                let sig_l=cf_parameters["sig_l"];
+                let sigma=cf_parameters["sigma"];
+                let v0=cf_parameters["v0"];
+                let speed=cf_parameters["speed"];
+                let eta_v=cf_parameters["eta_v"];
+                let rho=cf_parameters["rho"];
+                let x_max_density=cf_functions::jump_diffusion_vol(
+                    sigma,
+                    lambda,
+                    mu_l,
+                    sig_l,
+                    maturity
+                )*density_scale;
 
-            //parameters.extend_strikes(x_max_options);
+                let x_max_options=x_max_density*option_scale_over_density;
 
-            //let strikes=Vec::from(parameters.strikes);
-            let inst_cf=cf_functions::merton_time_change_cf(
-                maturity, rate, lambda, mu_l, sig_l, sigma, v0,
-                speed, eta_v, rho
-            );
-            get_functions(
-                fn_choice,
-                include_iv,
-                num_u,
-                asset,
-                rate,
-                maturity,
-                quantile,
-                x_max_density,
-                &constraints::extend_strikes(
-                    strikes,
-                    asset, 
-                    x_max_options
-                ),
-                &inst_cf
-            )
-        },
-        constraints::HESTON=>{
-            constraints::check_cf_parameters(
-                &cf_parameters, 
-                &constraints::get_heston_constraints()
-            )?;
+                //parameters.extend_strikes(x_max_options);
 
-            let sigma=cf_parameters["sigma"];
-            let v0=cf_parameters["v0"];
-            let speed=cf_parameters["speed"];
-            let eta_v=cf_parameters["eta_v"];
-            let rho=cf_parameters["rho"];
+                //let strikes=Vec::from(parameters.strikes);
+                let inst_cf=cf_functions::merton_time_change_cf(
+                    maturity, rate, lambda, mu_l, sig_l, sigma, v0,
+                    speed, eta_v, rho
+                );
+                get_functions(
+                    fn_choice,
+                    include_iv,
+                    num_u,
+                    asset,
+                    rate,
+                    maturity,
+                    quantile,
+                    x_max_density,
+                    &constraints::extend_strikes(
+                        strikes,
+                        asset, 
+                        x_max_options
+                    ),
+                    &inst_cf
+                )
+            },
+            constraints::HESTON=>{
+                constraints::check_cf_parameters(
+                    &cf_parameters, 
+                    &constraints::get_heston_constraints()
+                )?;
 
-            let x_max_density=sigma*density_scale;
-            let x_max_options=x_max_density*option_scale_over_density;
-            //parameters.extend_strikes(x_max_options);
+                let sigma=cf_parameters["sigma"];
+                let v0=cf_parameters["v0"];
+                let speed=cf_parameters["speed"];
+                let eta_v=cf_parameters["eta_v"];
+                let rho=cf_parameters["rho"];
 
-            //let strikes=Vec::from(parameters.strikes);
-            let inst_cf=cf_functions::heston_cf(
-                maturity, rate, sigma, v0,
-                speed, eta_v, rho
-            );
-            get_functions(
-                fn_choice,
-                include_iv,
-                num_u,
-                asset,
-                rate,
-                maturity,
-                quantile,
-                x_max_density,
-                &constraints::extend_strikes(
-                    strikes,
-                    asset, 
-                    x_max_options
-                ),
-                &inst_cf
-            )
-        },
-        _ => constraints::throw_no_existing("No CF function chosen!")
-    }?;
-    Ok(())
+                let x_max_density=sigma*density_scale;
+                let x_max_options=x_max_density*option_scale_over_density;
+                //parameters.extend_strikes(x_max_options);
+
+                //let strikes=Vec::from(parameters.strikes);
+                let inst_cf=cf_functions::heston_cf(
+                    maturity, rate, sigma, v0,
+                    speed, eta_v, rho
+                );
+                get_functions(
+                    fn_choice,
+                    include_iv,
+                    num_u,
+                    asset,
+                    rate,
+                    maturity,
+                    quantile,
+                    x_max_density,
+                    &constraints::extend_strikes(
+                        strikes,
+                        asset, 
+                        x_max_options
+                    ),
+                    &inst_cf
+                )
+            },
+            _ => constraints::throw_no_existing("No CF function chosen!")
+        }?;
+        let res = lambda::gateway::response() // Create a response
+            .status(200) // Set HTTP status code as 200 (Ok)
+            .body(lambda::gateway::Body::from("hello world"))?; 
+        Ok(res)
+    })
 }
 
 
