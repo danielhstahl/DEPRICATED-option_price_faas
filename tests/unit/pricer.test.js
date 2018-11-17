@@ -31,6 +31,7 @@ it('correctly calls calculator handlers', (done)=>{
     return handler.calculator(event, {}, (_err, val)=>{
         const parsedVal=JSON.parse(val.body)
         expect(Array.isArray(parsedVal)).toEqual(true)
+        expect(parsedVal[0].iv).toEqual(undefined)
         done()
     })
 })
@@ -62,6 +63,7 @@ it('correctly calls calculator with iv', (done)=>{
     return handler.calculator(event, {}, (_err, val)=>{
         const parsedVal=JSON.parse(val.body)
         expect(Array.isArray(parsedVal)).toEqual(true)
+        expect(parsedVal[0].iv).toBeDefined()
         done()
     })
 })
@@ -94,6 +96,7 @@ it('correctly calls calculator with cgmy', (done)=>{
     return handler.calculator(event, {}, (_err, val)=>{
         const parsedVal=JSON.parse(val.body)
         expect(Array.isArray(parsedVal)).toEqual(true)
+        expect(parsedVal[0].iv).toBeDefined()
         done()
     })
 })

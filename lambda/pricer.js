@@ -9,7 +9,7 @@ module.exports.calculator=(event, _context, callback)=>{
     const function_choice=calculatorKeys[key]
     const cf_choice=calculatorKeys[model]
     const {includeImpliedVolatility:iv}=(event.queryStringParameters||{})
-    let includeIV=iv===true?1:0
+    const includeIV=JSON.parse(iv||false)===true?1:0
     genericSpawn('pricer', [
         function_choice, includeIV, 
         cf_choice, event.body
