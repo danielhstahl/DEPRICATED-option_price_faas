@@ -9,8 +9,8 @@ extern crate cf_dist_utils;
 extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
+extern crate utils;
 
-extern crate constraints;
 extern crate aws_lambda as lambda;
 #[cfg(test)]
 extern crate rand;
@@ -20,338 +20,14 @@ use rand::{SeedableRng, StdRng};
 use rand::distributions::Uniform;
 #[cfg(test)]
 use rand::distributions::{Distribution};
+use utils::constraints;
+use utils::maps;
 
-
-use fang_oost_option::option_pricing;
-use std::env;
-use std::io;
-use rayon::prelude::*;
-use num_complex::Complex;
-
-
-const PUT_PRICE:i32=0;
-const CALL_PRICE:i32=1;
-
-const PUT_DELTA:i32=2;
-const CALL_DELTA:i32=3;
-
-const PUT_GAMMA:i32=4;
-const CALL_GAMMA:i32=5;
-
-const PUT_THETA:i32=6;
-const CALL_THETA:i32=7;
-
-const DENSITY:i32=8;
-const RISK_MEASURES:i32=9;
-
-#[derive(Serialize, Deserialize)]
-struct GraphElementIV {
-    at_point:f64,
-    value:f64,
-    iv:f64
-}
-#[derive(Serialize, Deserialize)]
-struct GraphElement {
-    at_point:f64,
-    value:f64
-}
-#[derive(Serialize, Deserialize)]
-struct RiskMeasures {
-    value_at_risk:f64,
-    expected_shortfall:f64
-}
-
-fn print_risk_measures(
-    risk_measure:(f64, f64)
-) {
-    let (expected_shortfall, value_at_risk)=risk_measure;
-    let json_value=json!(
-        RiskMeasures {
-            value_at_risk,
-            expected_shortfall
-        }
-    );
-    println!("{}", serde_json::to_string_pretty(&json_value).unwrap())
-}
-
-fn print_density(
-    x_values:&[f64],
-    values:&[f64]
-) { //void, prints to stdout
-    let json_value=json!(
-        x_values.iter().zip(values.iter()).map(|(x_val, val)|{
-            GraphElement {
-                at_point:*x_val,
-                value:*val
-            }
-        }).collect::<Vec<_>>()
-    );
-    println!("{}", serde_json::to_string_pretty(&json_value).unwrap())
-}
-fn print_greeks(
-    x_values:&[f64],
-    values:&[f64]
-) { //void, prints to stdout
-    let x_val_crit=x_values.len()-1;
-    let json_value=json!(
-        x_values.iter().zip(values.iter())
-            .enumerate().filter(|(index, _)|index>&0&&index<&x_val_crit)
-            .map(|(_, (x_val, val))|{
-                GraphElement {
-                    at_point:*x_val,
-                    value:*val
-                }
-            }).collect::<Vec<_>>()
-    );
-    println!("{}", serde_json::to_string_pretty(&json_value).unwrap())
-}
-
-fn print_generic_price_and_iv(
-    strikes:&[f64],
-    values:&[f64],
-    asset:f64,
-    rate:f64,
-    maturity:f64,
-    iv_fn:&Fn(f64, f64, f64, f64, f64)->f64,
-) { //void, prints to stdout
-    let x_val_crit=values.len()-1;
-    let json_prices=json!(
-        strikes.iter().zip(values.iter())
-            .enumerate().filter(|(index, _)|index>&0&&index<&x_val_crit)
-            .map(|(_, (strike, price))|{
-                let iv=iv_fn(*price, asset, *strike, rate, maturity);
-                GraphElementIV {
-                    at_point:*strike,
-                    value:*price,
-                    iv
-                }
-            }).collect::<Vec<_>>()
-    );
-    println!("{}", serde_json::to_string_pretty(&json_prices).unwrap())
-}
-fn print_call_prices(
-    strikes:&[f64],
-    values:&[f64],
-    asset:f64,
-    rate:f64,
-    maturity:f64
-) { //void, prints to stdout
-    print_generic_price_and_iv(
-        strikes,
-        values,
-        asset,
-        rate,
-        maturity,
-        &black_scholes::call_iv
-    )
-}
-fn print_put_prices(
-    strikes:&[f64],
-    values:&[f64],
-    asset:f64,
-    rate:f64,
-    maturity:f64
-) { //void, prints to stdout
-    print_generic_price_and_iv(
-        strikes,
-        values,
-        asset,
-        rate,
-        maturity,
-        &black_scholes::put_iv
-    )
-}
-
-fn adjust_density<T>(
-    num_u:usize,
-    x_max:f64,
-    cf:T    
-) 
-    where T:Fn(&Complex<f64>)->Complex<f64>+
-    std::marker::Sync+std::marker::Send
-{
-    let num_x=128;
-    let x_min=-x_max;
-    let x_domain=fang_oost::get_x_domain(
-        num_x, x_min, x_max
-    ).collect::<Vec<_>>();
-    let discrete_cf=fang_oost::get_discrete_cf(
-        num_u, x_min, x_max, &cf
-    );
-    let option_range:Vec<f64>=fang_oost::get_density(
-        x_min, x_max, 
-        fang_oost::get_x_domain(
-            num_x, x_min, x_max
-        ), 
-        &discrete_cf
-    ).collect();
-    print_density(&x_domain, &option_range)
-}
-
-const MAX_SIMS:usize=100;
-const PRECISION:f64=0.0000001;
-
-fn get_functions(
-    fn_choice:i32,
-    include_iv:bool,
-    num_u:usize,
-    asset:f64,
-    rate:f64,
-    maturity:f64,
-    quantile:f64,
-    x_max_density:f64,
-    strikes:&[f64],
-    inst_cf:&(Fn(&Complex<f64>)->Complex<f64>+std::marker::Sync)
-)->Result<(), io::Error>{
-    match fn_choice {
-        CALL_PRICE => if include_iv {
-            print_call_prices(
-                &strikes,
-                &option_pricing::fang_oost_call_price(
-                    num_u, asset, 
-                    &strikes, rate, 
-                    maturity, &inst_cf
-                ),
-                asset, rate, maturity
-            );
-            Ok(())
-        } else {
-            print_greeks(
-                &strikes,
-                &option_pricing::fang_oost_call_price(
-                    num_u, asset, 
-                    &strikes, rate, 
-                    maturity, &inst_cf
-                )
-            );
-            Ok(())
-        },
-        PUT_PRICE => if include_iv {
-            print_put_prices(
-                &strikes,
-                &option_pricing::fang_oost_put_price(
-                    num_u, asset, 
-                    &strikes, rate, 
-                    maturity, &inst_cf
-                ),
-                asset, rate, maturity
-            );
-            Ok(())
-        } else {
-            print_greeks(
-                &strikes,
-                &option_pricing::fang_oost_put_price(
-                    num_u, asset, 
-                    &strikes, rate, 
-                    maturity, &inst_cf
-                )
-            );
-            Ok(())
-        },
-        CALL_DELTA => {
-            print_greeks(
-                &strikes,
-                &option_pricing::fang_oost_call_delta(
-                    num_u, asset, 
-                    &strikes, rate, 
-                    maturity, &inst_cf
-                )
-            );
-            Ok(())
-        },
-        PUT_DELTA => {
-            print_greeks(
-                &strikes,
-                &option_pricing::fang_oost_put_delta(
-                    num_u, asset, 
-                    &strikes, rate, 
-                    maturity, &inst_cf
-                )
-            );
-            Ok(())
-        },
-        CALL_GAMMA => {
-            print_greeks(
-                &strikes,
-                &option_pricing::fang_oost_call_gamma(
-                    num_u, asset, 
-                    &strikes, rate, 
-                    maturity, &inst_cf
-                )
-            );
-            Ok(())
-        },
-        PUT_GAMMA => {
-            print_greeks(
-                &strikes,
-                &option_pricing::fang_oost_put_gamma(
-                    num_u, asset, 
-                    &strikes, rate, 
-                    maturity, &inst_cf
-                )
-            );
-            Ok(())
-        },
-        CALL_THETA => {
-            print_greeks(
-                &strikes,
-                &option_pricing::fang_oost_call_theta(
-                    num_u, asset, 
-                    &strikes, rate, 
-                    maturity, &inst_cf
-                )
-            );
-            Ok(())
-        },
-        PUT_THETA => {
-            print_greeks(
-                &strikes,
-                &option_pricing::fang_oost_put_theta(
-                    num_u, asset, 
-                    &strikes, rate, 
-                    maturity, &inst_cf
-                )
-            );
-            Ok(())
-        },
-        DENSITY => {
-            adjust_density(
-                num_u, x_max_density, &inst_cf
-            );
-            Ok(())
-        },
-        RISK_MEASURES => {
-            print_risk_measures(
-                cf_dist_utils::get_expected_shortfall_and_value_at_risk(
-                    quantile, num_u, -x_max_density, 
-                    x_max_density, MAX_SIMS, PRECISION, &inst_cf
-                )
-            );
-            Ok(())
-        },
-        _ => constraints::throw_no_existing("No function selected!")
-    }
-}
-
+const DENSITY_SCALE:f64=5.0;
+const OPTION_SCALE_OVER_DENSITY:f64=2.0;
 fn main() {
-    /*let args: Vec<String> = env::args().collect();
-    let fn_choice:i32=args[1].parse().unwrap();
-    let iv_choice:i32=args[2].parse().unwrap();
-    let cf_choice:i32=args[3].parse().unwrap();
-
-    let include_iv:bool=if iv_choice==1 {true} else {false};*/
-
-
     lambda::gateway::start(|req| {
-        let fn_choice:i32=0;
-        let include_iv:bool=false;
-        let cf_choice:i32=2;
-
-        println!("{}", req.uri().path());
-        //let query=req.uri().query();
-        //println!("{}", query);
         let body=req.body().as_str()?;
-        println!("{}", body);
         let parameters:constraints::OptionParameters=
             serde_json::from_str(body)?;
 
@@ -359,10 +35,7 @@ fn main() {
             &parameters, 
             &constraints::get_constraints()
         )?;
-        let density_scale=5.0;
-        let option_scale_over_density=2.0;
-        
-        
+
         let constraints::OptionParameters {
             maturity,
             rate,
@@ -373,139 +46,38 @@ fn main() {
             cf_parameters,
             ..
         }=parameters; //destructure
-        
+
+        let (fn_choice, cf_choice)=maps::get_fn_cf_indicators(
+            req.uri().path()
+        )?;
+
+        let query=match req.uri().query(){
+            Some(query)=>query,
+            None=>""
+        };
+
+        let include_iv=maps::get_iv_choice(query);
+
         let num_u=(2 as usize).pow(num_u_base as u32);
-        match cf_choice {
-            constraints::CGMY=>{
-                constraints::check_cf_parameters(
-                    &cf_parameters, 
-                    &constraints::get_cgmy_constraints()
-                )?;
-                let c=cf_parameters["c"]; //guaranteed to exist from the check
-                let g=cf_parameters["g"];
-                let m=cf_parameters["m"];
-                let y=cf_parameters["y"];
-                let sigma=cf_parameters["sigma"];
-                let v0=cf_parameters["v0"];
-                let speed=cf_parameters["speed"];
-                let eta_v=cf_parameters["eta_v"];
-                let rho=cf_parameters["rho"];
-
-                let x_max_density=cf_functions::cgmy_diffusion_vol(
-                    sigma, c, g, m, y, maturity
-                )*density_scale;
-                let x_max_options=x_max_density*option_scale_over_density;
-                let inst_cf=cf_functions::cgmy_time_change_cf(
-                    maturity, rate, c, g, m, y, sigma, v0,
-                    speed, eta_v, rho
-                );
-                get_functions(
-                    fn_choice,
-                    include_iv,
-                    num_u,
-                    asset,
-                    rate,
-                    maturity,
-                    quantile,
-                    x_max_density,
-                    &constraints::extend_strikes(
-                        strikes,
-                        asset, 
-                        x_max_options
-                    ),
-                    &inst_cf
-                )
-            },
-            constraints::MERTON=>{
-                constraints::check_cf_parameters(
-                    &cf_parameters, 
-                    &constraints::get_merton_constraints()
-                )?;
-                let lambda=cf_parameters["lambda"];
-                let mu_l=cf_parameters["mu_l"];
-                let sig_l=cf_parameters["sig_l"];
-                let sigma=cf_parameters["sigma"];
-                let v0=cf_parameters["v0"];
-                let speed=cf_parameters["speed"];
-                let eta_v=cf_parameters["eta_v"];
-                let rho=cf_parameters["rho"];
-                let x_max_density=cf_functions::jump_diffusion_vol(
-                    sigma,
-                    lambda,
-                    mu_l,
-                    sig_l,
-                    maturity
-                )*density_scale;
-
-                let x_max_options=x_max_density*option_scale_over_density;
-
-                //parameters.extend_strikes(x_max_options);
-
-                //let strikes=Vec::from(parameters.strikes);
-                let inst_cf=cf_functions::merton_time_change_cf(
-                    maturity, rate, lambda, mu_l, sig_l, sigma, v0,
-                    speed, eta_v, rho
-                );
-                get_functions(
-                    fn_choice,
-                    include_iv,
-                    num_u,
-                    asset,
-                    rate,
-                    maturity,
-                    quantile,
-                    x_max_density,
-                    &constraints::extend_strikes(
-                        strikes,
-                        asset, 
-                        x_max_options
-                    ),
-                    &inst_cf
-                )
-            },
-            constraints::HESTON=>{
-                constraints::check_cf_parameters(
-                    &cf_parameters, 
-                    &constraints::get_heston_constraints()
-                )?;
-
-                let sigma=cf_parameters["sigma"];
-                let v0=cf_parameters["v0"];
-                let speed=cf_parameters["speed"];
-                let eta_v=cf_parameters["eta_v"];
-                let rho=cf_parameters["rho"];
-
-                let x_max_density=sigma*density_scale;
-                let x_max_options=x_max_density*option_scale_over_density;
-                //parameters.extend_strikes(x_max_options);
-
-                //let strikes=Vec::from(parameters.strikes);
-                let inst_cf=cf_functions::heston_cf(
-                    maturity, rate, sigma, v0,
-                    speed, eta_v, rho
-                );
-                get_functions(
-                    fn_choice,
-                    include_iv,
-                    num_u,
-                    asset,
-                    rate,
-                    maturity,
-                    quantile,
-                    x_max_density,
-                    &constraints::extend_strikes(
-                        strikes,
-                        asset, 
-                        x_max_options
-                    ),
-                    &inst_cf
-                )
-            },
-            _ => constraints::throw_no_existing("No CF function chosen!")
-        }?;
+        
+        let result=maps::get_results_as_json(
+            cf_choice,
+            fn_choice,
+            include_iv,
+            &cf_parameters,
+            DENSITY_SCALE,
+            OPTION_SCALE_OVER_DENSITY,
+            num_u,
+            asset,
+            maturity,
+            rate, 
+            quantile,
+            strikes
+        )?;
+        
         let res = lambda::gateway::response() // Create a response
             .status(200) // Set HTTP status code as 200 (Ok)
-            .body(lambda::gateway::Body::from("hello world"))?; 
+            .body(lambda::gateway::Body::from(result))?; 
         Ok(res)
     })
 }
