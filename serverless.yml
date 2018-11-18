@@ -32,7 +32,7 @@ custom:
 
 package:
   exclude:
-    - functions/**
+    - src
     - node_modules
     - tests/**
     - tests
@@ -40,17 +40,15 @@ package:
     - package-lock.json
     - package.json
     - README.md
-    - main_site/**
     - serverless.yml
     - .travis.yml
     - docs/**
   include:
-   - functions/target/x86_64-unknown-linux-musl/release/output_constraints
-   - functions/target/x86_64-unknown-linux-musl/release/pricer
-   - lambda/**
+   - target/x86_64-unknown-linux-musl/release/output_constraints
+   - target/x86_64-unknown-linux-musl/release/pricer
 functions:
   calculator:
-    handler: lambda/pricer.calculator
+    handler: target/x86_64-unknown-linux-musl/release/pricer
     events:
       - http:
           path: v1/{model}/calculator/{optionType}/{sensitivity}
@@ -67,7 +65,7 @@ functions:
                 includeImpliedVolatility: false
 
   density:
-    handler: lambda/pricer.density
+    handler: target/x86_64-unknown-linux-musl/release/pricer
     events:
       - http:
           path: v1/{model}/density
@@ -80,7 +78,7 @@ functions:
                 model: true
 
   riskmetric:
-    handler: lambda/pricer.riskmetric
+    handler: target/x86_64-unknown-linux-musl/release/pricer
     events:
       - http:
           path: v1/{model}/riskmetric
@@ -93,7 +91,7 @@ functions:
                 model: true
           
   constraints:
-    handler: lambda/pricer.constraints
+    handler: target/x86_64-unknown-linux-musl/release/output_constraints
     events:
       - http:
           path: v1/{model}/parameters/parameter_ranges
