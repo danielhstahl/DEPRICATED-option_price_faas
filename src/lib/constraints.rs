@@ -1,19 +1,11 @@
 //Todo: consider writing a macro to iterate over structs
 //structs will allow for static typing and possibly speed
 //optimizations vs hashmaps
-//extern crate cuckoo;
-extern crate serde_json;
-#[macro_use]
-extern crate serde_derive;
 
 use std::collections::VecDeque;
 use std::collections::HashMap;
 use std::io;
 use std::io::{Error, ErrorKind};
-
-pub const CGMY:i32=0;
-pub const MERTON:i32=1;
-pub const HESTON:i32=2;
 
 #[derive(Serialize, Deserialize)] 
 pub struct ConstraintsSchema {

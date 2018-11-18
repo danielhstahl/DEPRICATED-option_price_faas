@@ -19,10 +19,13 @@ rayon = "1.0.1"
 black_scholes = "0.3.0"
 cf_functions = "0.10"
 num-complex = "0.2"
-#cuckoo = "0.7"
+aws_lambda = { git = "https://github.com/srijs/rust-aws-lambda" }
+#constraints = { path = "src/lib/constraints" }
+#maps = { path = "src/lib/maps" }
 
 [dev-dependencies]
 rand = "0.5"
+approx = "0.2.0"
 
 [badges]
 travis-ci = { repository = "phillyfan1138/option_price_faas" }
@@ -36,5 +39,6 @@ name = "pricer"
 path = "src/bin/pricer.rs"
 
 [lib]
-name = "constraints"
-path = "src/lib/constraints.rs"
+name = "utils"
+path = "src/lib/lib.rs"
+

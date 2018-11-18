@@ -18,3 +18,11 @@ These are a set of lambda functions for pricing options when assets follow an ex
 
 ### More documentation/design evidence
 Additional documentation is available at the [fang_oost_charts](https://github.com/phillyfan1138/fang_oost_cal_charts).
+
+### Migrate to pure rust
+
+`cd functions`
+
+`cargo build --target x86_64-unknown-linux-musl --release`
+
+`cat parameter1.json | sudo docker run --rm -v "$PWD":/var/task -i -e DOCKER_LAMBDA_USE_STDIN=1 lambci/lambda:go1.x ./target/x86_64-unknown-linux-musl/release/pricer`

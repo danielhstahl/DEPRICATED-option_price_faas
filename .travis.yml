@@ -5,6 +5,9 @@ rust:
 - beta
 - nightly
 
+services:
+  - docker
+  
 before_install:
 - wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
 - nvm install 8
@@ -17,21 +20,18 @@ before_cache: |
   fi
 
 script:
-  - cd functions
   - cargo clean
   - cargo build --release --target=x86_64-unknown-linux-musl
   - cargo test
-  - cd ..
+  - sudo docker pull lambci/lambda:go1.x  #this is to download the docker image if it doesnt exist yet
   - npm install
   - npm test
 
 after_success: |
   if [ "$TRAVIS_RUST_VERSION" = "nightly" ]; then
     bash <(curl -s https://codecov.io/bash) 
-    cd functions
     cargo tarpaulin --out Xml
     bash <(curl -s https://codecov.io/bash)
-    cd ..
   fi
 
 before_deploy: 
@@ -67,6 +67,8 @@ addons:
     - zlib1g-dev #codecov
     - binutils-dev
     - libiberty-dev
+    - musl-tools
+    - musl-dev
 
 deploy:
   - provider: releases
