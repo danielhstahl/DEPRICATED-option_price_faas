@@ -33,6 +33,7 @@ custom:
 package:
   exclude:
     - src
+    - target
     - node_modules
     - tests/**
     - tests
