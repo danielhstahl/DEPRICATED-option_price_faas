@@ -5,9 +5,7 @@ extern crate black_scholes;
 extern crate cf_functions;
 extern crate num_complex;
 extern crate cf_dist_utils;
-#[macro_use]
 extern crate serde_json;
-#[macro_use]
 extern crate serde_derive;
 extern crate utils;
 
