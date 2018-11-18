@@ -4,3 +4,6 @@ extern crate serde_json;
 extern crate serde_derive;
 pub mod constraints;
 pub mod maps;
+#[macro_use]
+#[cfg(test)]
+extern crate approx;

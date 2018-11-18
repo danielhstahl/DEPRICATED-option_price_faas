@@ -34,8 +34,5 @@
     "js-yaml": "^3.12.0",
     "json-refs": "^3.0.10",
     "serverless-domain-manager": "^2.6.5"
-  },
-  "directories": {
-    "test": "tests"
   }
 }
