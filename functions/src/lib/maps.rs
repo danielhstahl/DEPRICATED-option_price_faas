@@ -333,7 +333,9 @@ fn put_iv_as_json(
         )
     })
 }
-
+const MAX_SIMS:usize=100;
+const PRECISION:f64=0.0000001;
+const NUM_X:usize=128;
 fn adjust_density<T>(
     num_u:usize,
     x_max:f64,
@@ -342,10 +344,9 @@ fn adjust_density<T>(
     where T:Fn(&Complex<f64>)->Complex<f64>+
     std::marker::Sync+std::marker::Send
 {
-    let num_x=128;
     let x_min=-x_max;
     let x_domain=fang_oost::get_x_domain(
-        num_x, x_min, x_max
+        NUM_X, x_min, x_max
     ).collect::<Vec<_>>();
     let discrete_cf=fang_oost::get_discrete_cf(
         num_u, x_min, x_max, &cf
@@ -353,14 +354,13 @@ fn adjust_density<T>(
     let option_range:Vec<f64>=fang_oost::get_density(
         x_min, x_max, 
         fang_oost::get_x_domain(
-            num_x, x_min, x_max
+            NUM_X, x_min, x_max
         ), 
         &discrete_cf
     ).collect();
     density_as_json(&x_domain, &option_range)
 }
-const MAX_SIMS:usize=100;
-const PRECISION:f64=0.0000001;
+
 fn get_results(
     fn_choice:i32,
     include_iv:bool,
