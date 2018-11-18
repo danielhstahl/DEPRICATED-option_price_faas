@@ -4,16 +4,7 @@ const {exec} = require('child_process')
 const spawnCommand=(jsonFile, callback)=>{
     exec('cat '+jsonFile+' | '+command, callback)
 }
-/*
-spawnCommand('./tests/parameter1.json', (err, result)=>{
-    if(err){
-        throw(err)
-    }
-    const res=JSON.parse(result)
-    console.log(JSON.parse(res.body))
-    //expect(Array.isArray(JSON.parse(result)))
-    //done()
-})*/
+
 describe('option prices', ()=>{
     it('returns array of value and points', done=>{
         spawnCommand('./tests/parameter1.json', (err, result)=>{

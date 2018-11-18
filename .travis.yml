@@ -5,7 +5,13 @@ rust:
 - beta
 - nightly
 
+services:
+  - docker
+  
 before_install:
+- wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
+- nvm install 8
+- node --version
 - rustup target add x86_64-unknown-linux-musl
 
 before_cache: |
@@ -14,19 +20,18 @@ before_cache: |
   fi
 
 script:
-  - cd functions
   - cargo clean
   - cargo build --release --target=x86_64-unknown-linux-musl
   - cargo test
   - cd ..
+  - npm install
+  - npm test
 
 after_success: |
   if [ "$TRAVIS_RUST_VERSION" = "nightly" ]; then
     bash <(curl -s https://codecov.io/bash) 
-    cd functions
     cargo tarpaulin --out Xml
     bash <(curl -s https://codecov.io/bash)
-    cd ..
   fi
 
 before_deploy: 
