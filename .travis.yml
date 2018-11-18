@@ -23,7 +23,7 @@ script:
   - cargo clean
   - cargo build --release --target=x86_64-unknown-linux-musl
   - cargo test
-  - sudo docker run --rm -v "$PWD":/var/task -i -e DOCKER_LAMBDA_USE_STDIN=1 lambci/lambda:go1.x ./target/x86_64-unknown-linux-musl/release/pricer #this is to download the docker image if it doesnt exist yet
+  - sudo docker pull lambci/lambda:go1.x  #this is to download the docker image if it doesnt exist yet
   - npm install
   - npm test
 
