@@ -4,6 +4,7 @@ const {exec} = require('child_process')
 const spawnCommand=(jsonFile, callback)=>{
     exec('cat '+jsonFile+' | '+command, callback)
 }
+jest.setTimeout(20000)
 it('returns constraints for cgmy', done=>{
     spawnCommand('./tests/parameter5.json', (err, result)=>{
         if(err){

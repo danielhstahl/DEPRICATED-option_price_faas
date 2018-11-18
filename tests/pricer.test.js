@@ -4,6 +4,7 @@ const {exec} = require('child_process')
 const spawnCommand=(jsonFile, callback)=>{
     exec('cat '+jsonFile+' | '+command, callback)
 }
+jest.setTimeout(20000)
 
 describe('option prices', ()=>{
     it('returns array of value and points', done=>{
