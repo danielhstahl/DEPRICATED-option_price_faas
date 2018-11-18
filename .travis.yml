@@ -67,6 +67,8 @@ addons:
     - zlib1g-dev #codecov
     - binutils-dev
     - libiberty-dev
+    - musl-tools
+    - musl-dev
 
 deploy:
   - provider: releases
