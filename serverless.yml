@@ -2,7 +2,7 @@ service: option-price-faas
 
 provider:
   name: aws
-  runtime: nodejs8.10
+  runtime: go1.x
   stage: prd
   #usagePlan: # Optional usage plan configuration
   #  quota:
