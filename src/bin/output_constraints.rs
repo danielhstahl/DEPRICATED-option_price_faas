@@ -7,13 +7,13 @@ use utils::constraints;
 fn main() {
     lambda::gateway::start(|req| {
         let results=match req.uri().path(){
-            "/v1/heston/parameters/parameter_ranges"=>json!(
+            "/realoptions/v1/heston/parameters/parameter_ranges"=>json!(
                 constraints::get_heston_constraints()
             ).to_string(),
-            "/v1/cgmy/parameters/parameter_ranges"=>json!(
+            "/realoptions/v1/cgmy/parameters/parameter_ranges"=>json!(
                 constraints::get_cgmy_constraints()
             ).to_string(),
-            "/v1/merton/parameters/parameter_ranges"=>json!(
+            "/realoptions/v1/merton/parameters/parameter_ranges"=>json!(
                 constraints::get_merton_constraints()
             ).to_string(),
             _=>json!(
