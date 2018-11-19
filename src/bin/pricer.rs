@@ -68,6 +68,8 @@ fn main() {
         
         let res = lambda::gateway::response() // Create a response
             .status(200) // Set HTTP status code as 200 (Ok)
+            .header("Access-Control-Allow-Origin", "*")
+            .header("Access-Control-Allow-Credentials", "true")
             .body(lambda::gateway::Body::from(result))?; 
         Ok(res)
     })
