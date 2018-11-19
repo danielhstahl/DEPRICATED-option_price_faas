@@ -51,7 +51,7 @@ pub const RISK_MEASURES:i32=9;
 /// use utils::maps;
 /// # fn main() {
 /// let (sensitivity, model) = maps::get_fn_cf_indicators(
-///     "/v1/cgmy/calculator/put/price"
+///     "/realoptions/v1/cgmy/calculator/put/price"
 /// ).unwrap();
 /// # }
 /// ```
@@ -532,7 +532,7 @@ mod tests {
     use maps::*;
     #[test]
     fn get_fn_cf_indicators_gets_match(){
-        let (sensitivity, model)=get_fn_cf_indicators("/v1/heston/calculator/put/delta").unwrap();
+        let (sensitivity, model)=get_fn_cf_indicators("/realoptions/v1/heston/calculator/put/delta").unwrap();
         assert_eq!(model, HESTON);
         assert_eq!(sensitivity, PUT_DELTA);
     }
