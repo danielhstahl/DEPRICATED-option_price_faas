@@ -70,7 +70,7 @@ functions:
     handler: target/x86_64-unknown-linux-musl/release/pricer
     events:
       - http:
-          path: v1/{model}/{optionType}
+          path: v1/{model}/density/{optionType}
           method: post
           cors: true
           private: true
