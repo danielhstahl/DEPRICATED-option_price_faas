@@ -378,7 +378,7 @@ paths:
                 - strikes
                 - quantile
               additionalProperties: false
-  /v1/cgmy/density:
+  /v1/cgmy/density/density:
     post:
       summary: Calculator for computing probability densities for CGMY process
       description: Computes probability density for an extended CGMY process
@@ -411,7 +411,7 @@ paths:
         content:
           application/json:
             schema: *ref_3
-  /v1/heston/density:
+  /v1/heston/density/density:
     post:
       summary: Calculator for computing probability densities for Heston model
       description: Computes probability density for a Heston model
@@ -432,7 +432,7 @@ paths:
         content:
           application/json:
             schema: *ref_5
-  /v1/merton/density:
+  /v1/merton/density/density:
     post:
       summary: Calculator for computing probability densities for Merton model
       description: Computes probability density for a Merton model
@@ -453,7 +453,7 @@ paths:
         content:
           application/json:
             schema: *ref_6
-  /v1/cgmy/riskmetric:
+  /v1/cgmy/density/riskmetric:
     post:
       summary: Calculator for computing risk metrics for CGMY process
       description: Computes value at risk and expected shortfall for extended CGMY process
@@ -486,7 +486,7 @@ paths:
         content:
           application/json:
             schema: *ref_3
-  /v1/heston/riskmetric:
+  /v1/heston/density/riskmetric:
     post:
       summary: Calculator for computing risk metrics for Heston model
       description: Computes value at risk and expected shortfall for a Heston model
@@ -507,7 +507,7 @@ paths:
         content:
           application/json:
             schema: *ref_5
-  /v1/merton/riskmetric:
+  /v1/merton/density/riskmetric:
     post:
       summary: Calculator for computing risk metrics for Merton model
       description: >-
