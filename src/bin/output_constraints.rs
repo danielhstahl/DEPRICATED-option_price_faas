@@ -3,17 +3,26 @@ extern crate serde_json;
 extern crate utils;
 extern crate aws_lambda as lambda;
 use utils::constraints;
+use utils::maps;
 
 fn main() {
     lambda::gateway::start(|req| {
-        let results=match req.uri().path(){
-            "/realoptions/v1/heston/parameters/parameter_ranges"=>json!(
+        let path_parameters=req.extensions().get::<lambda::gateway::PathParameters>();
+        let default_model="".to_string();
+        let model=maps::get_from_path(
+            &path_parameters,
+            &default_model,
+            "model"
+        );
+
+        let results=match model.as_str(){
+            "heston"=>json!(
                 constraints::get_heston_constraints()
             ).to_string(),
-            "/realoptions/v1/cgmy/parameters/parameter_ranges"=>json!(
+            "cgmy"=>json!(
                 constraints::get_cgmy_constraints()
             ).to_string(),
-            "/realoptions/v1/merton/parameters/parameter_ranges"=>json!(
+            "merton"=>json!(
                 constraints::get_merton_constraints()
             ).to_string(),
             _=>json!(

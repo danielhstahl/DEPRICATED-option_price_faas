@@ -6,6 +6,7 @@ extern crate fang_oost_option;
 extern crate num_complex;
 extern crate cf_dist_utils;
 extern crate serde;
+extern crate aws_lambda as lambda;
 #[cfg(test)]
 extern crate rand;
 #[cfg(test)]
@@ -42,7 +43,39 @@ pub const CALL_THETA:i32=7;
 pub const DENSITY:i32=8;
 pub const RISK_MEASURES:i32=9;
 
-/// Gets indicators for which sensitivity and model
+pub fn get_from_path<'a>(
+    path_parameters:&'a Option<&lambda::gateway::PathParameters>,
+    default_value:&'a String,
+    parameter_key:&str,
+)->&'a String{
+    match path_parameters{
+        Some(lambda::gateway::PathParameters(v))=>{
+            match v.get(parameter_key){
+                Some(m)=>m,
+                None=>default_value
+            }
+        },
+        None=>default_value
+    }
+}
+pub fn get_from_query<'a>(
+    path_parameters:&'a Option<&lambda::gateway::QueryParameters>,
+    default_value:&'a String,
+    parameter_key:&str,
+)->&'a String{
+    match path_parameters{
+        Some(lambda::gateway::QueryParameters(v))=>{
+            match v.get(parameter_key){
+                Some(m)=>m,
+                None=>default_value
+            }
+        },
+        None=>default_value
+    }
+}
+
+
+/// Gets indicators for which model
 /// to retrieve
 /// # Examples
 /// 
@@ -50,47 +83,55 @@ pub const RISK_MEASURES:i32=9;
 /// extern crate utils;
 /// use utils::maps;
 /// # fn main() {
-/// let (sensitivity, model) = maps::get_fn_cf_indicators(
-///     "/realoptions/v1/cgmy/calculator/put/price"
+/// let model = maps::get_model_indicators(
+///     &"cgmy".to_string()
 /// ).unwrap();
 /// # }
 /// ```
-pub fn get_fn_cf_indicators(
-    path:&str
-)->Result<(i32, i32), io::Error>{
-    match path {
-        "/realoptions/v1/cgmy/calculator/put/price"=>Ok((PUT_PRICE, CGMY)),
-        "/realoptions/v1/cgmy/calculator/call/price"=>Ok((CALL_PRICE, CGMY)),
-        "/realoptions/v1/cgmy/calculator/put/delta"=>Ok((PUT_DELTA, CGMY)),
-        "/realoptions/v1/cgmy/calculator/call/delta"=>Ok((CALL_DELTA, CGMY)),
-        "/realoptions/v1/cgmy/calculator/put/gamma"=>Ok((PUT_GAMMA, CGMY)),
-        "/realoptions/v1/cgmy/calculator/call/gamma"=>Ok((CALL_GAMMA, CGMY)),
-        "/realoptions/v1/cgmy/calculator/put/theta"=>Ok((PUT_THETA, CGMY)),
-        "/realoptions/v1/cgmy/calculator/call/theta"=>Ok((CALL_THETA, CGMY)),
-        "/realoptions/v1/cgmy/riskmetric"=>Ok((RISK_MEASURES, CGMY)),
-        "/realoptions/v1/cgmy/density"=>Ok((DENSITY, CGMY)),
-        "/realoptions/v1/merton/calculator/put/price"=>Ok((PUT_PRICE, MERTON)),
-        "/realoptions/v1/merton/calculator/call/price"=>Ok((CALL_PRICE, MERTON)),
-        "/realoptions/v1/merton/calculator/put/delta"=>Ok((PUT_DELTA, MERTON)),
-        "/realoptions/v1/merton/calculator/call/delta"=>Ok((CALL_DELTA, MERTON)),
-        "/realoptions/v1/merton/calculator/put/gamma"=>Ok((PUT_GAMMA, MERTON)),
-        "/realoptions/v1/merton/calculator/call/gamma"=>Ok((CALL_GAMMA, MERTON)),
-        "/realoptions/v1/merton/calculator/put/theta"=>Ok((PUT_THETA, MERTON)),
-        "/realoptions/v1/merton/calculator/call/theta"=>Ok((CALL_THETA, MERTON)),
-        "/realoptions/v1/merton/riskmetric"=>Ok((RISK_MEASURES, MERTON)),
-        "/realoptions/v1/merton/density"=>Ok((DENSITY, MERTON)),
-        "/realoptions/v1/heston/calculator/put/price"=>Ok((PUT_PRICE, HESTON)),
-        "/realoptions/v1/heston/calculator/call/price"=>Ok((CALL_PRICE, HESTON)),
-        "/realoptions/v1/heston/calculator/put/delta"=>Ok((PUT_DELTA, HESTON)),
-        "/realoptions/v1/heston/calculator/call/delta"=>Ok((CALL_DELTA, HESTON)),
-        "/realoptions/v1/heston/calculator/put/gamma"=>Ok((PUT_GAMMA, HESTON)),
-        "/realoptions/v1/heston/calculator/call/gamma"=>Ok((CALL_GAMMA, HESTON)),
-        "/realoptions/v1/heston/calculator/put/theta"=>Ok((PUT_THETA, HESTON)),
-        "/realoptions/v1/heston/calculator/call/theta"=>Ok((CALL_THETA, HESTON)),
-        "/realoptions/v1/heston/riskmetric"=>Ok((RISK_MEASURES, HESTON)),
-        "/realoptions/v1/heston/density"=>Ok((DENSITY, HESTON)),
+pub fn get_model_indicators(
+    model:&String
+)->Result<i32, io::Error>{
+    match model.as_str() {
+        "cgmy"=>Ok(CGMY),
+        "merton"=>Ok(MERTON),
+        "heston"=>Ok(HESTON),
         _ => Err(
-            Error::new(ErrorKind::Other, format!("No matches for path {}!", path))
+            Error::new(ErrorKind::Other, format!("No matches for model {}!", model))
+        )
+    }
+}
+/// Gets indicators for which sensitivity
+/// to retrieve
+/// # Examples
+/// 
+/// ```
+/// extern crate utils;
+/// use utils::maps;
+/// # fn main() {
+/// let sensitivity = maps::get_fn_indicators(
+///     &"put".to_string(),
+///     &"price".to_string()
+/// ).unwrap();
+/// # }
+/// ```
+pub fn get_fn_indicators(
+    option_type:&String,
+    sensitivity:&String
+)->Result<i32, io::Error>{
+    let combine_types = format!("{}_{}", option_type, sensitivity);//.as_str();
+    match combine_types.as_str(){
+        "put_price"=>Ok(PUT_PRICE),
+        "call_price"=>Ok(CALL_PRICE),
+        "put_delta"=>Ok(PUT_DELTA),
+        "call_delta"=>Ok(CALL_DELTA),
+        "put_gamma"=>Ok(PUT_GAMMA),
+        "call_gamma"=>Ok(CALL_GAMMA),
+        "put_theta"=>Ok(PUT_THETA),
+        "call_theta"=>Ok(CALL_THETA),
+        "density_"=>Ok(DENSITY),
+        "riskmetric_"=>Ok(RISK_MEASURES),
+        _ => Err(
+            Error::new(ErrorKind::Other, format!("No matches for types {}!", combine_types))
         )
     }
 }
@@ -102,16 +143,16 @@ pub fn get_fn_cf_indicators(
 /// use utils::maps;
 /// # fn main() {
 /// let include_iv = maps::get_iv_choice(
-///     "includeImpliedVolatility=true"
+///     &"true".to_string()
 /// );
 /// assert!(include_iv);
 /// # }
 /// ```
 pub fn get_iv_choice(
-    query:&str
+    query:&String
 )->bool{
-    match query {
-        "includeImpliedVolatility=true"=>true,
+    match query.as_str() {
+        "true"=>true,
         _=>false
     }
 }
@@ -531,10 +572,97 @@ fn get_results(
 mod tests {
     use maps::*;
     #[test]
-    fn get_fn_cf_indicators_gets_match(){
-        let (sensitivity, model)=get_fn_cf_indicators("/realoptions/v1/heston/calculator/put/delta").unwrap();
-        assert_eq!(model, HESTON);
-        assert_eq!(sensitivity, PUT_DELTA);
+    fn get_from_path_gets_match(){
+        let mut hash_map=HashMap::new();
+        hash_map.insert("hello".to_string(), "world".to_string());
+        let path_parameters=lambda::gateway::PathParameters(hash_map);
+        let path_parameters_option=Some(&path_parameters);
+        let default_value="goodbye".to_string();
+        let value=get_from_path(
+            &path_parameters_option,
+            &default_value,
+            "hello"
+        );
+        assert_eq!(value, &"world".to_string());
+    }
+    #[test]
+    fn get_from_path_gets_default(){
+        let mut hash_map=HashMap::new();
+        hash_map.insert("hello".to_string(), "world".to_string());
+        let path_parameters=lambda::gateway::PathParameters(hash_map);
+        let path_parameters_option=Some(&path_parameters);
+        let default_value="goodbye".to_string();
+        let value=get_from_path(
+            &path_parameters_option,
+            &default_value,
+            "nothello"
+        );
+        assert_eq!(value, &"goodbye".to_string());
+    }
+    #[test]
+    fn get_from_path_gets_default_on_none(){
+        let path_parameters_option=None;
+        let default_value="goodbye".to_string();
+        let value=get_from_path(
+            &path_parameters_option,
+            &default_value,
+            "hello"
+        );
+        assert_eq!(value, &"goodbye".to_string());
+    }
+    #[test]
+    fn get_from_query_gets_match(){
+        let mut hash_map=HashMap::new();
+        hash_map.insert("hello".to_string(), "world".to_string());
+        let query_parameters=lambda::gateway::QueryParameters(hash_map);
+        let query_parameters_option=Some(&query_parameters);
+        let default_value="goodbye".to_string();
+        let value=get_from_query(
+            &query_parameters_option,
+            &default_value,
+            "hello"
+        );
+        assert_eq!(value, &"world".to_string());
+    }
+    #[test]
+    fn get_from_query_gets_default(){
+        let mut hash_map=HashMap::new();
+        hash_map.insert("hello".to_string(), "world".to_string());
+        let query_parameters=lambda::gateway::QueryParameters(hash_map);
+        let query_parameters_option=Some(&query_parameters);
+        let default_value="goodbye".to_string();
+        let value=get_from_query(
+            &query_parameters_option,
+            &default_value,
+            "nothello"
+        );
+        assert_eq!(value, &"goodbye".to_string());
+    }
+    #[test]
+    fn get_from_query_gets_default_on_none(){
+        let query_parameters_option=None;
+        let default_value="goodbye".to_string();
+        let value=get_from_query(
+            &query_parameters_option,
+            &default_value,
+            "hello"
+        );
+        assert_eq!(value, &"goodbye".to_string());
+    }
+    #[test]
+    fn get_model_indicators_gets_match(){
+        let model=get_model_indicators(
+            &"cgmy".to_string()
+        ).unwrap();
+        assert_eq!(model, CGMY);
+    }
+    #[test]
+    fn get_fn_indicators_gets_match(){
+        let model=get_fn_indicators(
+            &"put".to_string(),
+            &"price".to_string()
+        ).unwrap();
+        assert_eq!(model, PUT_PRICE);
     }
     fn get_rng_seed(seed:[u8; 32])->StdRng{
         SeedableRng::from_seed(seed) 
@@ -678,8 +806,17 @@ mod tests {
         );
     }
     #[test]
-    fn get_fn_cf_indicators_no_match(){
-        assert!(get_fn_cf_indicators("/something").is_err(), "there should be no match!");
+    fn get_fn_indicators_no_match(){
+        assert!(get_fn_indicators(
+            &"something".to_string(), 
+            &"somethingelse".to_string()
+        ).is_err(), "there should be no match!");
+    }
+    #[test]
+    fn get_model_indicators_no_match(){
+        assert!(get_model_indicators(
+            &"something".to_string()
+        ).is_err(), "there should be no match!");
     }
     #[test]
     fn test_cgmy_price_1(){

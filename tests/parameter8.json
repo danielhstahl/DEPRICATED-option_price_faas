@@ -1,3 +1,6 @@
 {
-    "path":"/realoptions/v1/market/parameters/parameter_ranges"
+    "path":"/realoptions/v1/market/parameters/parameter_ranges",
+    "pathParameters":{
+        "model":"market"
+    }
 }

@@ -1,4 +1,9 @@
 {
     "body":"{\"num_u\":8,\"rate\":0.1,\"maturity\":0.5,\"asset\":38,\"cf_parameters\":{\"sigma\":0.5,\"speed\":0.1,\"v0\":0.2,\"eta_v\":0.1,\"rho\":-0.5},\"strikes\":[100],\"quantile\":0.01}",
-    "path":"/realoptions/v1/heston/calculator/put/price"
+    "path":"/realoptions/v1/heston/calculator/put/price",
+    "pathParameters":{
+        "model":"heston",
+        "sensitivity":"price",
+        "optionType":"put"
+    }
 }

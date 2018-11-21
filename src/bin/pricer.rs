@@ -38,22 +38,42 @@ fn main() {
             ..
         }=parameters; //destructure
 
-        let (fn_choice, cf_choice)=maps::get_fn_cf_indicators(
-            req.uri().path()
-        )?;
+        let path_parameters=req.extensions().get::<lambda::gateway::PathParameters>();
+        let query_parameters=req.extensions().get::<lambda::gateway::QueryParameters>();
+        let default_value="".to_string();
+        let model=maps::get_from_path(
+            &path_parameters,
+            &default_value,
+            "model"
+        );
 
-        let query=match req.uri().query(){
-            Some(query)=>query,
-            None=>""
-        };
+        let sensitivity=maps::get_from_path(
+            &path_parameters,
+            &default_value,
+            "sensitivity"
+        );
+        let option_type=maps::get_from_path(
+            &path_parameters,
+            &default_value,
+            "optionType"
+        );
+
+        let model_indicator=maps::get_model_indicators(&model)?;
+        let fn_indicator=maps::get_fn_indicators(&option_type, &sensitivity)?;
+
+        let query=maps::get_from_query(
+            &query_parameters,
+            &default_value,
+            "includeImpliedVolatility"
+        );
 
         let include_iv=maps::get_iv_choice(query);
 
         let num_u=(2 as usize).pow(num_u_base as u32);
         
         let result=maps::get_results_as_json(
-            cf_choice,
-            fn_choice,
+            model_indicator,
+            fn_indicator,
             include_iv,
             &cf_parameters,
             DENSITY_SCALE,

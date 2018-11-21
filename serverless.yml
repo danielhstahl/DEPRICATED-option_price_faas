@@ -70,7 +70,7 @@ functions:
     handler: target/x86_64-unknown-linux-musl/release/pricer
     events:
       - http:
-          path: v1/{model}/density
+          path: v1/{model}/{optionType}
           method: post
           cors: true
           private: true
@@ -78,20 +78,8 @@ functions:
             parameters:
               paths:
                 model: true
+                optionType: true
 
-  riskmetric:
-    handler: target/x86_64-unknown-linux-musl/release/pricer
-    events:
-      - http:
-          path: v1/{model}/riskmetric
-          method: post
-          cors: true
-          private: true
-          request:
-            parameters:
-              paths:
-                model: true
-          
   constraints:
     handler: target/x86_64-unknown-linux-musl/release/output_constraints
     events:
