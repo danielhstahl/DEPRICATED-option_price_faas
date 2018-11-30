@@ -8,15 +8,14 @@ extern crate cf_dist_utils;
 extern crate serde_json;
 extern crate serde_derive;
 extern crate utils;
-extern crate aws_lambda_events;
 extern crate log;
 extern crate simple_logger;
 extern crate lambda_runtime as lambda;
-
-use aws_lambda_events::event::apigw;
+extern crate lambda_http;
 
 use serde_derive::{Serialize, Deserialize};
 use lambda::{lambda, Context, error::HandlerError};
+use lambda_http::{lambda, Request, Response};
 use std::error::Error;
 
 use utils::constraints;
@@ -31,10 +30,13 @@ fn main() -> Result<(), Box<dyn Error>> {
 }
 
 fn price_options(
-    event:apigw::ApiGatewayProxyRequest, 
+    event:Request, 
     ctx:Context
-)->Result<Vec<maps::GraphElement>, HandlerError>{
+)->Result<Response, HandlerError>{
+
     let body=event.body.ok_or(ctx.new_error("Requires body"))?;
+
+
     let parameters:constraints::OptionParameters=serde_json::from_str(&body)    
         .map_err(|e|ctx.new_error(&e.to_string()))?;
 
@@ -58,19 +60,20 @@ fn price_options(
 
 
     let default_value="".to_string();
+
     let model=maps::get_key_or_default(
-        &event.path_parameters,
+        &event.path_parameters(),
         &default_value,
         "model"
     );
 
     let sensitivity=maps::get_key_or_default(
-        &event.path_parameters,
+        &event.path_parameters(),
         &default_value,
         "sensitivity"
     );
     let option_type=maps::get_key_or_default(
-        &event.path_parameters,
+        &event.path_parameters(),
         &default_value,
         "optionType"
     );
@@ -81,7 +84,7 @@ fn price_options(
         .map_err(|e|ctx.new_error(&e.to_string()))?;
 
     let query=maps::get_key_or_default(
-        &event.query_string_parameters,
+        &event.query_string_parameters(),
         &default_value,
         "includeImpliedVolatility"
     );
@@ -90,7 +93,7 @@ fn price_options(
 
     let num_u=(2 as usize).pow(num_u_base as u32);
     
-    maps::get_option_results_as_json(
+    let results=maps::get_option_results_as_json(
         model_indicator,
         fn_indicator,
         include_iv,
@@ -101,5 +104,10 @@ fn price_options(
         maturity,
         rate, 
         strikes_unwrap
-    ).map_err(|e|ctx.new_error(&e.to_string()))
+    ).map_err(|e|ctx.new_error(&e.to_string()))?;
+    let res=Response::builder(200)
+        .header("Access-Control-Allow-Origin", "*")
+        .header("Access-Control-Allow-Credentials", "true")
+        .body(json!(results).to_string())?;
+    Ok(res)
 }

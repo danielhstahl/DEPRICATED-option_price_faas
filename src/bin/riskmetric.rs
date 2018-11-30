@@ -8,16 +8,15 @@ extern crate cf_dist_utils;
 extern crate serde_json;
 extern crate serde_derive;
 extern crate utils;
-extern crate aws_lambda_events;
 extern crate log;
 extern crate simple_logger;
 extern crate lambda_runtime as lambda;
-
-use aws_lambda_events::event::apigw;
+extern crate lambda_http;
 
 use serde_derive::{Serialize, Deserialize};
 use lambda::{lambda, Context, error::HandlerError};
 use std::error::Error;
+use lambda_http::{lambda, Request, Response};
 
 use utils::constraints;
 use utils::maps;
@@ -31,9 +30,9 @@ fn main() -> Result<(), Box<dyn Error>> {
 }
 
 fn risk_metric(
-    event:apigw::ApiGatewayProxyRequest, 
+    event:Request, 
     ctx:Context
-)->Result<maps::RiskMeasures, HandlerError>{
+)->Result<Response, HandlerError>{
     let body=event.body.ok_or(ctx.new_error("Requires body"))?;
     let parameters:constraints::OptionParameters=serde_json::from_str(&body)    
         .map_err(|e|ctx.new_error(&e.to_string()))?;
@@ -55,7 +54,7 @@ fn risk_metric(
 
     let default_value="".to_string();
     let model=maps::get_key_or_default(
-        &event.path_parameters,
+        &event.path_parameters(),
         &default_value,
         "model"
     );
@@ -65,7 +64,7 @@ fn risk_metric(
 
     let num_u=(2 as usize).pow(num_u_base as u32);
     
-    maps::get_risk_measure_results_as_json(
+    let results=maps::get_risk_measure_results_as_json(
         model_indicator,
         &cf_parameters,
         DENSITY_SCALE,
@@ -73,5 +72,10 @@ fn risk_metric(
         maturity,
         rate,
         quantile_unwrap
-    ).map_err(|e|ctx.new_error(&e.to_string()))
+    ).map_err(|e|ctx.new_error(&e.to_string()))?;
+    let res=Response::builder(200)
+        .header("Access-Control-Allow-Origin", "*")
+        .header("Access-Control-Allow-Credentials", "true")
+        .body(json!(results).to_string())?;
+    Ok(res)
 }
