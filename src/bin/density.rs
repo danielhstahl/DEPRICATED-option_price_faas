@@ -22,15 +22,15 @@ use std::error::Error;
 use utils::constraints;
 use utils::maps;
 
-const OPTION_SCALE:f64=10.0;
+const DENSITY_SCALE:f64=5.0;
 
 fn main() -> Result<(), Box<dyn Error>> {
     simple_logger::init_with_level(log::Level::Debug)?;
-    lambda!(price_options);
+    lambda!(density);
     Ok(())
 }
 
-fn price_options(
+fn density(
     event:apigw::ApiGatewayProxyRequest, 
     ctx:Context
 )->Result<Vec<maps::GraphElement>, HandlerError>{
@@ -46,16 +46,10 @@ fn price_options(
     let constraints::OptionParameters {
         maturity,
         rate,
-        asset,
         num_u:num_u_base,
-        strikes,
         cf_parameters,
         ..
     }=parameters; //destructure
-
-    let strikes_unwrap=strikes.ok_or(ctx.new_error("Requires strikes"))?;
-    let asset_unwrap=asset.ok_or(ctx.new_error("Requires asset"))?;
-
 
     let default_value="".to_string();
     let model=maps::get_key_or_default(
@@ -64,42 +58,17 @@ fn price_options(
         "model"
     );
 
-    let sensitivity=maps::get_key_or_default(
-        &event.path_parameters,
-        &default_value,
-        "sensitivity"
-    );
-    let option_type=maps::get_key_or_default(
-        &event.path_parameters,
-        &default_value,
-        "optionType"
-    );
-
     let model_indicator=maps::get_model_indicators(&model)
         .map_err(|e|ctx.new_error(&e.to_string()))?;
-    let fn_indicator=maps::get_fn_indicators(&option_type, &sensitivity)
-        .map_err(|e|ctx.new_error(&e.to_string()))?;
-
-    let query=maps::get_key_or_default(
-        &event.query_string_parameters,
-        &default_value,
-        "includeImpliedVolatility"
-    );
-
-    let include_iv=maps::get_iv_choice(query);
 
     let num_u=(2 as usize).pow(num_u_base as u32);
     
-    maps::get_option_results_as_json(
+    maps::get_density_results_as_json(
         model_indicator,
-        fn_indicator,
-        include_iv,
         &cf_parameters,
-        OPTION_SCALE,
+        DENSITY_SCALE,
         num_u,
-        asset_unwrap,
         maturity,
-        rate, 
-        strikes_unwrap
+        rate    
     ).map_err(|e|ctx.new_error(&e.to_string()))
 }

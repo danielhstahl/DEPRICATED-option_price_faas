@@ -1,10 +1,30 @@
 #[macro_use]
 extern crate serde_json;
 extern crate utils;
-extern crate aws_lambda as lambda;
+extern crate aws_lambda;
+extern crate lambda_runtime as lambda;
+
+use aws_lambda::aws_lambda_events;
+
+use serde_derive::{Serialize, Deserialize};
+use lambda::{lambda, Context, error::HandlerError};
+use log::error;
+use std::error::Error;
 use utils::constraints;
 use utils::maps;
 
+fn main() -> Result<(), Box<dyn Error>> {
+    simple_logger::init_with_level(log::Level::Debug)?;
+    lambda!(output_constraints);
+}
+
+fn output_constraints(
+    event:aws_lambda_events::encodings::ApiGatewayProxyRequest, 
+    ctx:Context
+)->Result<Vec<GraphElement>, HandlerError>{
+
+
+}
 fn main() {
     lambda::gateway::start(|req| {
         let path_parameters=req.extensions().get::<lambda::gateway::PathParameters>();

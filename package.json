@@ -13,11 +13,6 @@
     "coverageDirectory": "./coverage/",
     "collectCoverage": true
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "node index && git add ."
-    }
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/phillyfan1138/option_price_faas.git"

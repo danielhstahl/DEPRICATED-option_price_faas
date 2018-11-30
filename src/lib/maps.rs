@@ -6,7 +6,7 @@ extern crate fang_oost_option;
 extern crate num_complex;
 extern crate cf_dist_utils;
 extern crate serde;
-extern crate aws_lambda as lambda;
+//extern crate aws_lambda as lambda;
 #[cfg(test)]
 extern crate rand;
 #[cfg(test)]
@@ -43,7 +43,18 @@ pub const CALL_THETA:i32=7;
 pub const DENSITY:i32=8;
 pub const RISK_MEASURES:i32=9;
 
-pub fn get_from_path<'a>(
+pub fn get_key_or_default<'a>(
+    parameters:&'a HashMap<String, String>,
+    default_value:&'a String,
+    parameter_key:&str,
+)->&'a String{
+    match parameters.get(parameter_key){
+        Some(m)=>m,
+        None=>default_value
+    }
+}
+
+/*pub fn get_from_path<'a>(
     path_parameters:&'a Option<&lambda::gateway::PathParameters>,
     default_value:&'a String,
     parameter_key:&str,
@@ -72,7 +83,7 @@ pub fn get_from_query<'a>(
         },
         None=>default_value
     }
-}
+}*/
 
 
 /// Gets indicators for which model
@@ -156,57 +167,122 @@ pub fn get_iv_choice(
         _=>false
     }
 }
-/// Returns results as a string
-pub fn get_results_as_json(
+
+fn get_cgmy_cf(
+    cf_parameters:&HashMap<String, f64>,
+    maturity:f64,
+    rate:f64
+)->Result<(impl Fn(&Complex<f64>)->Complex<f64>, f64), io::Error>
+//where T: Fn(&Complex<f64>)->Complex<f64>
+{
+    constraints::check_cf_parameters(
+        &cf_parameters, 
+        &constraints::get_cgmy_constraints()
+    )?;
+    let c=cf_parameters["c"]; //guaranteed to exist from the check
+    let g=cf_parameters["g"];
+    let m=cf_parameters["m"];
+    let y=cf_parameters["y"];
+    let sigma=cf_parameters["sigma"];
+    let v0=cf_parameters["v0"];
+    let speed=cf_parameters["speed"];
+    let eta_v=cf_parameters["eta_v"];
+    let rho=cf_parameters["rho"];
+    let cf_inst=cf_functions::cgmy_time_change_cf(
+        maturity, rate, c, g, m, y, sigma, v0,
+        speed, eta_v, rho
+    );
+    let vol=cf_functions::cgmy_diffusion_vol(
+        sigma, c, g, m, y, maturity
+    );
+    Ok((cf_inst, vol))
+}
+fn get_merton_cf(
+    cf_parameters:&HashMap<String, f64>,
+    maturity:f64,
+    rate:f64
+)->Result<(impl Fn(&Complex<f64>)->Complex<f64>, f64), io::Error>
+//where T: Fn(&Complex<f64>)->Complex<f64>
+{
+    constraints::check_cf_parameters(
+        &cf_parameters, 
+        &constraints::get_merton_constraints()
+    )?;
+    let lambda=cf_parameters["lambda"];
+    let mu_l=cf_parameters["mu_l"];
+    let sig_l=cf_parameters["sig_l"];
+    let sigma=cf_parameters["sigma"];
+    let v0=cf_parameters["v0"];
+    let speed=cf_parameters["speed"];
+    let eta_v=cf_parameters["eta_v"];
+    let rho=cf_parameters["rho"];
+    let cf_inst=cf_functions::merton_time_change_cf(
+        maturity, rate, lambda, mu_l, sig_l, sigma, v0,
+        speed, eta_v, rho
+    );
+    let vol=cf_functions::jump_diffusion_vol(
+        sigma,
+        lambda,
+        mu_l,
+        sig_l,
+        maturity
+    );
+    Ok((cf_inst, vol))
+}
+fn get_heston_cf(
+    cf_parameters:&HashMap<String, f64>,
+    maturity:f64,
+    rate:f64
+)->Result<(impl Fn(&Complex<f64>)->Complex<f64>, f64), io::Error>
+//where T: Fn(&Complex<f64>)->Complex<f64>
+{
+    constraints::check_cf_parameters(
+        &cf_parameters, 
+        &constraints::get_heston_constraints()
+    )?;
+    let sigma=cf_parameters["sigma"];
+    let v0=cf_parameters["v0"];
+    let speed=cf_parameters["speed"];
+    let eta_v=cf_parameters["eta_v"];
+    let rho=cf_parameters["rho"];
+    let cf_inst=cf_functions::heston_cf(
+        maturity, rate, sigma, v0,
+        speed, eta_v, rho
+    );
+    Ok((cf_inst, sigma))
+}
+
+
+pub fn get_option_results_as_json(
     cf_indicator:i32,
     fn_choice:i32,
     include_iv:bool,
     cf_parameters:&HashMap<String, f64>,
-    density_scale:f64,
-    option_scale_over_density:f64,
+    option_scale:f64,
     num_u:usize,
     asset:f64,
     maturity:f64,
     rate:f64,
-    quantile:f64,
     strikes:VecDeque<f64>
 )->Result<
-    String, 
+    Vec<GraphElement>, 
     io::Error
 > {
     match cf_indicator{
         CGMY=>{
-            constraints::check_cf_parameters(
-                &cf_parameters, 
-                &constraints::get_cgmy_constraints()
+            let (cf_inst, vol)=get_cgmy_cf(
+                cf_parameters,
+                maturity, 
+                rate
             )?;
-            let c=cf_parameters["c"]; //guaranteed to exist from the check
-            let g=cf_parameters["g"];
-            let m=cf_parameters["m"];
-            let y=cf_parameters["y"];
-            let sigma=cf_parameters["sigma"];
-            let v0=cf_parameters["v0"];
-            let speed=cf_parameters["speed"];
-            let eta_v=cf_parameters["eta_v"];
-            let rho=cf_parameters["rho"];
-            let cf_inst=cf_functions::cgmy_time_change_cf(
-                maturity, rate, c, g, m, y, sigma, v0,
-                speed, eta_v, rho
-            );
-            let vol=cf_functions::cgmy_diffusion_vol(
-                sigma, c, g, m, y, maturity
-            );
-            let x_max_density=vol*density_scale;
-            let x_max_options=x_max_density*option_scale_over_density;
-            get_results(
+            let x_max_options=option_scale*vol;
+            get_option_results(
                 fn_choice,
                 include_iv,
                 num_u,
                 asset,
                 rate,
                 maturity,
-                quantile,
-                x_max_density,
                 &constraints::extend_strikes(
                     strikes,
                     asset, 
@@ -216,40 +292,19 @@ pub fn get_results_as_json(
             )
         },
         MERTON=>{
-            constraints::check_cf_parameters(
-                &cf_parameters, 
-                &constraints::get_merton_constraints()
+            let (cf_inst, vol)=get_merton_cf(
+                cf_parameters,
+                maturity, 
+                rate
             )?;
-            let lambda=cf_parameters["lambda"];
-            let mu_l=cf_parameters["mu_l"];
-            let sig_l=cf_parameters["sig_l"];
-            let sigma=cf_parameters["sigma"];
-            let v0=cf_parameters["v0"];
-            let speed=cf_parameters["speed"];
-            let eta_v=cf_parameters["eta_v"];
-            let rho=cf_parameters["rho"];
-            let cf_inst=cf_functions::merton_time_change_cf(
-                maturity, rate, lambda, mu_l, sig_l, sigma, v0,
-                speed, eta_v, rho
-            );
-            let vol=cf_functions::jump_diffusion_vol(
-                sigma,
-                lambda,
-                mu_l,
-                sig_l,
-                maturity
-            );
-            let x_max_density=vol*density_scale;
-            let x_max_options=x_max_density*option_scale_over_density;
-            get_results(
+            let x_max_options=option_scale*vol;
+            get_option_results(
                 fn_choice,
                 include_iv,
                 num_u,
                 asset,
                 rate,
                 maturity,
-                quantile,
-                x_max_density,
                 &constraints::extend_strikes(
                     strikes,
                     asset, 
@@ -259,30 +314,19 @@ pub fn get_results_as_json(
             )
         },
         HESTON=>{
-            constraints::check_cf_parameters(
-                &cf_parameters, 
-                &constraints::get_heston_constraints()
+            let (cf_inst, vol)=get_heston_cf(
+                cf_parameters,
+                maturity, 
+                rate
             )?;
-            let sigma=cf_parameters["sigma"];
-            let v0=cf_parameters["v0"];
-            let speed=cf_parameters["speed"];
-            let eta_v=cf_parameters["eta_v"];
-            let rho=cf_parameters["rho"];
-            let cf_inst=cf_functions::heston_cf(
-                maturity, rate, sigma, v0,
-                speed, eta_v, rho
-            );
-            let x_max_density=sigma*density_scale;
-            let x_max_options=x_max_density*option_scale_over_density;
-            get_results(
+            let x_max_options=option_scale*vol;
+            get_option_results(
                 fn_choice,
                 include_iv,
                 num_u,
                 asset,
                 rate,
                 maturity,
-                quantile,
-                x_max_density,
                 &constraints::extend_strikes(
                     strikes,
                     asset, 
@@ -296,34 +340,146 @@ pub fn get_results_as_json(
         )
     }
 }
+pub fn get_density_results_as_json(
+    cf_indicator:i32,
+    cf_parameters:&HashMap<String, f64>,
+    density_scale:f64,
+    num_u:usize,
+    maturity:f64,
+    rate:f64
+)->Result<
+    Vec<GraphElement>, 
+    io::Error
+> {
+    match cf_indicator{
+        CGMY=>{
+            let (cf_inst, vol)=get_cgmy_cf(
+                cf_parameters,
+                maturity, 
+                rate
+            )?;
+            let x_max_density=vol*density_scale;
+            get_density_results(
+                num_u,
+                x_max_density,
+                &cf_inst
+            )
+        },
+        MERTON=>{
+            let (cf_inst, vol)=get_merton_cf(
+                cf_parameters,
+                maturity, 
+                rate
+            )?;
+            let x_max_density=vol*density_scale;
+            get_density_results(
+                num_u,
+                x_max_density,
+                &cf_inst
+            )
+        },
+        HESTON=>{
+            let (cf_inst, vol)=get_heston_cf(
+                cf_parameters,
+                maturity, 
+                rate
+            )?;
+            let x_max_density=vol*density_scale;
+            get_density_results(
+                num_u,
+                x_max_density,
+                &cf_inst
+            )
+        },
+        _ => Err(
+            Error::new(ErrorKind::Other, format!("No matches for cf indicator {}!", cf_indicator))
+        )
+    }
+}
+pub fn get_risk_measure_results_as_json(
+    cf_indicator:i32,
+    cf_parameters:&HashMap<String, f64>,
+    density_scale:f64,
+    num_u:usize,
+    maturity:f64,
+    rate:f64,
+    quantile:f64
+)->Result<
+    RiskMeasures, 
+    io::Error
+> {
+    match cf_indicator{
+        CGMY=>{
+            let (cf_inst, vol)=get_cgmy_cf(
+                cf_parameters,
+                maturity, 
+                rate
+            )?;
+            let x_max_density=vol*density_scale;
+            get_risk_measure_results(
+                num_u,
+                x_max_density,
+                quantile,
+                &cf_inst
+            )
+        },
+        MERTON=>{
+            let (cf_inst, vol)=get_merton_cf(
+                cf_parameters,
+                maturity, 
+                rate
+            )?;
+            let x_max_density=vol*density_scale;
+            get_risk_measure_results(
+                num_u,
+                x_max_density,
+                quantile,
+                &cf_inst
+            )
+        },
+        HESTON=>{
+            let (cf_inst, vol)=get_heston_cf(
+                cf_parameters,
+                maturity, 
+                rate
+            )?;
+            let x_max_density=vol*density_scale;
+            get_risk_measure_results(
+                num_u,
+                x_max_density,
+                quantile,
+                &cf_inst
+            )
+        },
+        _ => Err(
+            Error::new(ErrorKind::Other, format!("No matches for cf indicator {}!", cf_indicator))
+        )
+    }
+}
 
 
 
 #[derive(Serialize, Deserialize)]
-struct GraphElementIV {
+pub struct GraphElement {
     at_point:f64,
     value:f64,
-    iv:f64
+    #[serde(skip_serializing_if = "Option::is_none")] //skip when iv is not provided
+    iv:Option<f64>
 }
 #[derive(Serialize, Deserialize)]
-struct GraphElement {
-    at_point:f64,
-    value:f64
-}
-#[derive(Serialize, Deserialize)]
-struct RiskMeasures {
+pub struct RiskMeasures {
     value_at_risk:f64,
     expected_shortfall:f64
 }
 
 fn risk_measure_as_json(
     risk_measure:(f64, f64)
-)->String {
+)->RiskMeasures {
     let (expected_shortfall, value_at_risk)=risk_measure;
-    json!(RiskMeasures {
+    RiskMeasures {
         value_at_risk,
         expected_shortfall
-    }).to_string()
+    }
 }
 
 fn create_generic_iterator<'a, 'b:'a>(
@@ -340,45 +496,43 @@ fn create_generic_iterator<'a, 'b:'a>(
 fn density_as_json(
     x_values:&[f64],
     values:&[f64]
-)->String { 
-    json!(
-        x_values.iter().zip(values.iter()).map(|(x_val, val)|{
-            GraphElement {
-                at_point:*x_val,
-                value:*val
-            }
-        }).collect::<Vec<_>>()
-    ).to_string()
+)->Vec<GraphElement> { 
+    x_values.iter().zip(values.iter()).map(|(x_val, val)|{
+        GraphElement {
+            at_point:*x_val,
+            value:*val,
+            iv:None
+        }
+    }).collect::<Vec<_>>()
 }
 
 fn graph_no_iv_as_json(
     x_values:&[f64],
     values:&[f64]
-)->String { 
-    json!(create_generic_iterator(x_values, values)
+)->Vec<GraphElement> { 
+    create_generic_iterator(x_values, values)
         .map(|(_, (x_val, val))|{
             GraphElement {
                 at_point:*x_val,
-                value:*val
+                value:*val,
+                iv:None
             }
         }).collect::<Vec<_>>()
-    ).to_string()
 }
 fn graph_iv_as_json(
     x_values:&[f64],
     values:&[f64],
     iv_fn:&Fn(f64, f64)->f64
-)->String { 
-    json!(create_generic_iterator(x_values, values)
+)->Vec<GraphElement> { 
+    create_generic_iterator(x_values, values)
         .map(|(_, (strike, price))|{
             let iv=iv_fn(*price, *strike);
-            GraphElementIV {
+            GraphElement {
                 at_point:*strike,
                 value:*price,
-                iv
+                iv:Some(iv)
             }
         }).collect::<Vec<_>>()
-    ).to_string()
 }
 
 fn call_iv_as_json(
@@ -387,7 +541,7 @@ fn call_iv_as_json(
     asset:f64,
     rate:f64,
     maturity:f64
-)->String {
+)->Vec<GraphElement> {
     graph_iv_as_json(x_values, values, &|price, strike|{
         black_scholes::call_iv(
             price, asset, strike, 
@@ -401,7 +555,7 @@ fn put_iv_as_json(
     asset:f64,
     rate:f64,
     maturity:f64
-)->String {
+)->Vec<GraphElement> {
     graph_iv_as_json(x_values, values, &|price, strike|{
         black_scholes::put_iv(
             price, asset, strike, 
@@ -416,7 +570,7 @@ fn adjust_density<T>(
     num_u:usize,
     x_max:f64,
     cf:T    
-)->String 
+)->Vec<GraphElement> 
     where T:Fn(&Complex<f64>)->Complex<f64>+
     std::marker::Sync+std::marker::Send
 {
@@ -437,18 +591,16 @@ fn adjust_density<T>(
     density_as_json(&x_domain, &option_range)
 }
 
-fn get_results(
+fn get_option_results(
     fn_choice:i32,
     include_iv:bool,
     num_u:usize,
     asset:f64,
     rate:f64,
     maturity:f64,
-    quantile:f64,
-    x_max_density:f64,
     strikes:&[f64],
     inst_cf:&(Fn(&Complex<f64>)->Complex<f64>+std::marker::Sync)
-)->Result<String, io::Error>{
+)->Result<Vec<GraphElement>, io::Error>{
     match fn_choice {
         CALL_PRICE => {
             let prices=option_pricing::fang_oost_call_price(
@@ -548,30 +700,38 @@ fn get_results(
                 )
             ))
         },
-        DENSITY => {
-            Ok(adjust_density(
-                num_u, x_max_density, &inst_cf
-            ))
-        },
-        RISK_MEASURES => {
-            Ok(risk_measure_as_json(
-                cf_dist_utils::get_expected_shortfall_and_value_at_risk(
-                    quantile, num_u, -x_max_density, 
-                    x_max_density, MAX_SIMS, PRECISION, &inst_cf
-                )
-            ))
-        },
         _ => Err(
             Error::new(ErrorKind::Other, format!("No matches for function indicator {}!", fn_choice))
         )
     }
 }
-
+fn get_density_results(
+    num_u:usize,
+    x_max_density:f64,
+    inst_cf:&(Fn(&Complex<f64>)->Complex<f64>+std::marker::Sync)
+)->Result<Vec<GraphElement>, io::Error>{
+    Ok(adjust_density(
+        num_u, x_max_density, &inst_cf
+    ))
+}
+fn get_risk_measure_results(
+    num_u:usize,
+    x_max_density:f64,
+    quantile:f64,
+    inst_cf:&(Fn(&Complex<f64>)->Complex<f64>+std::marker::Sync)
+)->Result<RiskMeasures, io::Error>{
+    Ok(risk_measure_as_json(
+        cf_dist_utils::get_expected_shortfall_and_value_at_risk(
+            quantile, num_u, -x_max_density, 
+            x_max_density, MAX_SIMS, PRECISION, &inst_cf
+        )
+    ))
+}
 
 #[cfg(test)]
 mod tests {
     use maps::*;
-    #[test]
+    /*#[test]
     fn get_from_path_gets_match(){
         let mut hash_map=HashMap::new();
         hash_map.insert("hello".to_string(), "world".to_string());
@@ -648,7 +808,7 @@ mod tests {
             "hello"
         );
         assert_eq!(value, &"goodbye".to_string());
-    }
+    }*/
     #[test]
     fn get_model_indicators_gets_match(){
         let model=get_model_indicators(
@@ -840,21 +1000,19 @@ mod tests {
         let rate=0.1;
         let quantile=0.01;
         let asset=100.0;
-        let results_str=get_results_as_json(
+        let results=get_option_results_as_json(
             CGMY,
             CALL_PRICE,
             true,
             &parameters,
-            5.0, 
-            2.0, 
+            10.0, 
             num_u, 
             asset, 
             t, 
             rate, 
-            quantile, 
             strikes
         ).unwrap();
-        let results:Vec<GraphElementIV>=serde_json::from_str(&results_str).unwrap();
+        //let results:Vec<GraphElement>=serde_json::from_str(&results_str).unwrap();
         assert_abs_diff_eq!(results[0].value, 19.812948843, epsilon=0.00001);
     }
     #[test]
@@ -879,21 +1037,19 @@ mod tests {
         let rate=0.1;
         let quantile=0.01;
         let asset=100.0;
-        let results_str=get_results_as_json(
+        let results=get_option_results_as_json(
             CGMY,
             CALL_PRICE,
             false,
             &parameters,
-            5.0, 
-            2.0, 
+            10.0, 
             num_u, 
             asset, 
             t, 
             rate, 
-            quantile, 
             strikes
         ).unwrap();
-        let results:Vec<GraphElement>=serde_json::from_str(&results_str).unwrap();
+       //let results:Vec<GraphElement>=serde_json::from_str(&results_str).unwrap();
         assert_abs_diff_eq!(results[0].value, 49.790905469, epsilon=0.00001);
     }
     #[test]
@@ -918,21 +1074,19 @@ mod tests {
         let rate=0.1;
         let quantile=0.01;
         let asset=100.0;
-        let results_str=get_results_as_json(
+        let results=get_option_results_as_json(
             CGMY,
             CALL_PRICE,
             false,
             &parameters,
-            5.0, 
-            2.0, 
+            10.0,
             num_u, 
             asset, 
             t, 
             rate, 
-            quantile, 
             strikes
         ).unwrap();
-        let results:Vec<GraphElement>=serde_json::from_str(&results_str).unwrap();
+        //let results:Vec<GraphElement>=serde_json::from_str(&results_str).unwrap();
         assert_abs_diff_eq!(results[0].value, 99.999905510, epsilon=0.00001);
     }
     #[test]
@@ -957,21 +1111,19 @@ mod tests {
         let rate=0.1;
         let quantile=0.01;
         let asset=38.0;
-        let results_str=get_results_as_json(
+        let results=get_option_results_as_json(
             MERTON,
             CALL_PRICE,
             false,
             &parameters,
-            5.0, 
-            2.0, 
+            10.0, 
             num_u, 
             asset, 
             t, 
             rate, 
-            quantile, 
             strikes
         ).unwrap();
-        let results:Vec<GraphElement>=serde_json::from_str(&results_str).unwrap();
+        //let results:Vec<GraphElement>=serde_json::from_str(&results_str).unwrap();
         assert_abs_diff_eq!(results[0].value, 5.9713, epsilon=0.0001);
     }
     #[test]
@@ -999,23 +1151,20 @@ mod tests {
         let num_u:usize=256;
         let t=1.0;
         let rate=0.0;
-        let quantile=0.01;
         let asset=100.0;
-        let results_str=get_results_as_json(
+        let results=get_option_results_as_json(
             MERTON,
             CALL_PRICE,
             false,
             &parameters,
-            5.0, 
-            2.0, 
+            10.0,
             num_u, 
             asset, 
             t, 
             rate, 
-            quantile, 
             strikes
         ).unwrap();
-        let results:Vec<GraphElement>=serde_json::from_str(&results_str).unwrap();
+        //let results:Vec<GraphElement>=serde_json::from_str(&results_str).unwrap();
         assert_abs_diff_eq!(results[0].value, 5.78515545, epsilon=0.0001);
     }
     #[test]
@@ -1038,23 +1187,20 @@ mod tests {
         let num_u:usize=256;
         let t=1.0;
         let rate=0.0;
-        let quantile=0.01;
         let asset=100.0;
-        let results_str=get_results_as_json(
+        let results=get_option_results_as_json(
             HESTON,
             CALL_PRICE,
             false,
             &parameters,
-            5.0, 
-            2.0, 
+            10.0, 
             num_u, 
             asset, 
             t, 
             rate, 
-            quantile, 
             strikes
         ).unwrap();
-        let results:Vec<GraphElement>=serde_json::from_str(&results_str).unwrap();
+        //let results:Vec<GraphElement>=serde_json::from_str(&results_str).unwrap();
         assert_abs_diff_eq!(results[0].value, 5.78515545, epsilon=0.0001);
     }
     #[test]
@@ -1075,23 +1221,20 @@ mod tests {
         let num_u:usize=256;
         let t=1.0;
         let rate=0.03;
-        let quantile=0.01;
         let asset=50.0;
-        let results_str=get_results_as_json(
+        let results=get_option_results_as_json(
             MERTON,
             CALL_PRICE,
             false,
             &parameters,
-            5.0, 
-            2.0, 
+            10.0, 
             num_u, 
             asset, 
             t, 
             rate, 
-            quantile, 
             strikes
         ).unwrap();
-        let results:Vec<GraphElement>=serde_json::from_str(&results_str).unwrap();
+        //let results:Vec<GraphElement>=serde_json::from_str(&results_str).unwrap();
         //MC price is 4.793274
         assert!(results[0].value>4.781525);
         assert!(results[0].value<4.805023);
@@ -1116,21 +1259,13 @@ mod tests {
         let rate=0.004;
         let quantile=0.01;
         let asset=191.96;
-        let results_str=get_results_as_json(
+        let results=get_risk_measure_results_as_json(
             MERTON,
-            RISK_MEASURES,
-            false,
             &parameters,
-            5.0, 
-            2.0, 
-            num_u, 
-            asset, 
-            t, 
-            rate, 
-            quantile, 
-            strikes
+            5.0,
+            num_u, t, rate, quantile
         ).unwrap();
-        let results:RiskMeasures=serde_json::from_str(&results_str).unwrap();
+        //let results:RiskMeasures=serde_json::from_str(&results_str).unwrap();
         assert_abs_diff_eq!(results.value_at_risk, 0.261503, epsilon=0.00001);
     }
 }

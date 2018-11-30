@@ -18,9 +18,9 @@ pub struct ConstraintsSchema {
 pub struct OptionParameters {
     pub maturity: f64,
     pub rate:f64,
-    pub asset:f64,
-    pub strikes:VecDeque<f64>,
-    pub quantile:f64,
+    pub asset:Option<f64>,
+    pub strikes:Option<VecDeque<f64>>,
+    pub quantile:Option<f64>,
     pub num_u:usize, //raised to the power of two.  if this is 8, then there will be 2^8=256 discrete "u"
     pub cf_parameters:HashMap<String, f64>
 }
@@ -104,6 +104,24 @@ fn check_constraint<'a>(
         )
     }
 }
+fn check_constraint_option<'a>(
+    parameter:&Option<f64>,
+    constraint:&'a ConstraintsSchema,
+    parameter_name: &'a str
+)->Result<(), io::Error>{
+    if parameter.is_none(){
+        Ok(())
+    }
+    let param=parameter.unwrap();//guaranteed to work
+    if param>=constraint.lower&&param<=constraint.upper{
+        Ok(())
+    }
+    else {
+        Err(
+            Error::new(ErrorKind::Other, format!("Parameter {} out of bounds", parameter_name))
+        )
+    }
+}
 fn get_parameter(
     parameters:&HashMap<String, f64>,
     key:&String
@@ -137,7 +155,7 @@ pub fn check_parameters<'a>(
     parameters:&OptionParameters,
     constraints:&ParameterConstraints
 )->Result<(), io::Error> {
-    check_constraint(
+    check_constraint_option(
         parameters.asset, &constraints.asset, "asset"
     )?;
     check_constraint(
@@ -149,7 +167,7 @@ pub fn check_parameters<'a>(
     check_constraint(
         parameters.num_u as f64, &constraints.num_u, "num_u"
     )?;
-    check_constraint(
+    check_constraint_option(
         parameters.quantile, &constraints.quantile, "quantile"
     )?;
     
