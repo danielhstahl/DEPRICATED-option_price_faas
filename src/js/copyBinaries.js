@@ -1,6 +1,6 @@
 const fs=require('fs-extra')
-const origBinaryLocation='./target/x86_64-unknown-linux-musl/release/'
-const newBinaryLocation='./target/lambda/'
+const origBinaryLocation='./target/x86_64-unknown-linux-musl/release'
+const newBinaryLocation='./target/lambda'
 
 module.exports=()=>Promise.all([
     fs.copy(
