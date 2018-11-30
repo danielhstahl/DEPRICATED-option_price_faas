@@ -17,6 +17,11 @@
     "type": "git",
     "url": "git+https://github.com/phillyfan1138/option_price_faas.git"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "node index && git add ."
+    }
+  },
   "author": "Daniel Stahl",
   "license": "MIT",
   "bugs": {
