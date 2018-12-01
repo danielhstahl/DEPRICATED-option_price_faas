@@ -6,7 +6,6 @@ extern crate fang_oost_option;
 extern crate num_complex;
 extern crate cf_dist_utils;
 extern crate serde;
-//extern crate aws_lambda as lambda;
 #[cfg(test)]
 extern crate rand;
 #[cfg(test)]
@@ -43,6 +42,24 @@ pub const CALL_THETA:i32=7;
 pub const DENSITY:i32=8;
 pub const RISK_MEASURES:i32=9;
 
+/// Gets the key or a default from a HashMap
+/// # Examples
+/// 
+/// ```
+/// extern crate utils;
+/// use utils::maps;
+/// 
+/// # fn main() {
+/// let mut hash_map=HashMap::new();
+/// hash_map.insert("hello".to_string(), "world".to_string());
+/// let default_value="goodbye".to_string();
+/// let value=get_key_or_default(
+///     &hash_map,
+///     &default_value,
+///     "hello"
+/// );
+/// # }
+/// ```
 pub fn get_key_or_default<'a>(
     parameters:&'a HashMap<String, String>,
     default_value:&'a String,
@@ -53,38 +70,6 @@ pub fn get_key_or_default<'a>(
         None=>default_value
     }
 }
-
-/*pub fn get_from_path<'a>(
-    path_parameters:&'a Option<&lambda::gateway::PathParameters>,
-    default_value:&'a String,
-    parameter_key:&str,
-)->&'a String{
-    match path_parameters{
-        Some(lambda::gateway::PathParameters(v))=>{
-            match v.get(parameter_key){
-                Some(m)=>m,
-                None=>default_value
-            }
-        },
-        None=>default_value
-    }
-}
-pub fn get_from_query<'a>(
-    path_parameters:&'a Option<&lambda::gateway::QueryParameters>,
-    default_value:&'a String,
-    parameter_key:&str,
-)->&'a String{
-    match path_parameters{
-        Some(lambda::gateway::QueryParameters(v))=>{
-            match v.get(parameter_key){
-                Some(m)=>m,
-                None=>default_value
-            }
-        },
-        None=>default_value
-    }
-}*/
-
 
 /// Gets indicators for which model
 /// to retrieve
@@ -202,7 +187,6 @@ fn get_merton_cf(
     maturity:f64,
     rate:f64
 )->Result<(impl Fn(&Complex<f64>)->Complex<f64>, f64), io::Error>
-//where T: Fn(&Complex<f64>)->Complex<f64>
 {
     constraints::check_cf_parameters(
         &cf_parameters, 
@@ -234,7 +218,6 @@ fn get_heston_cf(
     maturity:f64,
     rate:f64
 )->Result<(impl Fn(&Complex<f64>)->Complex<f64>, f64), io::Error>
-//where T: Fn(&Complex<f64>)->Complex<f64>
 {
     constraints::check_cf_parameters(
         &cf_parameters, 
@@ -251,7 +234,6 @@ fn get_heston_cf(
     );
     Ok((cf_inst, sigma))
 }
-
 
 pub fn get_option_results_as_json(
     cf_indicator:i32,
@@ -563,8 +545,7 @@ fn put_iv_as_json(
         )
     })
 }
-const MAX_SIMS:usize=100;
-const PRECISION:f64=0.0000001;
+
 const NUM_X:usize=128;
 fn adjust_density<T>(
     num_u:usize,
@@ -714,6 +695,9 @@ fn get_density_results(
         num_u, x_max_density, &inst_cf
     ))
 }
+const MAX_SIMS:usize=100;
+const PRECISION:f64=0.0000001;
+
 fn get_risk_measure_results(
     num_u:usize,
     x_max_density:f64,
@@ -731,84 +715,30 @@ fn get_risk_measure_results(
 #[cfg(test)]
 mod tests {
     use maps::*;
-    /*#[test]
-    fn get_from_path_gets_match(){
+    #[test]
+    fn get_key_or_default_returns_key_if_exists(){
         let mut hash_map=HashMap::new();
         hash_map.insert("hello".to_string(), "world".to_string());
-        let path_parameters=lambda::gateway::PathParameters(hash_map);
-        let path_parameters_option=Some(&path_parameters);
         let default_value="goodbye".to_string();
-        let value=get_from_path(
-            &path_parameters_option,
+        let value=get_key_or_default(
+            &hash_map,
             &default_value,
             "hello"
         );
         assert_eq!(value, &"world".to_string());
     }
     #[test]
-    fn get_from_path_gets_default(){
+    fn get_key_or_default_returns_default_if_key_does_not_exist(){
         let mut hash_map=HashMap::new();
         hash_map.insert("hello".to_string(), "world".to_string());
-        let path_parameters=lambda::gateway::PathParameters(hash_map);
-        let path_parameters_option=Some(&path_parameters);
         let default_value="goodbye".to_string();
-        let value=get_from_path(
-            &path_parameters_option,
+        let value=get_key_or_default(
+            &hash_map,
             &default_value,
-            "nothello"
+            "somethingelse"
         );
         assert_eq!(value, &"goodbye".to_string());
     }
-    #[test]
-    fn get_from_path_gets_default_on_none(){
-        let path_parameters_option=None;
-        let default_value="goodbye".to_string();
-        let value=get_from_path(
-            &path_parameters_option,
-            &default_value,
-            "hello"
-        );
-        assert_eq!(value, &"goodbye".to_string());
-    }
-    #[test]
-    fn get_from_query_gets_match(){
-        let mut hash_map=HashMap::new();
-        hash_map.insert("hello".to_string(), "world".to_string());
-        let query_parameters=lambda::gateway::QueryParameters(hash_map);
-        let query_parameters_option=Some(&query_parameters);
-        let default_value="goodbye".to_string();
-        let value=get_from_query(
-            &query_parameters_option,
-            &default_value,
-            "hello"
-        );
-        assert_eq!(value, &"world".to_string());
-    }
-    #[test]
-    fn get_from_query_gets_default(){
-        let mut hash_map=HashMap::new();
-        hash_map.insert("hello".to_string(), "world".to_string());
-        let query_parameters=lambda::gateway::QueryParameters(hash_map);
-        let query_parameters_option=Some(&query_parameters);
-        let default_value="goodbye".to_string();
-        let value=get_from_query(
-            &query_parameters_option,
-            &default_value,
-            "nothello"
-        );
-        assert_eq!(value, &"goodbye".to_string());
-    }
-    #[test]
-    fn get_from_query_gets_default_on_none(){
-        let query_parameters_option=None;
-        let default_value="goodbye".to_string();
-        let value=get_from_query(
-            &query_parameters_option,
-            &default_value,
-            "hello"
-        );
-        assert_eq!(value, &"goodbye".to_string());
-    }*/
     #[test]
     fn get_model_indicators_gets_match(){
         let model=get_model_indicators(
@@ -998,7 +928,6 @@ mod tests {
         let num_u:usize=256;
         let t=1.0;
         let rate=0.1;
-        let quantile=0.01;
         let asset=100.0;
         let results=get_option_results_as_json(
             CGMY,
@@ -1035,7 +964,6 @@ mod tests {
         let num_u:usize=256;
         let t=1.0;
         let rate=0.1;
-        let quantile=0.01;
         let asset=100.0;
         let results=get_option_results_as_json(
             CGMY,
@@ -1072,7 +1000,6 @@ mod tests {
         let num_u:usize=256;
         let t=1.0;
         let rate=0.1;
-        let quantile=0.01;
         let asset=100.0;
         let results=get_option_results_as_json(
             CGMY,
@@ -1109,7 +1036,6 @@ mod tests {
         let num_u:usize=256;
         let t=0.5;
         let rate=0.1;
-        let quantile=0.01;
         let asset=38.0;
         let results=get_option_results_as_json(
             MERTON,
@@ -1258,7 +1184,6 @@ mod tests {
         let t=0.187689;
         let rate=0.004;
         let quantile=0.01;
-        let asset=191.96;
         let results=get_risk_measure_results_as_json(
             MERTON,
             &parameters,

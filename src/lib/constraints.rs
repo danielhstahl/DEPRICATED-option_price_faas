@@ -109,17 +109,12 @@ fn check_constraint_option<'a>(
     constraint:&'a ConstraintsSchema,
     parameter_name: &'a str
 )->Result<(), io::Error>{
-    if parameter.is_none(){
-        Ok(())
-    }
-    let param=parameter.unwrap();//guaranteed to work
-    if param>=constraint.lower&&param<=constraint.upper{
-        Ok(())
-    }
-    else {
-        Err(
-            Error::new(ErrorKind::Other, format!("Parameter {} out of bounds", parameter_name))
-        )
+    match parameter{
+        Some(param)=>check_constraint(
+            *param, constraint, 
+            parameter_name
+        ),
+        None=>Ok(())
     }
 }
 fn get_parameter(
@@ -156,7 +151,7 @@ pub fn check_parameters<'a>(
     constraints:&ParameterConstraints
 )->Result<(), io::Error> {
     check_constraint_option(
-        parameters.asset, &constraints.asset, "asset"
+        &parameters.asset, &constraints.asset, "asset"
     )?;
     check_constraint(
         parameters.maturity, &constraints.maturity, "maturity"
@@ -168,7 +163,7 @@ pub fn check_parameters<'a>(
         parameters.num_u as f64, &constraints.num_u, "num_u"
     )?;
     check_constraint_option(
-        parameters.quantile, &constraints.quantile, "quantile"
+        &parameters.quantile, &constraints.quantile, "quantile"
     )?;
     
     Ok(())
@@ -185,6 +180,48 @@ pub fn throw_no_existing(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn test_check_constraint_option(){
+        let constraint=ConstraintsSchema{
+            lower:0.0, upper:1.0, 
+            types:"float".to_string()
+        };
+        let parameter=Some(0.5);
+        let result=check_constraint_option(
+            &parameter, 
+            &constraint, 
+            "hello"
+        );
+        assert!(result.is_ok());
+    }
+    #[test]
+    fn test_check_constraint_option_failure(){
+        let constraint=ConstraintsSchema{
+            lower:0.0, upper:1.0, 
+            types:"float".to_string()
+        };
+        let parameter=None;
+        let result=check_constraint_option(
+            &parameter, 
+            &constraint, 
+            "hello"
+        );
+        assert!(result.is_err(), "Parameter hello does not exist");
+    }
+    #[test]
+    fn test_check_constraint_option_failure_bounds(){
+        let constraint=ConstraintsSchema{
+            lower:0.0, upper:1.0, 
+            types:"float".to_string()
+        };
+        let parameter=Some(5.0);
+        let result=check_constraint_option(
+            &parameter, 
+            &constraint, 
+            "hello"
+        );
+        assert!(result.is_err(), "Parameter hello out of bounds");
+    }
     #[test]
     fn test_check_cf_parameters_missing(){
         let mut parameters=HashMap::new();

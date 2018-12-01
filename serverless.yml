@@ -61,7 +61,7 @@ functions:
         - target/lambda/density/bootstrap
     events:
       - http:
-          path: v1/{model}/density/density
+          path: v1/{model}/density
           method: post
           cors: true
           private: true
@@ -77,7 +77,7 @@ functions:
         - target/lambda/riskmetric/bootstrap
     events:
       - http:
-          path: v1/{model}/density/riskmetric
+          path: v1/{model}/riskmetric
           method: post
           cors: true
           private: true

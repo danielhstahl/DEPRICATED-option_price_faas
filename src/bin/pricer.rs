@@ -36,7 +36,6 @@ fn price_options(
 
     let body=event.body.ok_or(ctx.new_error("Requires body"))?;
 
-
     let parameters:constraints::OptionParameters=serde_json::from_str(&body)    
         .map_err(|e|ctx.new_error(&e.to_string()))?;
 
@@ -57,7 +56,6 @@ fn price_options(
 
     let strikes_unwrap=strikes.ok_or(ctx.new_error("Requires strikes"))?;
     let asset_unwrap=asset.ok_or(ctx.new_error("Requires asset"))?;
-
 
     let default_value="".to_string();
 
