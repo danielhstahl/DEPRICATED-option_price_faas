@@ -153,7 +153,6 @@ fn get_cgmy_cf(
     maturity: f64,
     rate: f64,
 ) -> Result<(impl Fn(&Complex<f64>) -> Complex<f64>, f64), io::Error>
-//where T: Fn(&Complex<f64>)->Complex<f64>
 {
     constraints::check_cf_parameters(&cf_parameters, &constraints::get_cgmy_constraints())?;
     let c = cf_parameters["c"]; //guaranteed to exist from the check
