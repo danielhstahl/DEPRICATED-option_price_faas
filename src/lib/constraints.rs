@@ -169,14 +169,6 @@ pub fn check_parameters<'a>(
     Ok(())
 }
 
-pub fn throw_no_existing(
-    message:&str
-)->Result<(), io::Error>{
-    Err(
-        Error::new(ErrorKind::Other, format!("No matches! {}", message))
-    )?
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
