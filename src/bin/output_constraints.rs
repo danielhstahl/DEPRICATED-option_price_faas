@@ -1,19 +1,20 @@
 #[macro_use]
 extern crate serde_json;
 extern crate lambda_http;
-extern crate lambda_runtime as lambda;
+extern crate lambda_runtime as runtime;
 extern crate log;
 extern crate simple_logger;
 extern crate utils;
+extern crate http; //I dont like that I need this
+use http::Response as HttpResponse;
+use lambda_http::{lambda, Body, Request, RequestExt, Response};
+use runtime::{error::HandlerError, Context};
+//use serde_derive::{Deserialize, Serialize};
 
-use lambda::{error::HandlerError, lambda, Context};
-use lambda_http::{lambda, Request, Response};
-use serde_derive::{Deserialize, Serialize};
-
-use log::error;
+//use log::error;
 use std::error::Error;
 use utils::constraints;
-use utils::maps;
+//use utils::maps;
 
 fn main() -> Result<(), Box<dyn Error>> {
     simple_logger::init_with_level(log::Level::Debug)?;
@@ -22,17 +23,23 @@ fn main() -> Result<(), Box<dyn Error>> {
 }
 
 fn output_constraints(event: Request, ctx: Context) -> Result<Response, HandlerError> {
-    let default_model = "".to_string();
-    let model = maps::get_from_path(&event.path_parameters(), &default_model, "model");
-    let results = match model.as_str() {
-        "heston" => constraints::get_heston_constraints(),
-        "cgmy" => constraints::get_cgmy_constraints(),
-        "merton" => constraints::get_merton_constraints(),
-        _ => constraints::get_constraints(),
+    let default_model = "";
+    let path_parameters=event.path_parameters();
+    let model = match path_parameters.get("model") {
+        Some(m) => m,
+        None => default_model
     };
-    let res = Response::builder(200)
+    let results = match model {
+        "heston" => json!(constraints::get_heston_constraints()).to_string(),
+        "cgmy" => json!(constraints::get_cgmy_constraints()).to_string(),
+        "merton" => json!(constraints::get_merton_constraints()).to_string(),
+        _ => json!(constraints::get_constraints()).to_string(),
+    };
+    let res = HttpResponse::builder()
+        .status(200)
         .header("Access-Control-Allow-Origin", "*")
         .header("Access-Control-Allow-Credentials", "true")
-        .body(json!(results).to_string())?;
+        .body::<Body>(results.into())
+        .map_err(|e| ctx.new_error(&e.to_string()))?;
     Ok(res)
 }

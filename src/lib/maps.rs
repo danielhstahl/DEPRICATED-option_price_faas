@@ -42,34 +42,6 @@ pub const CALL_THETA: i32 = 7;
 pub const DENSITY: i32 = 8;
 pub const RISK_MEASURES: i32 = 9;
 
-/// Gets the key or a default from a HashMap
-/// # Examples
-///
-/// ```
-/// extern crate utils;
-/// use utils::maps;
-///
-/// # fn main() {
-/// let mut hash_map=HashMap::new();
-/// hash_map.insert("hello".to_string(), "world".to_string());
-/// let default_value="goodbye".to_string();
-/// let value=get_key_or_default(
-///     &hash_map,
-///     &default_value,
-///     "hello"
-/// );
-/// # }
-/// ```
-pub fn get_key_or_default<'a>(
-    parameters: &'a HashMap<String, String>,
-    default_value: &'a String,
-    parameter_key: &str,
-) -> &'a String {
-    match parameters.get(parameter_key) {
-        Some(m) => m,
-        None => default_value,
-    }
-}
 
 /// Gets indicators for which model
 /// to retrieve
@@ -80,12 +52,12 @@ pub fn get_key_or_default<'a>(
 /// use utils::maps;
 /// # fn main() {
 /// let model = maps::get_model_indicators(
-///     &"cgmy".to_string()
+///     "cgmy"
 /// ).unwrap();
 /// # }
 /// ```
-pub fn get_model_indicators(model: &String) -> Result<i32, io::Error> {
-    match model.as_str() {
+pub fn get_model_indicators(model: &str) -> Result<i32, io::Error> {
+    match model {
         "cgmy" => Ok(CGMY),
         "merton" => Ok(MERTON),
         "heston" => Ok(HESTON),
@@ -104,12 +76,12 @@ pub fn get_model_indicators(model: &String) -> Result<i32, io::Error> {
 /// use utils::maps;
 /// # fn main() {
 /// let sensitivity = maps::get_fn_indicators(
-///     &"put".to_string(),
-///     &"price".to_string()
+///     "put",
+///     "price"
 /// ).unwrap();
 /// # }
 /// ```
-pub fn get_fn_indicators(option_type: &String, sensitivity: &String) -> Result<i32, io::Error> {
+pub fn get_fn_indicators(option_type: &str, sensitivity: &str) -> Result<i32, io::Error> {
     let combine_types = format!("{}_{}", option_type, sensitivity); //.as_str();
     match combine_types.as_str() {
         "put_price" => Ok(PUT_PRICE),
@@ -136,13 +108,13 @@ pub fn get_fn_indicators(option_type: &String, sensitivity: &String) -> Result<i
 /// use utils::maps;
 /// # fn main() {
 /// let include_iv = maps::get_iv_choice(
-///     &"true".to_string()
+///     &"true"
 /// );
 /// assert!(include_iv);
 /// # }
 /// ```
-pub fn get_iv_choice(query: &String) -> bool {
-    match query.as_str() {
+pub fn get_iv_choice(query: &str) -> bool {
+    match query {
         "true" => true,
         _ => false,
     }
@@ -533,29 +505,13 @@ fn get_risk_measure_results(
 mod tests {
     use maps::*;
     #[test]
-    fn get_key_or_default_returns_key_if_exists() {
-        let mut hash_map = HashMap::new();
-        hash_map.insert("hello".to_string(), "world".to_string());
-        let default_value = "goodbye".to_string();
-        let value = get_key_or_default(&hash_map, &default_value, "hello");
-        assert_eq!(value, &"world".to_string());
-    }
-    #[test]
-    fn get_key_or_default_returns_default_if_key_does_not_exist() {
-        let mut hash_map = HashMap::new();
-        hash_map.insert("hello".to_string(), "world".to_string());
-        let default_value = "goodbye".to_string();
-        let value = get_key_or_default(&hash_map, &default_value, "somethingelse");
-        assert_eq!(value, &"goodbye".to_string());
-    }
-    #[test]
     fn get_model_indicators_gets_match() {
-        let model = get_model_indicators(&"cgmy".to_string()).unwrap();
+        let model = get_model_indicators("cgmy").unwrap();
         assert_eq!(model, CGMY);
     }
     #[test]
     fn get_fn_indicators_gets_match() {
-        let model = get_fn_indicators(&"put".to_string(), &"price".to_string()).unwrap();
+        let model = get_fn_indicators("put", "price").unwrap();
         assert_eq!(model, PUT_PRICE);
     }
     fn get_rng_seed(seed: [u8; 32]) -> StdRng {
@@ -1029,8 +985,6 @@ mod tests {
         ]
         .into_iter()
         .collect();
-        let strikes: VecDeque<f64> = VecDeque::new();
-        //strikes.push_back(50.0);
         let num_u: usize = 256;
         let t = 0.187689;
         let rate = 0.004;
@@ -1038,7 +992,6 @@ mod tests {
         let results =
             get_risk_measure_results_as_json(MERTON, &parameters, 5.0, num_u, t, rate, quantile)
                 .unwrap();
-        //let results:RiskMeasures=serde_json::from_str(&results_str).unwrap();
         assert_abs_diff_eq!(results.value_at_risk, 0.261503, epsilon = 0.00001);
     }
 }

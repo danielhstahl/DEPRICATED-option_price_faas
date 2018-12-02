@@ -352,7 +352,7 @@ mod tests {
         };
         let parameter = None;
         let result = check_constraint_option(&parameter, &constraint, "hello");
-        assert!(result.is_err(), "Parameter hello does not exist");
+        assert!(result.is_ok());
     }
     #[test]
     fn test_check_constraint_option_failure_bounds() {
@@ -363,20 +363,21 @@ mod tests {
         };
         let parameter = Some(5.0);
         let result = check_constraint_option(&parameter, &constraint, "hello");
-        assert!(result.is_err(), "Parameter hello out of bounds");
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().to_string(), "Parameter hello out of bounds".to_string());
     }
     #[test]
     fn test_check_cf_parameters_missing() {
         let mut parameters = HashMap::new();
         parameters.insert("lambda".to_string(), 0.4);
         let result = check_cf_parameters(&parameters, &get_merton_constraints());
-        assert!(result.is_err(), "Parameter does not exist");
+        assert!(result.is_err());
     }
     #[test]
     fn test_check_cf_parameters_out_bounds() {
         let mut parameters = HashMap::new();
         parameters.insert("lambda".to_string(), -50.0);
         let result = check_cf_parameters(&parameters, &get_merton_constraints());
-        assert!(result.is_err(), "Parameter out of bounds");
+        assert!(result.is_err());
     }
 }

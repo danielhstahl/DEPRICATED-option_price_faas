@@ -5,8 +5,8 @@ rust:
 - beta
 - nightly
 
-services:
-  - docker
+#services:
+  #- docker
   
 before_install:
 - wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
@@ -23,7 +23,7 @@ script:
   - cargo clean
   - cargo build --release --target=x86_64-unknown-linux-musl
   - cargo test
-  - sudo docker pull lambci/lambda:go1.x  #this is to download the docker image if it doesnt exist yet
+  #- sudo docker pull lambci/lambda:go1.x  #this is to download the docker image if it doesnt exist yet
   - npm install
   - npm test
 
@@ -76,8 +76,7 @@ deploy:
       secure: dbSsXp7XBdsrBbW5XtZyyC7fDzFjO2tnUBgpdj7LnML4BmcdPpNWTQ7pEDNU0P0fcQaOc3/NAE7YwDi71uKclo0bZyXfmlzgVOKTkFAuMwrkYMhvM29d2p919ezUVAnfvDSK7U2uT8wucC09sVGbMfdiCC+ep12/O5+3rMfGyeB8A8dIkXx0UwqErqyc8yyxm8S9orpHYGgspDtWUJuEkhUZ3SFQZuwTTKqA79h9b7KaP0/8nMOk8FW1Ck/zzw1fJNy9478EXLYfL8UiAybr1n1eRqWft4o/qHTC2KI9AG2+EvG3XCe/3WLyzWOgH0lst515g6nZybM/eZgxngvQj6egEVUd1GLFaWgC69BksfMvdfr9nd70kfgVqfYiEcCQU1TtSxR1htDphtCs7QDLb0bSLCykHYe6VR0DrE8EZxrmA15WY0/Fbi3DgA46rEP5s0K79NkvuxElC+JhHpMh+ygi36jabBFDr64as/ToVf604iVZiaMddWIi6FIgkdg65JXl7/f2QCUwy2iuxk+gVl7FWtteti++2seyM2xfgyTgxkVrDVQ0L8uN3snkuZkADEJgRGtBe8SyZa90hNs+VNjGUh7Kb9CEJPmmUjSmyXAnrlhW2rKlxbJqoIuaxfoh/XJO4Ma9CWqvZlzTsYwoeW7jjM8aWmIWhCjAAX0juvk=
     file_glob: true
     file:
-    - "./target/x86_64-unknown-linux-musl/release/output_constraints"
-    - "./target/x86_64-unknown-linux-musl/release/pricer"
+    - "./target/lambda/release/*"
     - "./serverless.yml"
     - "./docs/openapi_merged.yml"
     skip_cleanup: true

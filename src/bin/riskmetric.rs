@@ -4,18 +4,20 @@ extern crate cf_functions;
 extern crate fang_oost;
 extern crate fang_oost_option;
 extern crate lambda_http;
-extern crate lambda_runtime as lambda;
+extern crate lambda_runtime as runtime;
 extern crate log;
 extern crate num_complex;
 extern crate rayon;
 extern crate serde_derive;
+#[macro_use]
 extern crate serde_json;
 extern crate simple_logger;
 extern crate utils;
+extern crate http; //I dont like that I need this
 
-use lambda::{error::HandlerError, lambda, Context};
-use lambda_http::{lambda, Request, Response};
-use serde_derive::{Deserialize, Serialize};
+use http::Response as HttpResponse;
+use lambda_http::{lambda, Body, Request, RequestExt, Response};
+use runtime::{error::HandlerError, Context};
 use std::error::Error;
 
 use utils::constraints;
@@ -30,9 +32,9 @@ fn main() -> Result<(), Box<dyn Error>> {
 }
 
 fn risk_metric(event: Request, ctx: Context) -> Result<Response, HandlerError> {
-    let body = event.body.ok_or(ctx.new_error("Requires body"))?;
     let parameters: constraints::OptionParameters =
-        serde_json::from_str(&body).map_err(|e| ctx.new_error(&e.to_string()))?;
+        serde_json::from_reader(event.body().as_ref()).map_err(|e| ctx.new_error(&e.to_string()))?;
+
     constraints::check_parameters(&parameters, &constraints::get_constraints())
         .map_err(|e| ctx.new_error(&e.to_string()))?;
 
@@ -47,9 +49,12 @@ fn risk_metric(event: Request, ctx: Context) -> Result<Response, HandlerError> {
 
     let quantile_unwrap = quantile.ok_or(ctx.new_error("Requires quantile"))?;
 
-    let default_value = "".to_string();
-    let model = maps::get_key_or_default(&event.path_parameters(), &default_value, "model");
-
+    let default_value = "";
+    let path_parameters=event.path_parameters();
+    let model = match path_parameters.get("model") {
+        Some(m) => m,
+        None => default_value
+    };
     let model_indicator =
         maps::get_model_indicators(&model).map_err(|e| ctx.new_error(&e.to_string()))?;
 
@@ -65,9 +70,11 @@ fn risk_metric(event: Request, ctx: Context) -> Result<Response, HandlerError> {
         quantile_unwrap,
     )
     .map_err(|e| ctx.new_error(&e.to_string()))?;
-    let res = Response::builder(200)
+    let res = HttpResponse::builder()
+        .status(200)
         .header("Access-Control-Allow-Origin", "*")
         .header("Access-Control-Allow-Credentials", "true")
-        .body(json!(results).to_string())?;
+        .body::<Body>(json!(results).to_string().into())
+        .map_err(|e| ctx.new_error(&e.to_string()))?;
     Ok(res)
 }
