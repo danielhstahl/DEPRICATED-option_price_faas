@@ -33,7 +33,7 @@ custom:
 package:
   individually: true #needed to name each binary "bootstrap"
   exclude:
-    - /**
+    - ./**
 functions:
   calculator:
     handler: target/lambda/pricer/bootstrap

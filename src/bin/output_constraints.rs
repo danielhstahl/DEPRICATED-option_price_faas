@@ -9,12 +9,9 @@ extern crate http; //I dont like that I need this
 use http::Response as HttpResponse;
 use lambda_http::{lambda, Body, Request, RequestExt, Response};
 use runtime::{error::HandlerError, Context};
-//use serde_derive::{Deserialize, Serialize};
 
-//use log::error;
 use std::error::Error;
 use utils::constraints;
-//use utils::maps;
 
 fn main() -> Result<(), Box<dyn Error>> {
     simple_logger::init_with_level(log::Level::Debug)?;
