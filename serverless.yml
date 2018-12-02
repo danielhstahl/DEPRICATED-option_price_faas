@@ -2,7 +2,7 @@ service: option-price-faas
 
 provider:
   name: aws
-  runtime: go1.x
+  runtime: provided
   stage: prd
   #usagePlan: # Optional usage plan configuration
   #  quota:
@@ -31,26 +31,15 @@ custom:
     createRoute53Record: true
 
 package:
+  individually: true #needed to name each binary "bootstrap"
   exclude:
-    - src
-    - target/**
-    - target
-    - node_modules
-    - tests/**
-    - tests
-    - .gitignore
-    - package-lock.json
-    - package.json
-    - README.md
-    - serverless.yml
-    - .travis.yml
-    - docs/**
-  include:
-   - target/x86_64-unknown-linux-musl/release/output_constraints
-   - target/x86_64-unknown-linux-musl/release/pricer
+    - ./**
 functions:
   calculator:
-    handler: target/x86_64-unknown-linux-musl/release/pricer
+    handler: target/lambda/pricer/bootstrap
+    package:
+      include:
+        - target/lambda/pricer/bootstrap
     events:
       - http:
           path: v1/{model}/calculator/{optionType}/{sensitivity}
@@ -65,12 +54,14 @@ functions:
                 model: true
               querystrings:
                 includeImpliedVolatility: false
-
   density:
-    handler: target/x86_64-unknown-linux-musl/release/pricer
+    handler: target/lambda/density/bootstrap
+    package:
+      include:
+        - target/lambda/density/bootstrap
     events:
       - http:
-          path: v1/{model}/density/{optionType}
+          path: v1/{model}/density
           method: post
           cors: true
           private: true
@@ -78,10 +69,28 @@ functions:
             parameters:
               paths:
                 model: true
-                optionType: true
+
+  riskmetric:
+    handler: target/lambda/riskmetric/bootstrap
+    package:
+      include:
+        - target/lambda/riskmetric/bootstrap
+    events:
+      - http:
+          path: v1/{model}/riskmetric
+          method: post
+          cors: true
+          private: true
+          request:
+            parameters:
+              paths:
+                model: true
 
   constraints:
-    handler: target/x86_64-unknown-linux-musl/release/output_constraints
+    handler: target/lambda/constraints/bootstrap
+    package:
+      include:
+        - target/lambda/constraints/bootstrap
     events:
       - http:
           path: v1/{model}/parameters/parameter_ranges

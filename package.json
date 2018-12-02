@@ -13,14 +13,14 @@
     "coverageDirectory": "./coverage/",
     "collectCoverage": true
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/phillyfan1138/option_price_faas.git"
+  },
   "husky": {
     "hooks": {
       "pre-commit": "node index && git add ."
     }
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/phillyfan1138/option_price_faas.git"
   },
   "author": "Daniel Stahl",
   "license": "MIT",
@@ -34,5 +34,8 @@
     "js-yaml": "^3.12.0",
     "json-refs": "^3.0.10",
     "serverless-domain-manager": "^2.6.5"
+  },
+  "dependencies": {
+    "fs-extra": "^7.0.1"
   }
 }

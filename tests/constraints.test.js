@@ -1,5 +1,5 @@
 'use strict'
-const command='sudo docker run --rm -v "$PWD":/var/task -i -e DOCKER_LAMBDA_USE_STDIN=1 lambci/lambda:go1.x ./target/x86_64-unknown-linux-musl/release/output_constraints'
+const command='sudo docker run --rm -v "$PWD":/var/task -i -e DOCKER_LAMBDA_USE_STDIN=1 lambci/lambda:provided -bootstrap ./target/lambda/constraints/bootstrap'
 const {exec} = require('child_process')
 const spawnCommand=(jsonFile, callback)=>{
     exec('cat '+jsonFile+' | '+command, callback)

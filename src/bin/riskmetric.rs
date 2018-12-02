@@ -23,15 +23,15 @@ use std::error::Error;
 use utils::constraints;
 use utils::maps;
 
-const OPTION_SCALE: f64 = 10.0;
+const DENSITY_SCALE: f64 = 5.0;
 
 fn main() -> Result<(), Box<dyn Error>> {
     simple_logger::init_with_level(log::Level::Debug)?;
-    lambda!(price_options);
+    lambda!(risk_metric);
     Ok(())
 }
 
-fn price_options(event: Request, ctx: Context) -> Result<Response, HandlerError> {
+fn risk_metric(event: Request, ctx: Context) -> Result<Response, HandlerError> {
     let parameters: constraints::OptionParameters =
         serde_json::from_reader(event.body().as_ref()).map_err(|e| ctx.new_error(&e.to_string()))?;
 
@@ -41,61 +41,33 @@ fn price_options(event: Request, ctx: Context) -> Result<Response, HandlerError>
     let constraints::OptionParameters {
         maturity,
         rate,
-        asset,
         num_u: num_u_base,
-        strikes,
+        quantile,
         cf_parameters,
         ..
     } = parameters; //destructure
 
-    let strikes_unwrap = strikes.ok_or(ctx.new_error("Requires strikes"))?;
-    let asset_unwrap = asset.ok_or(ctx.new_error("Requires asset"))?;
+    let quantile_unwrap = quantile.ok_or(ctx.new_error("Requires quantile"))?;
 
-    let default_value = "";//.to_string();
-
+    let default_value = "";
     let path_parameters=event.path_parameters();
-    let query_string_parameters=event.query_string_parameters();
-    
     let model = match path_parameters.get("model") {
         Some(m) => m,
         None => default_value
     };
-
-    let sensitivity = match path_parameters.get("sensitivity") {
-        Some(m) => m,
-        None => default_value,
-    };
-    let option_type =match path_parameters.get("optionType") {
-        Some(m) => m,
-        None => default_value,
-    };
-
     let model_indicator =
-        maps::get_model_indicators(model).map_err(|e| ctx.new_error(&e.to_string()))?;
-    
-    let fn_indicator = maps::get_fn_indicators(&option_type, &sensitivity)
-        .map_err(|e| ctx.new_error(&e.to_string()))?;
-
-    let query =match query_string_parameters.get("includeImpliedVolatility") {
-        Some(m) => m,
-        None => default_value,
-    };
-
-    let include_iv = maps::get_iv_choice(query);
+        maps::get_model_indicators(&model).map_err(|e| ctx.new_error(&e.to_string()))?;
 
     let num_u = (2 as usize).pow(num_u_base as u32);
 
-    let results = maps::get_option_results_as_json(
+    let results = maps::get_risk_measure_results_as_json(
         model_indicator,
-        fn_indicator,
-        include_iv,
         &cf_parameters,
-        OPTION_SCALE,
+        DENSITY_SCALE,
         num_u,
-        asset_unwrap,
         maturity,
         rate,
-        strikes_unwrap,
+        quantile_unwrap,
     )
     .map_err(|e| ctx.new_error(&e.to_string()))?;
     let res = HttpResponse::builder()

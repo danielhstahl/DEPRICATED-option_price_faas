@@ -64,7 +64,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: './PostCGMYRequest.json'
+              $ref: './PostCGMYRequestOptions.json'
   /v1/heston/calculator/{optionType}/{sensitivity}:
     post:
       summary: Calculator for computing option prices and sensitivities for a Heston model
@@ -109,7 +109,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: './PostHestonRequest.json'
+              $ref: './PostHestonRequestOptions.json'
 
   /v1/merton/calculator/{optionType}/{sensitivity}:
     post:
@@ -155,9 +155,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: './PostMertonRequest.json'
+              $ref: './PostMertonRequestOptions.json'
 
-  /v1/cgmy/density/density:
+  /v1/cgmy/density:
     post:
       summary: Calculator for computing probability densities for CGMY process
       description: Computes probability density for an extended CGMY process
@@ -181,9 +181,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: './PostCGMYRequest.json'
+              $ref: './PostCGMYRequestDensity.json'
 
-  /v1/heston/density/density:
+  /v1/heston/density:
     post:
       summary: Calculator for computing probability densities for Heston model
       description: Computes probability density for a Heston model
@@ -207,9 +207,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: './PostHestonRequest.json'
+              $ref: './PostHestonRequestDensity.json'
 
-  /v1/merton/density/density:
+  /v1/merton/density:
     post:
       summary: Calculator for computing probability densities for Merton model
       description: Computes probability density for a Merton model
@@ -233,9 +233,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: './PostMertonRequest.json'
+              $ref: './PostMertonRequestDensity.json'
 
-  /v1/cgmy/density/riskmetric:
+  /v1/cgmy/riskmetric:
     post:
       summary: Calculator for computing risk metrics for CGMY process
       description: Computes value at risk and expected shortfall for extended CGMY process
@@ -259,8 +259,8 @@ paths:
         content:
           application/json:
             schema:
-              $ref: './PostCGMYRequest.json'
-  /v1/heston/density/riskmetric:
+              $ref: './PostCGMYRequestRiskMetric.json'
+  /v1/heston/riskmetric:
     post:
       summary: Calculator for computing risk metrics for Heston model
       description: Computes value at risk and expected shortfall for a Heston model
@@ -284,8 +284,8 @@ paths:
         content:
           application/json:
             schema:
-              $ref: './PostHestonRequest.json'
-  /v1/merton/density/riskmetric:
+              $ref: './PostHestonRequestRiskMetric.json'
+  /v1/merton/riskmetric:
     post:
       summary: Calculator for computing risk metrics for Merton model
       description: Computes value at risk and expected shortfall for an extended Merton model
@@ -309,7 +309,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: './PostMertonRequest.json'
+              $ref: './PostMertonRequestRiskMetric.json'
 
   /v1/heston/parameters/parameter_ranges:
     get:

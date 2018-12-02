@@ -96,7 +96,7 @@ paths:
         required: true
         content:
           application/json:
-            schema: &ref_3
+            schema:
               type: object
               properties:
                 num_u:
@@ -212,7 +212,7 @@ paths:
         required: true
         content:
           application/json:
-            schema: &ref_5
+            schema:
               type: object
               properties:
                 num_u:
@@ -252,9 +252,6 @@ paths:
                     type: number
                   example:
                     - 50
-                quantile:
-                  type: number
-                  example: 0.01
               required:
                 - num_u
                 - rate
@@ -262,7 +259,6 @@ paths:
                 - asset
                 - cf_parameters
                 - strikes
-                - quantile
               additionalProperties: false
   '/v1/merton/calculator/{optionType}/{sensitivity}':
     post:
@@ -317,7 +313,7 @@ paths:
         required: true
         content:
           application/json:
-            schema: &ref_6
+            schema:
               type: object
               properties:
                 num_u:
@@ -366,9 +362,6 @@ paths:
                     type: number
                   example:
                     - 50
-                quantile:
-                  type: number
-                  example: 0.01
               required:
                 - num_u
                 - rate
@@ -376,9 +369,8 @@ paths:
                 - asset
                 - cf_parameters
                 - strikes
-                - quantile
               additionalProperties: false
-  /v1/cgmy/density/density:
+  /v1/cgmy/density:
     post:
       summary: Calculator for computing probability densities for CGMY process
       description: Computes probability density for an extended CGMY process
@@ -387,7 +379,7 @@ paths:
           description: Density
           content:
             application/json:
-              schema: &ref_4
+              schema: &ref_3
                 type: array
                 items:
                   type: object
@@ -410,8 +402,56 @@ paths:
         required: true
         content:
           application/json:
-            schema: *ref_3
-  /v1/heston/density/density:
+            schema:
+              type: object
+              properties:
+                num_u:
+                  type: integer
+                  example: 8
+                rate:
+                  type: number
+                  example: 0.04
+                maturity:
+                  type: number
+                  example: 0.5
+                cf_parameters:
+                  type: object
+                  properties:
+                    sigma:
+                      type: number
+                      example: 0.3
+                    c:
+                      type: number
+                      example: 0.3
+                    g:
+                      type: number
+                      example: 5
+                    m:
+                      type: number
+                      example: 5
+                    'y':
+                      type: number
+                      example: 1.2
+                    speed:
+                      type: number
+                      example: 0.2
+                    v0:
+                      type: number
+                      example: 0.9
+                    eta_v:
+                      type: number
+                      example: 0.2
+                    rho:
+                      type: number
+                      example: -0.5
+                  additionalProperties: false
+              required:
+                - num_u
+                - rate
+                - maturity
+                - cf_parameters
+              additionalProperties: false
+  /v1/heston/density:
     post:
       summary: Calculator for computing probability densities for Heston model
       description: Computes probability density for a Heston model
@@ -420,7 +460,7 @@ paths:
           description: Density
           content:
             application/json:
-              schema: *ref_4
+              schema: *ref_3
               example: *ref_1
         '400':
           description: Error for incorrect request
@@ -431,8 +471,44 @@ paths:
         required: true
         content:
           application/json:
-            schema: *ref_5
-  /v1/merton/density/density:
+            schema:
+              type: object
+              properties:
+                num_u:
+                  type: integer
+                  example: 8
+                rate:
+                  type: number
+                  example: 0.04
+                maturity:
+                  type: number
+                  example: 0.5
+                cf_parameters:
+                  type: object
+                  properties:
+                    sigma:
+                      type: number
+                      example: 0.3
+                    speed:
+                      type: number
+                      example: 0.2
+                    v0:
+                      type: number
+                      example: 0.25
+                    eta_v:
+                      type: number
+                      example: 0.2
+                    rho:
+                      type: number
+                      example: -0.5
+                  additionalProperties: false
+              required:
+                - num_u
+                - rate
+                - maturity
+                - cf_parameters
+              additionalProperties: false
+  /v1/merton/density:
     post:
       summary: Calculator for computing probability densities for Merton model
       description: Computes probability density for a Merton model
@@ -441,7 +517,7 @@ paths:
           description: Density
           content:
             application/json:
-              schema: *ref_4
+              schema: *ref_3
               example: *ref_1
         '400':
           description: Error for incorrect request
@@ -452,8 +528,53 @@ paths:
         required: true
         content:
           application/json:
-            schema: *ref_6
-  /v1/cgmy/density/riskmetric:
+            schema:
+              type: object
+              properties:
+                num_u:
+                  type: integer
+                  example: 8
+                rate:
+                  type: number
+                  example: 0.04
+                maturity:
+                  type: number
+                  example: 0.5
+                cf_parameters:
+                  type: object
+                  properties:
+                    sigma:
+                      type: number
+                      example: 0.3
+                    mu_l:
+                      type: number
+                      example: -0.05
+                    sig_l:
+                      type: number
+                      example: 0.2
+                    lambda:
+                      type: number
+                      example: 1
+                    speed:
+                      type: number
+                      example: 0.2
+                    v0:
+                      type: number
+                      example: 0.9
+                    eta_v:
+                      type: number
+                      example: 0.2
+                    rho:
+                      type: number
+                      example: -0.5
+                  additionalProperties: false
+              required:
+                - num_u
+                - rate
+                - maturity
+                - cf_parameters
+              additionalProperties: false
+  /v1/cgmy/riskmetric:
     post:
       summary: Calculator for computing risk metrics for CGMY process
       description: Computes value at risk and expected shortfall for extended CGMY process
@@ -462,7 +583,7 @@ paths:
           description: Value at risk and expected shortfall
           content:
             application/json:
-              schema: &ref_7
+              schema: &ref_4
                 type: object
                 properties:
                   value_at_risk:
@@ -473,7 +594,7 @@ paths:
                   - value_at_risk
                   - expected_shortfall
                 additionalProperties: false
-              example: &ref_8
+              example: &ref_5
                 value_at_risk: 5
                 expected_shortfall: 5
         '400':
@@ -485,8 +606,59 @@ paths:
         required: true
         content:
           application/json:
-            schema: *ref_3
-  /v1/heston/density/riskmetric:
+            schema:
+              type: object
+              properties:
+                num_u:
+                  type: integer
+                  example: 8
+                rate:
+                  type: number
+                  example: 0.04
+                maturity:
+                  type: number
+                  example: 0.5
+                cf_parameters:
+                  type: object
+                  properties:
+                    sigma:
+                      type: number
+                      example: 0.3
+                    c:
+                      type: number
+                      example: 0.3
+                    g:
+                      type: number
+                      example: 5
+                    m:
+                      type: number
+                      example: 5
+                    'y':
+                      type: number
+                      example: 1.2
+                    speed:
+                      type: number
+                      example: 0.2
+                    v0:
+                      type: number
+                      example: 0.9
+                    eta_v:
+                      type: number
+                      example: 0.2
+                    rho:
+                      type: number
+                      example: -0.5
+                  additionalProperties: false
+                quantile:
+                  type: number
+                  example: 0.01
+              required:
+                - num_u
+                - rate
+                - maturity
+                - cf_parameters
+              additionalProperties: false
+  /v1/heston/riskmetric:
     post:
       summary: Calculator for computing risk metrics for Heston model
       description: Computes value at risk and expected shortfall for a Heston model
@@ -495,8 +667,8 @@ paths:
           description: Value at risk and expected shortfall
           content:
             application/json:
-              schema: *ref_7
-              example: *ref_8
+              schema: *ref_4
+              example: *ref_5
         '400':
           description: Error for incorrect request
           content:
@@ -506,8 +678,48 @@ paths:
         required: true
         content:
           application/json:
-            schema: *ref_5
-  /v1/merton/density/riskmetric:
+            schema:
+              type: object
+              properties:
+                num_u:
+                  type: integer
+                  example: 8
+                rate:
+                  type: number
+                  example: 0.04
+                maturity:
+                  type: number
+                  example: 0.5
+                cf_parameters:
+                  type: object
+                  properties:
+                    sigma:
+                      type: number
+                      example: 0.3
+                    speed:
+                      type: number
+                      example: 0.2
+                    v0:
+                      type: number
+                      example: 0.25
+                    eta_v:
+                      type: number
+                      example: 0.2
+                    rho:
+                      type: number
+                      example: -0.5
+                  additionalProperties: false
+                quantile:
+                  type: number
+                  example: 0.01
+              required:
+                - num_u
+                - rate
+                - maturity
+                - cf_parameters
+                - quantile
+              additionalProperties: false
+  /v1/merton/riskmetric:
     post:
       summary: Calculator for computing risk metrics for Merton model
       description: >-
@@ -518,8 +730,8 @@ paths:
           description: Value at risk and expected shortfall
           content:
             application/json:
-              schema: *ref_7
-              example: *ref_8
+              schema: *ref_4
+              example: *ref_5
         '400':
           description: Error for incorrect request
           content:
@@ -529,7 +741,56 @@ paths:
         required: true
         content:
           application/json:
-            schema: *ref_6
+            schema:
+              type: object
+              properties:
+                num_u:
+                  type: integer
+                  example: 8
+                rate:
+                  type: number
+                  example: 0.04
+                maturity:
+                  type: number
+                  example: 0.5
+                cf_parameters:
+                  type: object
+                  properties:
+                    sigma:
+                      type: number
+                      example: 0.3
+                    mu_l:
+                      type: number
+                      example: -0.05
+                    sig_l:
+                      type: number
+                      example: 0.2
+                    lambda:
+                      type: number
+                      example: 1
+                    speed:
+                      type: number
+                      example: 0.2
+                    v0:
+                      type: number
+                      example: 0.9
+                    eta_v:
+                      type: number
+                      example: 0.2
+                    rho:
+                      type: number
+                      example: -0.5
+                  additionalProperties: false
+                quantile:
+                  type: number
+                  example: 0.01
+              required:
+                - num_u
+                - rate
+                - maturity
+                - cf_parameters
+                - quantile
+              additionalProperties: false
   /v1/heston/parameters/parameter_ranges:
     get:
       summary: Parameter Constraints
