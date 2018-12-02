@@ -36,6 +36,7 @@
     "serverless-domain-manager": "^2.6.5"
   },
   "dependencies": {
+    "adm-zip": "^0.4.13",
     "fs-extra": "^7.0.1"
   }
 }

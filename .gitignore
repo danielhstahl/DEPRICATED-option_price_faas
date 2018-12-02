@@ -6,3 +6,4 @@ quandlkey.txt
 *.log
 .serverless
 coverage
+*.zip

@@ -32,14 +32,11 @@ custom:
 
 package:
   individually: true #needed to name each binary "bootstrap"
-  exclude:
-    - ./**
 functions:
   calculator:
-    handler: target/lambda/pricer/bootstrap
+    handler: doesntmatter #because runtime is provided
     package:
-      include:
-        - target/lambda/pricer/bootstrap
+      artifact: pricer.zip
     events:
       - http:
           path: v1/{model}/calculator/{optionType}/{sensitivity}
@@ -55,10 +52,9 @@ functions:
               querystrings:
                 includeImpliedVolatility: false
   density:
-    handler: target/lambda/density/bootstrap
+    handler: doesntmatter #because runtime is provided
     package:
-      include:
-        - target/lambda/density/bootstrap
+      artifact: density.zip
     events:
       - http:
           path: v1/{model}/density
@@ -71,10 +67,9 @@ functions:
                 model: true
 
   riskmetric:
-    handler: target/lambda/riskmetric/bootstrap
+    handler: doesntmatter #because runtime is provided
     package:
-      include:
-        - target/lambda/riskmetric/bootstrap
+      artifact: riskmetric.zip
     events:
       - http:
           path: v1/{model}/riskmetric
@@ -87,10 +82,9 @@ functions:
                 model: true
 
   constraints:
-    handler: target/lambda/constraints/bootstrap
+    handler: doesntmatter #because runtime is provided
     package:
-      include:
-        - target/lambda/constraints/bootstrap
+      artifact: constraints.zip
     events:
       - http:
           path: v1/{model}/parameters/parameter_ranges
