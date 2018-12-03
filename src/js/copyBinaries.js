@@ -10,7 +10,7 @@ const locationNames=[
     'riskmetric',
     'density'
 ]
-module.exports=()=>locationNames.forEach(name=>{
+/*module.exports=()=>*/locationNames.forEach(name=>{
     fs.ensureDir(`${newZipLocation}/${name}`)
     .then(()=>{
         return new Promise((res, rej)=>{

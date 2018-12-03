@@ -1,7 +1,11 @@
-const binaryCopy=require('./src/js/copyBinaries')
+//const binaryCopy=require('./src/js/copyBinaries')
 const yamlWrite=require('./src/js/writeYml')
 
-Promise.all([
+yamlWrite().catch(err=>{
+    console.log(err)
+})
+
+/*Promise.all([
     binaryCopy(),
     yamlWrite()
 ]).then(([resb, resy])=>{
@@ -9,4 +13,4 @@ Promise.all([
     console.log(resy)
 }).catch(err=>{
     console.log(err)
-})
+})*/
