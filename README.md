@@ -23,4 +23,4 @@ Additional documentation is available at the [fang_oost_charts](https://github.c
 
 `cargo build --target x86_64-unknown-linux-musl --release`
 
-`cat ./tests/parameter1.json | sudo docker run --rm -v "$PWD":/var/task -i -e DOCKER_LAMBDA_USE_STDIN=1 lambci/lambda:go1.x ./target/x86_64-unknown-linux-musl/release/pricer`
+`cat ./tests/parameter1.json | sudo docker run --rm -v "$PWD":/var/task -i -e DOCKER_LAMBDA_USE_STDIN=1 lambci/lambda:provided ./target/x86_64-unknown-linux-musl/release/pricer`

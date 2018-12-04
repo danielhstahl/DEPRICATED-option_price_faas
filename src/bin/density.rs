@@ -13,24 +13,29 @@ extern crate serde_derive;
 extern crate serde_json;
 extern crate simple_logger;
 extern crate utils;
-
-use lambda_http::{lambda, Body, Request, RequestExt, Response};
+use lambda_http::{lambda, Body, IntoResponse, Request, RequestExt, Response};
 use runtime::{error::HandlerError, Context};
 
 use std::error::Error;
 
 use utils::constraints;
 use utils::maps;
+use utils::http_helper;
 
 const DENSITY_SCALE: f64 = 5.0;
 
 fn main() -> Result<(), Box<dyn Error>> {
     simple_logger::init_with_level(log::Level::Debug)?;
-    lambda!(density);
+    lambda!(density_wrapper);
     Ok(())
 }
-
-fn density(event: Request, ctx: Context) -> Result<Response<Body>, HandlerError> {
+fn density_wrapper(event: Request, ctx: Context) -> Result<impl IntoResponse, HandlerError> {
+    match density(event, ctx){
+        Ok(res)=>Ok(build_response(200, json!(res).to_string())),
+        Err(e)=>Ok(build_response(400, construct_error(e.to_string())))
+    }
+}
+fn density(event: Request, ctx: Context) -> Result<Vec<maps::GraphElement>, HandlerError> {
     let parameters: constraints::OptionParameters =
         serde_json::from_reader(event.body().as_ref()).map_err(|e| ctx.new_error(&e.to_string()))?;
 
@@ -67,12 +72,5 @@ fn density(event: Request, ctx: Context) -> Result<Response<Body>, HandlerError>
         maturity,
         rate,
     )
-    .map_err(|e| ctx.new_error(&e.to_string()))?;
-    let res = Response::builder()
-        .status(200)
-        .header("Access-Control-Allow-Origin", "*")
-        .header("Access-Control-Allow-Credentials", "true")
-        .body::<Body>(json!(results).to_string().into())
-        .map_err(|e| ctx.new_error(&e.to_string()))?;
-    Ok(res)
+    .map_err(|e| ctx.new_error(&e.to_string()))
 }

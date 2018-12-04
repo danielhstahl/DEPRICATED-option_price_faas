@@ -14,7 +14,7 @@ extern crate serde_json;
 extern crate simple_logger;
 extern crate utils;
 
-use lambda_http::{lambda, Body, Request, RequestExt, Response};
+use lambda_http::{lambda, Body, IntoResponse, Request, RequestExt, Response};
 use runtime::{error::HandlerError, Context};
 use std::error::Error;
 
@@ -25,11 +25,16 @@ const DENSITY_SCALE: f64 = 5.0;
 
 fn main() -> Result<(), Box<dyn Error>> {
     simple_logger::init_with_level(log::Level::Debug)?;
-    lambda!(risk_metric);
+    lambda!(risk_metric_wrapper);
     Ok(())
 }
-
-fn risk_metric(event: Request, ctx: Context) -> Result<Response<Body>, HandlerError> {
+fn risk_metric_wrapper(event: Request, ctx: Context) -> Result<impl IntoResponse, HandlerError> {
+    match risk_metric(event, ctx){
+        Ok(res)=>Ok(build_response(200, json!(res).to_string())),
+        Err(e)=>Ok(build_response(400, construct_error(e.to_string())))
+    }
+}
+fn risk_metric(event: Request, ctx: Context) -> Result<maps::RiskMeasures, HandlerError> {
     let parameters: constraints::OptionParameters =
         serde_json::from_reader(event.body().as_ref()).map_err(|e| ctx.new_error(&e.to_string()))?;
 
@@ -58,7 +63,7 @@ fn risk_metric(event: Request, ctx: Context) -> Result<Response<Body>, HandlerEr
 
     let num_u = (2 as usize).pow(num_u_base as u32);
 
-    let results = maps::get_risk_measure_results_as_json(
+    maps::get_risk_measure_results_as_json(
         model_indicator,
         &cf_parameters,
         DENSITY_SCALE,
@@ -66,13 +71,5 @@ fn risk_metric(event: Request, ctx: Context) -> Result<Response<Body>, HandlerEr
         maturity,
         rate,
         quantile_unwrap,
-    )
-    .map_err(|e| ctx.new_error(&e.to_string()))?;
-    let res = Response::builder()
-        .status(200)
-        .header("Access-Control-Allow-Origin", "*")
-        .header("Access-Control-Allow-Credentials", "true")
-        .body::<Body>(json!(results).to_string().into())
-        .map_err(|e| ctx.new_error(&e.to_string()))?;
-    Ok(res)
+    ).map_err(|e| ctx.new_error(&e.to_string()))
 }
