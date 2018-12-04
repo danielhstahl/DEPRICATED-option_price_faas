@@ -5,8 +5,6 @@ extern crate lambda_runtime as runtime;
 extern crate log;
 extern crate simple_logger;
 extern crate utils;
-extern crate http; //I dont like that I need this
-use http::Response as HttpResponse;
 use lambda_http::{lambda, Body, Request, RequestExt, Response};
 use runtime::{error::HandlerError, Context};
 
@@ -19,7 +17,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn output_constraints(event: Request, ctx: Context) -> Result<Response, HandlerError> {
+fn output_constraints(event: Request, ctx: Context) -> Result<Response<Body>, HandlerError> {
     let default_model = "";
     let path_parameters=event.path_parameters();
     let model = match path_parameters.get("model") {
@@ -32,7 +30,7 @@ fn output_constraints(event: Request, ctx: Context) -> Result<Response, HandlerE
         "merton" => json!(constraints::get_merton_constraints()).to_string(),
         _ => json!(constraints::get_constraints()).to_string(),
     };
-    let res = HttpResponse::builder()
+    let res = Response::builder()
         .status(200)
         .header("Access-Control-Allow-Origin", "*")
         .header("Access-Control-Allow-Credentials", "true")

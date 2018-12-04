@@ -13,9 +13,6 @@ extern crate serde_derive;
 extern crate serde_json;
 extern crate simple_logger;
 extern crate utils;
-extern crate http; //I dont like that I need this
-
-use http::Response as HttpResponse;
 use lambda_http::{lambda, Body, Request, RequestExt, Response};
 use runtime::{error::HandlerError, Context};
 use std::error::Error;
@@ -31,7 +28,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn price_options(event: Request, ctx: Context) -> Result<Response, HandlerError> {
+fn price_options(event: Request, ctx: Context) -> Result<Response<Body>, HandlerError> {
     let parameters: constraints::OptionParameters =
         serde_json::from_reader(event.body().as_ref()).map_err(|e| ctx.new_error(&e.to_string()))?;
 
@@ -98,7 +95,7 @@ fn price_options(event: Request, ctx: Context) -> Result<Response, HandlerError>
         strikes_unwrap,
     )
     .map_err(|e| ctx.new_error(&e.to_string()))?;
-    let res = HttpResponse::builder()
+    let res = Response::builder()
         .status(200)
         .header("Access-Control-Allow-Origin", "*")
         .header("Access-Control-Allow-Credentials", "true")

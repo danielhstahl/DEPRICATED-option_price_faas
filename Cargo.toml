@@ -22,10 +22,8 @@ simple_logger = "^1"
 black_scholes = "0.3.0"
 cf_functions = "0.10"
 num-complex = "0.2"
-#lambda_runtime = "0.1"
-http = "0.1" #note...I shouldnt have to need this
-lambda_http = { git = "https://github.com/softprops/aws-lambda-rust-runtime", branch="lambda-http" }
-lambda_runtime = { git = "https://github.com/softprops/aws-lambda-rust-runtime", branch="lambda-http" }
+lambda_http = { git = "https://github.com/awslabs/aws-lambda-rust-runtime" }
+lambda_runtime = { git = "https://github.com/awslabs/aws-lambda-rust-runtime" }
 
 [dev-dependencies]
 rand = "0.5"
