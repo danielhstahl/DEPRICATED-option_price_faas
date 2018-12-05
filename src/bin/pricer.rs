@@ -13,12 +13,13 @@ extern crate serde_derive;
 extern crate serde_json;
 extern crate simple_logger;
 extern crate utils;
-use lambda_http::{lambda, Body, IntoResponse, Request, RequestExt, Response};
+use lambda_http::{lambda, IntoResponse, Request, RequestExt};
 use runtime::{error::HandlerError, Context};
 use std::error::Error;
 
 use utils::constraints;
 use utils::maps;
+use utils::http_helper;
 
 const OPTION_SCALE: f64 = 10.0;
 
@@ -28,9 +29,12 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 fn price_options_wrapper(event: Request, ctx: Context) -> Result<impl IntoResponse, HandlerError> {
-    match density(event, ctx){
-        Ok(res)=>Ok(build_response(200, json!(res).to_string())),
-        Err(e)=>Ok(build_response(400, construct_error(e.to_string())))
+    match price_options(event, ctx){
+        Ok(res)=>Ok(http_helper::build_response(200, &json!(res).to_string())),
+        Err(e)=>Ok(http_helper::build_response(
+            400, 
+            &http_helper::construct_error(&e.to_string())
+        ))
     }
 }
 fn price_options(event: Request, ctx: Context) -> Result<Vec<maps::GraphElement>, HandlerError> {
@@ -87,7 +91,7 @@ fn price_options(event: Request, ctx: Context) -> Result<Vec<maps::GraphElement>
 
     let num_u = (2 as usize).pow(num_u_base as u32);
 
-    let results = maps::get_option_results_as_json(
+    maps::get_option_results_as_json(
         model_indicator,
         fn_indicator,
         include_iv,

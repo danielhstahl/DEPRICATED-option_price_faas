@@ -14,12 +14,13 @@ extern crate serde_json;
 extern crate simple_logger;
 extern crate utils;
 
-use lambda_http::{lambda, Body, IntoResponse, Request, RequestExt, Response};
+use lambda_http::{lambda, IntoResponse, Request, RequestExt};
 use runtime::{error::HandlerError, Context};
 use std::error::Error;
 
 use utils::constraints;
 use utils::maps;
+use utils::http_helper;
 
 const DENSITY_SCALE: f64 = 5.0;
 
@@ -30,8 +31,11 @@ fn main() -> Result<(), Box<dyn Error>> {
 }
 fn risk_metric_wrapper(event: Request, ctx: Context) -> Result<impl IntoResponse, HandlerError> {
     match risk_metric(event, ctx){
-        Ok(res)=>Ok(build_response(200, json!(res).to_string())),
-        Err(e)=>Ok(build_response(400, construct_error(e.to_string())))
+        Ok(res)=>Ok(http_helper::build_response(200, &json!(res).to_string())),
+        Err(e)=>Ok(http_helper::build_response(
+            400, 
+            &http_helper::construct_error(&e.to_string())
+        ))
     }
 }
 fn risk_metric(event: Request, ctx: Context) -> Result<maps::RiskMeasures, HandlerError> {

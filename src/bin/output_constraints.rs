@@ -5,11 +5,12 @@ extern crate lambda_runtime as runtime;
 extern crate log;
 extern crate simple_logger;
 extern crate utils;
-use lambda_http::{lambda, Body, IntoResponse, Request, RequestExt, Response};
+use lambda_http::{lambda, IntoResponse, Request, RequestExt};
 use runtime::{error::HandlerError, Context};
 
 use std::error::Error;
 use utils::constraints;
+use utils::http_helper;
 
 fn main() -> Result<(), Box<dyn Error>> {
     simple_logger::init_with_level(log::Level::Debug)?;
@@ -17,13 +18,16 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 fn output_constraints_wrapper(event: Request, ctx: Context) -> Result<impl IntoResponse, HandlerError> {
-    match density(event, ctx){
-        Ok(res)=>Ok(build_response(200, res)),
-        Err(e)=>Ok(build_response(400, construct_error(e.to_string())))
+    match output_constraints(event, ctx){
+        Ok(res)=>Ok(http_helper::build_response(200, &res)),
+        Err(e)=>Ok(http_helper::build_response(
+            400, 
+            &http_helper::construct_error(&e.to_string())
+        ))
     }
 }
 
-fn output_constraints(event: Request, ctx: Context) -> Result<& str, HandlerError> {
+fn output_constraints(event: Request, ctx: Context) -> Result<String, HandlerError> {
     let default_model = "";
     let path_parameters=event.path_parameters();
     let model = match path_parameters.get("model") {
@@ -35,5 +39,6 @@ fn output_constraints(event: Request, ctx: Context) -> Result<& str, HandlerErro
         "cgmy" => json!(constraints::get_cgmy_constraints()).to_string(),
         "merton" => json!(constraints::get_merton_constraints()).to_string(),
         _ => json!(constraints::get_constraints()).to_string(),
-    }
+    };
+    Ok(results)
 }

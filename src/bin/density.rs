@@ -13,7 +13,7 @@ extern crate serde_derive;
 extern crate serde_json;
 extern crate simple_logger;
 extern crate utils;
-use lambda_http::{lambda, Body, IntoResponse, Request, RequestExt, Response};
+use lambda_http::{lambda, IntoResponse, Request, RequestExt};
 use runtime::{error::HandlerError, Context};
 
 use std::error::Error;
@@ -31,8 +31,11 @@ fn main() -> Result<(), Box<dyn Error>> {
 }
 fn density_wrapper(event: Request, ctx: Context) -> Result<impl IntoResponse, HandlerError> {
     match density(event, ctx){
-        Ok(res)=>Ok(build_response(200, json!(res).to_string())),
-        Err(e)=>Ok(build_response(400, construct_error(e.to_string())))
+        Ok(res)=>Ok(http_helper::build_response(200, &json!(res).to_string())),
+        Err(e)=>Ok(http_helper::build_response(
+            400, 
+            &http_helper::construct_error(&e.to_string())
+        ))
     }
 }
 fn density(event: Request, ctx: Context) -> Result<Vec<maps::GraphElement>, HandlerError> {
@@ -64,7 +67,7 @@ fn density(event: Request, ctx: Context) -> Result<Vec<maps::GraphElement>, Hand
 
     let num_u = (2 as usize).pow(num_u_base as u32);
 
-    let results = maps::get_density_results_as_json(
+    maps::get_density_results_as_json(
         model_indicator,
         &cf_parameters,
         DENSITY_SCALE,
