@@ -5,19 +5,29 @@ extern crate lambda_runtime as runtime;
 extern crate log;
 extern crate simple_logger;
 extern crate utils;
-use lambda_http::{lambda, Body, Request, RequestExt, Response};
+use lambda_http::{lambda, IntoResponse, Request, RequestExt};
 use runtime::{error::HandlerError, Context};
-
+use std::io;
 use std::error::Error;
 use utils::constraints;
+use utils::http_helper;
 
 fn main() -> Result<(), Box<dyn Error>> {
     simple_logger::init_with_level(log::Level::Debug)?;
-    lambda!(output_constraints);
+    lambda!(output_constraints_wrapper);
     Ok(())
 }
+fn output_constraints_wrapper(event: Request, _ctx: Context) -> Result<impl IntoResponse, HandlerError> {
+    match output_constraints(event){
+        Ok(res)=>Ok(http_helper::build_response(200, &res)),
+        Err(e)=>Ok(http_helper::build_response(
+            400, 
+            &http_helper::construct_error(&e.to_string())
+        ))
+    }
+}
 
-fn output_constraints(event: Request, ctx: Context) -> Result<Response<Body>, HandlerError> {
+fn output_constraints(event: Request) -> Result<String, io::Error> {
     let default_model = "";
     let path_parameters=event.path_parameters();
     let model = match path_parameters.get("model") {
@@ -30,11 +40,5 @@ fn output_constraints(event: Request, ctx: Context) -> Result<Response<Body>, Ha
         "merton" => json!(constraints::get_merton_constraints()).to_string(),
         _ => json!(constraints::get_constraints()).to_string(),
     };
-    let res = Response::builder()
-        .status(200)
-        .header("Access-Control-Allow-Origin", "*")
-        .header("Access-Control-Allow-Credentials", "true")
-        .body::<Body>(results.into())
-        .map_err(|e| ctx.new_error(&e.to_string()))?;
-    Ok(res)
+    Ok(results)
 }

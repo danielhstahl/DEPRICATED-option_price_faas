@@ -14,27 +14,35 @@ extern crate serde_json;
 extern crate simple_logger;
 extern crate utils;
 
-use lambda_http::{lambda, Body, Request, RequestExt, Response};
+use lambda_http::{lambda, IntoResponse, Request, RequestExt};
 use runtime::{error::HandlerError, Context};
 use std::error::Error;
-
+use std::io;
 use utils::constraints;
 use utils::maps;
+use utils::http_helper;
 
 const DENSITY_SCALE: f64 = 5.0;
 
 fn main() -> Result<(), Box<dyn Error>> {
     simple_logger::init_with_level(log::Level::Debug)?;
-    lambda!(risk_metric);
+    lambda!(risk_metric_wrapper);
     Ok(())
 }
-
-fn risk_metric(event: Request, ctx: Context) -> Result<Response<Body>, HandlerError> {
+fn risk_metric_wrapper(event: Request, _ctx: Context) -> Result<impl IntoResponse, HandlerError> {
+    match risk_metric(event){
+        Ok(res)=>Ok(http_helper::build_response(200, &json!(res).to_string())),
+        Err(e)=>Ok(http_helper::build_response(
+            400, 
+            &http_helper::construct_error(&e.to_string())
+        ))
+    }
+}
+fn risk_metric(event: Request) -> Result<maps::RiskMeasures, io::Error> {
     let parameters: constraints::OptionParameters =
-        serde_json::from_reader(event.body().as_ref()).map_err(|e| ctx.new_error(&e.to_string()))?;
+        serde_json::from_reader(event.body().as_ref())?;
 
-    constraints::check_parameters(&parameters, &constraints::get_constraints())
-        .map_err(|e| ctx.new_error(&e.to_string()))?;
+    constraints::check_parameters(&parameters, &constraints::get_constraints())?;
 
     let constraints::OptionParameters {
         maturity,
@@ -45,7 +53,8 @@ fn risk_metric(event: Request, ctx: Context) -> Result<Response<Body>, HandlerEr
         ..
     } = parameters; //destructure
 
-    let quantile_unwrap = quantile.ok_or(ctx.new_error("Requires quantile"))?;
+    let quantile_unwrap = quantile
+        .ok_or(constraints::throw_no_exist_error("quantile"))?;
 
     let default_value = "";
     let path_parameters=event.path_parameters();
@@ -53,12 +62,11 @@ fn risk_metric(event: Request, ctx: Context) -> Result<Response<Body>, HandlerEr
         Some(m) => m,
         None => default_value
     };
-    let model_indicator =
-        maps::get_model_indicators(&model).map_err(|e| ctx.new_error(&e.to_string()))?;
+    let model_indicator = maps::get_model_indicators(&model)?;
 
     let num_u = (2 as usize).pow(num_u_base as u32);
 
-    let results = maps::get_risk_measure_results_as_json(
+    maps::get_risk_measure_results_as_json(
         model_indicator,
         &cf_parameters,
         DENSITY_SCALE,
@@ -67,12 +75,4 @@ fn risk_metric(event: Request, ctx: Context) -> Result<Response<Body>, HandlerEr
         rate,
         quantile_unwrap,
     )
-    .map_err(|e| ctx.new_error(&e.to_string()))?;
-    let res = Response::builder()
-        .status(200)
-        .header("Access-Control-Allow-Origin", "*")
-        .header("Access-Control-Allow-Credentials", "true")
-        .body::<Body>(json!(results).to_string().into())
-        .map_err(|e| ctx.new_error(&e.to_string()))?;
-    Ok(res)
 }

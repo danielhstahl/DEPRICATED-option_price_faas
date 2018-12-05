@@ -19,4 +19,15 @@ describe('risk_measures', ()=>{
             done()
         })
     })
+    it('returns error if not all parameters included', done=>{
+        spawnCommand('./tests/riskMetricError.json', (err, result)=>{
+            if(err){
+                throw(err)
+            }
+            const res=JSON.parse(JSON.parse(result).body)
+            expect(res.err).toBeDefined()
+            expect(res.err).toEqual("Parameter quantile does not exist")
+            done()
+        })
+    })
 })

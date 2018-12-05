@@ -329,9 +329,20 @@ pub fn check_parameters<'a>(
     Ok(())
 }
 
+pub fn throw_no_exist_error(
+    message:&str
+)->io::Error{
+    Error::new(ErrorKind::Other, format!("Parameter {} does not exist", message))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn test_throw_no_exist_error() {
+        let err = throw_no_exist_error("hello");
+        assert_eq!(err.to_string(), "Parameter hello does not exist");
+    }
     #[test]
     fn test_check_constraint_option() {
         let constraint = ConstraintsSchema {

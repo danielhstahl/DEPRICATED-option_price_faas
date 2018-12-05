@@ -34,5 +34,16 @@ describe('option prices', ()=>{
             done()
         })
     })
+    it('returns error if not all parameters included', done=>{
+        spawnCommand('./tests/pricerError.json', (err, result)=>{
+            if(err){
+                throw(err)
+            }
+            const res=JSON.parse(JSON.parse(result).body)
+            expect(res.err).toBeDefined()
+            expect(res.err).toEqual("Parameter strikes does not exist")
+            done()
+        })
+    })
 })
 
