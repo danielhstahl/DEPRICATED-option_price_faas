@@ -7,7 +7,7 @@ extern crate simple_logger;
 extern crate utils;
 use lambda_http::{lambda, IntoResponse, Request, RequestExt};
 use runtime::{error::HandlerError, Context};
-
+use std::io;
 use std::error::Error;
 use utils::constraints;
 use utils::http_helper;
@@ -17,8 +17,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     lambda!(output_constraints_wrapper);
     Ok(())
 }
-fn output_constraints_wrapper(event: Request, ctx: Context) -> Result<impl IntoResponse, HandlerError> {
-    match output_constraints(event, ctx){
+fn output_constraints_wrapper(event: Request, _ctx: Context) -> Result<impl IntoResponse, HandlerError> {
+    match output_constraints(event){
         Ok(res)=>Ok(http_helper::build_response(200, &res)),
         Err(e)=>Ok(http_helper::build_response(
             400, 
@@ -27,7 +27,7 @@ fn output_constraints_wrapper(event: Request, ctx: Context) -> Result<impl IntoR
     }
 }
 
-fn output_constraints(event: Request, ctx: Context) -> Result<String, HandlerError> {
+fn output_constraints(event: Request) -> Result<String, io::Error> {
     let default_model = "";
     let path_parameters=event.path_parameters();
     let model = match path_parameters.get("model") {

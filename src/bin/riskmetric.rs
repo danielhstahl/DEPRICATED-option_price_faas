@@ -17,7 +17,7 @@ extern crate utils;
 use lambda_http::{lambda, IntoResponse, Request, RequestExt};
 use runtime::{error::HandlerError, Context};
 use std::error::Error;
-
+use std::io;
 use utils::constraints;
 use utils::maps;
 use utils::http_helper;
@@ -29,8 +29,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     lambda!(risk_metric_wrapper);
     Ok(())
 }
-fn risk_metric_wrapper(event: Request, ctx: Context) -> Result<impl IntoResponse, HandlerError> {
-    match risk_metric(event, ctx){
+fn risk_metric_wrapper(event: Request, _ctx: Context) -> Result<impl IntoResponse, HandlerError> {
+    match risk_metric(event){
         Ok(res)=>Ok(http_helper::build_response(200, &json!(res).to_string())),
         Err(e)=>Ok(http_helper::build_response(
             400, 
@@ -38,12 +38,11 @@ fn risk_metric_wrapper(event: Request, ctx: Context) -> Result<impl IntoResponse
         ))
     }
 }
-fn risk_metric(event: Request, ctx: Context) -> Result<maps::RiskMeasures, HandlerError> {
+fn risk_metric(event: Request) -> Result<maps::RiskMeasures, io::Error> {
     let parameters: constraints::OptionParameters =
-        serde_json::from_reader(event.body().as_ref()).map_err(|e| ctx.new_error(&e.to_string()))?;
+        serde_json::from_reader(event.body().as_ref())?;
 
-    constraints::check_parameters(&parameters, &constraints::get_constraints())
-        .map_err(|e| ctx.new_error(&e.to_string()))?;
+    constraints::check_parameters(&parameters, &constraints::get_constraints())?;
 
     let constraints::OptionParameters {
         maturity,
@@ -54,7 +53,8 @@ fn risk_metric(event: Request, ctx: Context) -> Result<maps::RiskMeasures, Handl
         ..
     } = parameters; //destructure
 
-    let quantile_unwrap = quantile.ok_or(ctx.new_error("Requires quantile"))?;
+    let quantile_unwrap = quantile
+        .ok_or(constraints::throw_no_exist_error("quantile"))?;
 
     let default_value = "";
     let path_parameters=event.path_parameters();
@@ -62,8 +62,7 @@ fn risk_metric(event: Request, ctx: Context) -> Result<maps::RiskMeasures, Handl
         Some(m) => m,
         None => default_value
     };
-    let model_indicator =
-        maps::get_model_indicators(&model).map_err(|e| ctx.new_error(&e.to_string()))?;
+    let model_indicator = maps::get_model_indicators(&model)?;
 
     let num_u = (2 as usize).pow(num_u_base as u32);
 
@@ -75,5 +74,5 @@ fn risk_metric(event: Request, ctx: Context) -> Result<maps::RiskMeasures, Handl
         maturity,
         rate,
         quantile_unwrap,
-    ).map_err(|e| ctx.new_error(&e.to_string()))
+    )
 }

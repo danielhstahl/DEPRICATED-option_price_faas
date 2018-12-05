@@ -16,7 +16,7 @@ extern crate utils;
 use lambda_http::{lambda, IntoResponse, Request, RequestExt};
 use runtime::{error::HandlerError, Context};
 use std::error::Error;
-
+use std::io;
 use utils::constraints;
 use utils::maps;
 use utils::http_helper;
@@ -28,8 +28,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     lambda!(price_options_wrapper);
     Ok(())
 }
-fn price_options_wrapper(event: Request, ctx: Context) -> Result<impl IntoResponse, HandlerError> {
-    match price_options(event, ctx){
+fn price_options_wrapper(event: Request, _ctx: Context) -> Result<impl IntoResponse, HandlerError> {
+    match price_options(event){
         Ok(res)=>Ok(http_helper::build_response(200, &json!(res).to_string())),
         Err(e)=>Ok(http_helper::build_response(
             400, 
@@ -37,12 +37,11 @@ fn price_options_wrapper(event: Request, ctx: Context) -> Result<impl IntoRespon
         ))
     }
 }
-fn price_options(event: Request, ctx: Context) -> Result<Vec<maps::GraphElement>, HandlerError> {
+fn price_options(event: Request) -> Result<Vec<maps::GraphElement>, io::Error> {
     let parameters: constraints::OptionParameters =
-        serde_json::from_reader(event.body().as_ref()).map_err(|e| ctx.new_error(&e.to_string()))?;
+        serde_json::from_reader(event.body().as_ref())?;
 
-    constraints::check_parameters(&parameters, &constraints::get_constraints())
-        .map_err(|e| ctx.new_error(&e.to_string()))?;
+    constraints::check_parameters(&parameters, &constraints::get_constraints())?;
 
     let constraints::OptionParameters {
         maturity,
@@ -54,10 +53,12 @@ fn price_options(event: Request, ctx: Context) -> Result<Vec<maps::GraphElement>
         ..
     } = parameters; //destructure
 
-    let strikes_unwrap = strikes.ok_or(ctx.new_error("Requires strikes"))?;
-    let asset_unwrap = asset.ok_or(ctx.new_error("Requires asset"))?;
+    let strikes_unwrap = strikes
+        .ok_or(constraints::throw_no_exist_error("strikes"))?;
+    let asset_unwrap = asset
+        .ok_or(constraints::throw_no_exist_error("asset"))?;
 
-    let default_value = "";//.to_string();
+    let default_value = "";
 
     let path_parameters=event.path_parameters();
     let query_string_parameters=event.query_string_parameters();
@@ -76,11 +77,9 @@ fn price_options(event: Request, ctx: Context) -> Result<Vec<maps::GraphElement>
         None => default_value,
     };
 
-    let model_indicator =
-        maps::get_model_indicators(model).map_err(|e| ctx.new_error(&e.to_string()))?;
+    let model_indicator = maps::get_model_indicators(model)?;
     
-    let fn_indicator = maps::get_fn_indicators(&option_type, &sensitivity)
-        .map_err(|e| ctx.new_error(&e.to_string()))?;
+    let fn_indicator = maps::get_fn_indicators(&option_type, &sensitivity)?;
 
     let query =match query_string_parameters.get("includeImpliedVolatility") {
         Some(m) => m,
@@ -103,5 +102,4 @@ fn price_options(event: Request, ctx: Context) -> Result<Vec<maps::GraphElement>
         rate,
         strikes_unwrap,
     )
-    .map_err(|e| ctx.new_error(&e.to_string()))
 }

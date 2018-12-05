@@ -18,4 +18,15 @@ describe('density', ()=>{
             done()
         })
     })
+    it('returns error if not all parameters included', done=>{
+        spawnCommand('./tests/densityError.json', (err, result)=>{
+            if(err){
+                throw(err)
+            }
+            const res=JSON.parse(JSON.parse(result).body)
+            expect(res.err).toBeDefined()
+            expect(res.err).toEqual("Parameter rate does not exist")
+            done()
+        })
+    })
 })
