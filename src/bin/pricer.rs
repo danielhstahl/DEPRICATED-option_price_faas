@@ -5,13 +5,11 @@ extern crate fang_oost;
 extern crate fang_oost_option;
 extern crate lambda_http;
 extern crate lambda_runtime as runtime;
-extern crate log;
 extern crate num_complex;
 extern crate rayon;
 extern crate serde_derive;
 #[macro_use]
 extern crate serde_json;
-extern crate simple_logger;
 extern crate utils;
 use lambda_http::{lambda, IntoResponse, Request, RequestExt};
 use runtime::{error::HandlerError, Context};
@@ -24,7 +22,6 @@ use utils::http_helper;
 const OPTION_SCALE: f64 = 10.0;
 
 fn main() -> Result<(), Box<dyn Error>> {
-    simple_logger::init_with_level(log::Level::Debug)?;
     lambda!(price_options_wrapper);
     Ok(())
 }

@@ -676,14 +676,12 @@ dependencies = [
  "fang_oost_option 0.27.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "lambda_http 0.1.0 (git+https://github.com/awslabs/aws-lambda-rust-runtime)",
  "lambda_runtime 0.1.0 (git+https://github.com/awslabs/aws-lambda-rust-runtime)",
- "log 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "num-complex 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.5.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "rayon 1.0.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.80 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 1.0.80 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.33 (registry+https://github.com/rust-lang/crates.io-index)",
- "simple_logger 1.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]

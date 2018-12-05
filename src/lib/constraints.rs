@@ -1,7 +1,3 @@
-//Todo: consider writing a macro to iterate over structs
-//structs will allow for static typing and possibly speed
-//optimizations vs hashmaps
-
 use std::collections::HashMap;
 use std::collections::VecDeque;
 use std::io;

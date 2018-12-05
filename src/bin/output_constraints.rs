@@ -2,8 +2,6 @@
 extern crate serde_json;
 extern crate lambda_http;
 extern crate lambda_runtime as runtime;
-extern crate log;
-extern crate simple_logger;
 extern crate utils;
 use lambda_http::{lambda, IntoResponse, Request, RequestExt};
 use runtime::{error::HandlerError, Context};
@@ -13,7 +11,6 @@ use utils::constraints;
 use utils::http_helper;
 
 fn main() -> Result<(), Box<dyn Error>> {
-    simple_logger::init_with_level(log::Level::Debug)?;
     lambda!(output_constraints_wrapper);
     Ok(())
 }
