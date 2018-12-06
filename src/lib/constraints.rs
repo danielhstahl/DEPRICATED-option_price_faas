@@ -41,11 +41,11 @@ pub struct HestonParameters {
 }
 
 #[derive(Serialize, Deserialize)]
-#[serde(tag = "type")]
+#[serde(untagged)]
 pub enum CFParameters{
-    Merton(MertonParameters),
-    Heston(HestonParameters),
-    CGMY(CGMYParameters)
+    Merton(MertonParameters), 
+    CGMY(CGMYParameters),
+    Heston(HestonParameters)
 }
 
 #[derive(Serialize, Deserialize)]
@@ -73,6 +73,7 @@ pub struct ParameterConstraints {
     pub num_u: ConstraintsSchema,
     pub quantile: ConstraintsSchema,
 }
+
 #[derive(Serialize, Deserialize)]
 pub struct MertonConstraints {
     pub lambda: ConstraintsSchema,
@@ -84,6 +85,7 @@ pub struct MertonConstraints {
     pub eta_v: ConstraintsSchema,
     pub rho: ConstraintsSchema
 }
+
 #[derive(Serialize, Deserialize)]
 pub struct CGMYConstraints {
     pub c: ConstraintsSchema,
@@ -96,6 +98,7 @@ pub struct CGMYConstraints {
     pub eta_v: ConstraintsSchema,
     pub rho: ConstraintsSchema
 }
+
 #[derive(Serialize, Deserialize)]
 pub struct HestonConstraints {
     pub sigma: ConstraintsSchema,
@@ -285,34 +288,6 @@ fn check_constraint_option<'a>(
     }
 }
 
-/*
-fn get_parameter(parameters: &HashMap<String, f64>, key: &String) -> Result<f64, io::Error> {
-    match parameters.get(key) {
-        Some(parameter) => Ok(*parameter),
-        None => Err(Error::new(
-            ErrorKind::Other,
-            format!("Parameter {} does not exist", key),
-        )),
-    }
-}
-fn constraint_fn(
-    parameters: &HashMap<String, f64>,
-    key: &String,
-    value: &ConstraintsSchema,
-) -> Result<(), io::Error> {
-    let parameter = get_parameter(parameters, key)?;
-    check_constraint(parameter, value, key)?;
-    Ok(())
-}
-pub fn check_cf_parameters<'a>(
-    parameters: &HashMap<String, f64>,
-    constraints: &HashMap<String, ConstraintsSchema>,
-) -> Result<(), io::Error> {
-    constraints
-        .iter()
-        .try_for_each(|(key, value)| constraint_fn(parameters, key, value))?;
-    Ok(())
-}*/
 pub fn check_parameters<'a>(
     parameters: &OptionParameters,
     constraints: &ParameterConstraints,
@@ -543,5 +518,82 @@ mod tests {
         assert!(result.is_err());
         assert_eq!(result.unwrap_err().to_string(), "Parameter sigma out of bounds");
     }
-    
+    #[test]
+    fn test_serialization_heston(){
+        let json_str=r#"{
+            "maturity": 0.5,
+            "rate": 0.05,
+            "num_u": 8,
+            "cf_parameters":{
+                "sigma":0.5,
+                "speed":0.1,
+                "v0":0.2,
+                "eta_v":0.1,
+                "rho":-0.5
+            }
+        }"#;
+        let parameters: OptionParameters =
+        serde_json::from_str(json_str).unwrap();
+        match parameters.cf_parameters{
+            CFParameters::Heston(cf_params)=>{
+                assert_eq!(cf_params.sigma, 0.5);
+            },
+            _=>assert!(false)
+        }
+        
+    } 
+    #[test]
+    fn test_serialization_merton(){
+        let json_str=r#"{
+            "maturity": 0.5,
+            "rate": 0.05,
+            "num_u": 8,
+            "cf_parameters":{
+                "sigma":0.5,
+                "speed":0.1,
+                "v0":0.2,
+                "eta_v":0.1,
+                "rho":-0.5,
+                "lambda": 0.5,
+                "mu_l": -0.05,
+                "sig_l": 0.3
+            }
+        }"#;
+        let parameters: OptionParameters =
+        serde_json::from_str(json_str).unwrap();
+        match parameters.cf_parameters{
+            CFParameters::Merton(cf_params)=>{
+                assert_eq!(cf_params.sigma, 0.5);
+            },
+            _=>assert!(false)
+        }
+    } 
+    #[test]
+    fn test_serialization_cgmy(){
+        let json_str=r#"{
+            "maturity": 0.5,
+            "rate": 0.05,
+            "num_u": 8,
+            "cf_parameters":{
+                "sigma":0.5,
+                "speed":0.1,
+                "v0":0.2,
+                "eta_v":0.1,
+                "rho":-0.5,
+                "c": 0.5,
+                "g": 3.0,
+                "m": 4.0,
+                "y":0.5
+            }
+        }"#;
+        let parameters: OptionParameters =
+        serde_json::from_str(json_str).unwrap();
+        match parameters.cf_parameters{
+            CFParameters::CGMY(cf_params)=>{
+                assert_eq!(cf_params.sigma, 0.5);
+            },
+            _=>assert!(false)
+        }
+        
+    } 
 }
