@@ -41,6 +41,7 @@ pub struct HestonParameters {
 }
 
 #[derive(Serialize, Deserialize)]
+#[serde(tag = "type")]
 pub enum CFParameters{
     Merton(MertonParameters),
     Heston(HestonParameters),
