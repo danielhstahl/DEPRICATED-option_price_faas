@@ -60,11 +60,6 @@ fn price_options(event: Request) -> Result<Vec<maps::GraphElement>, io::Error> {
     let path_parameters=event.path_parameters();
     let query_string_parameters=event.query_string_parameters();
     
-    /*let model = match path_parameters.get("model") {
-        Some(m) => m,
-        None => default_value
-    };*/
-
     let sensitivity = match path_parameters.get("sensitivity") {
         Some(m) => m,
         None => default_value,
@@ -73,8 +68,6 @@ fn price_options(event: Request) -> Result<Vec<maps::GraphElement>, io::Error> {
         Some(m) => m,
         None => default_value,
     };
-
-    //let model_indicator = maps::get_model_indicators(model)?;
     
     let fn_indicator = maps::get_fn_indicators(&option_type, &sensitivity)?;
 
@@ -88,7 +81,6 @@ fn price_options(event: Request) -> Result<Vec<maps::GraphElement>, io::Error> {
     let num_u = (2 as usize).pow(num_u_base as u32);
 
     maps::get_option_results_as_json(
-        //model_indicator,
         fn_indicator,
         include_iv,
         &cf_parameters,

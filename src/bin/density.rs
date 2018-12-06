@@ -49,21 +49,9 @@ fn density(event: Request) -> Result<Vec<maps::GraphElement>, io::Error> {
         ..
     } = parameters; //destructure
 
-    /*let default_value = "";
-
-    let path_parameters=event.path_parameters();
-
-    let model = match path_parameters.get("model") {
-        Some(m) => m,
-        None => default_value
-    };
-
-    let model_indicator = maps::get_model_indicators(&model)?;*/
-
     let num_u = (2 as usize).pow(num_u_base as u32);
 
     maps::get_density_results_as_json(
-        //model_indicator,
         &cf_parameters,
         DENSITY_SCALE,
         num_u,

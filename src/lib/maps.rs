@@ -683,19 +683,6 @@ mod tests {
     fn test_cgmy_price_1() {
         //https://mpra.ub.uni-muenchen.de/8914/4/MPRA_paper_8914.pdf pg 18
         //S0 = 100, K = 100, r = 0.1, q = 0, C = 1, G = 5, M = 5, T = 1, Y=0.5
-        /*let parameters: HashMap<String, f64> = vec![
-            ("sigma".to_string(), 0.0),
-            ("c".to_string(), 1.0),
-            ("g".to_string(), 5.0),
-            ("m".to_string(), 5.0),
-            ("y".to_string(), 0.5),
-            ("speed".to_string(), 0.0),
-            ("v0".to_string(), 1.0),
-            ("eta_v".to_string(), 0.0),
-            ("rho".to_string(), 0.0),
-        ]
-        .into_iter()
-        .collect();*/
         let parameters=constraints::CGMYParameters{
             sigma:0.0,
             c: 1.0,
@@ -714,7 +701,6 @@ mod tests {
         let rate = 0.1;
         let asset = 100.0;
         let results = get_option_results_as_json(
-            //CGMY,
             CALL_PRICE,
             true,
             &constraints::CFParameters::CGMY(parameters),
@@ -726,26 +712,12 @@ mod tests {
             strikes,
         )
         .unwrap();
-        //let results:Vec<GraphElement>=serde_json::from_str(&results_str).unwrap();
         assert_abs_diff_eq!(results[0].value, 19.812948843, epsilon = 0.00001);
     }
     #[test]
     fn test_cgmy_price_2() {
         //https://mpra.ub.uni-muenchen.de/8914/4/MPRA_paper_8914.pdf pg 18
         //S0 = 100, K = 100, r = 0.1, q = 0, C = 1, G = 5, M = 5, T = 1, Y=1.5
-        /*let parameters: HashMap<String, f64> = vec![
-            ("sigma".to_string(), 0.0),
-            ("c".to_string(), 1.0),
-            ("g".to_string(), 5.0),
-            ("m".to_string(), 5.0),
-            ("y".to_string(), 1.5),
-            ("speed".to_string(), 0.0),
-            ("v0".to_string(), 1.0),
-            ("eta_v".to_string(), 0.0),
-            ("rho".to_string(), 0.0),
-        ]
-        .into_iter()
-        .collect();*/
         let parameters=constraints::CGMYParameters{
             sigma:0.0,
             c: 1.0,
@@ -764,7 +736,6 @@ mod tests {
         let rate = 0.1;
         let asset = 100.0;
         let results = get_option_results_as_json(
-            //CGMY,
             CALL_PRICE,
             false,
             &constraints::CFParameters::CGMY(parameters),
@@ -776,26 +747,12 @@ mod tests {
             strikes,
         )
         .unwrap();
-        //let results:Vec<GraphElement>=serde_json::from_str(&results_str).unwrap();
         assert_abs_diff_eq!(results[0].value, 49.790905469, epsilon = 0.00001);
     }
     #[test]
     fn test_cgmy_price_3() {
         //https://mpra.ub.uni-muenchen.de/8914/4/MPRA_paper_8914.pdf pg 18
         //S0 = 100, K = 100, r = 0.1, q = 0, C = 1, G = 5, M = 5, T = 1, Y=1.98
-        /*let parameters: HashMap<String, f64> = vec![
-            ("sigma".to_string(), 0.0),
-            ("c".to_string(), 1.0),
-            ("g".to_string(), 5.0),
-            ("m".to_string(), 5.0),
-            ("y".to_string(), 1.98),
-            ("speed".to_string(), 0.0),
-            ("v0".to_string(), 1.0),
-            ("eta_v".to_string(), 0.0),
-            ("rho".to_string(), 0.0),
-        ]
-        .into_iter()
-        .collect();*/
         let parameters=constraints::CGMYParameters{
             sigma:0.0,
             c: 1.0,
@@ -814,7 +771,6 @@ mod tests {
         let rate = 0.1;
         let asset = 100.0;
         let results = get_option_results_as_json(
-            //CGMY,
             CALL_PRICE,
             false,
             &constraints::CFParameters::CGMY(parameters),
@@ -826,7 +782,6 @@ mod tests {
             strikes,
         )
         .unwrap();
-        //let results:Vec<GraphElement>=serde_json::from_str(&results_str).unwrap();
         assert_abs_diff_eq!(results[0].value, 99.999905510, epsilon = 0.00001);
     }
     #[test]
@@ -834,18 +789,6 @@ mod tests {
         //https://www.upo.es/personal/jfernav/papers/Jumps_JOD_.pdf pg 8
         let sig_l = 0.05_f64.sqrt();
         let mu_l = -sig_l.powi(2) * 0.5;
-        /*let parameters: HashMap<String, f64> = vec![
-            ("sigma".to_string(), sig_l),
-            ("lambda".to_string(), 1.0),
-            ("mu_l".to_string(), mu_l),
-            ("sig_l".to_string(), sig_l),
-            ("speed".to_string(), 0.0),
-            ("v0".to_string(), 1.0),
-            ("eta_v".to_string(), 0.0),
-            ("rho".to_string(), 0.0),
-        ]
-        .into_iter()
-        .collect();*/
         let parameters=constraints::MertonParameters{
             sigma:sig_l,
             lambda: 1.0,
@@ -863,7 +806,6 @@ mod tests {
         let rate = 0.1;
         let asset = 38.0;
         let results = get_option_results_as_json(
-            //MERTON,
             CALL_PRICE,
             false,
             &constraints::CFParameters::Merton(parameters),
@@ -875,7 +817,6 @@ mod tests {
             strikes,
         )
         .unwrap();
-        //let results:Vec<GraphElement>=serde_json::from_str(&results_str).unwrap();
         assert_abs_diff_eq!(results[0].value, 5.9713, epsilon = 0.0001);
     }
     #[test]
@@ -888,18 +829,6 @@ mod tests {
         let c = 0.5751;
         let rho = -0.5711;
         let v0 = 0.0175;
-        /*let parameters: HashMap<String, f64> = vec![
-            ("sigma".to_string(), b.sqrt()),
-            ("lambda".to_string(), 0.0),
-            ("mu_l".to_string(), mu_l),
-            ("sig_l".to_string(), sig_l),
-            ("speed".to_string(), a),
-            ("v0".to_string(), v0 / b),
-            ("eta_v".to_string(), c / b.sqrt()),
-            ("rho".to_string(), rho),
-        ]
-        .into_iter()
-        .collect();*/
         let parameters=constraints::MertonParameters{
             sigma:b.sqrt(),
             lambda: 0.0,
@@ -917,7 +846,6 @@ mod tests {
         let rate = 0.0;
         let asset = 100.0;
         let results = get_option_results_as_json(
-            //MERTON,
             CALL_PRICE,
             false,
             &constraints::CFParameters::Merton(parameters),
@@ -929,7 +857,6 @@ mod tests {
             strikes,
         )
         .unwrap();
-        //let results:Vec<GraphElement>=serde_json::from_str(&results_str).unwrap();
         assert_abs_diff_eq!(results[0].value, 5.78515545, epsilon = 0.0001);
     }
     #[test]
@@ -940,15 +867,6 @@ mod tests {
         let c = 0.5751;
         let rho = -0.5711;
         let v0 = 0.0175;
-       /*let parameters: HashMap<String, f64> = vec![
-            ("sigma".to_string(), b.sqrt()),
-            ("speed".to_string(), a),
-            ("v0".to_string(), v0),
-            ("eta_v".to_string(), c),
-            ("rho".to_string(), rho),
-        ]
-        .into_iter()
-        .collect();*/
         let parameters=constraints::HestonParameters{
             sigma:b.sqrt(),
             speed: a,
@@ -963,7 +881,6 @@ mod tests {
         let rate = 0.0;
         let asset = 100.0;
         let results = get_option_results_as_json(
-            //HESTON,
             CALL_PRICE,
             false,
             &constraints::CFParameters::Heston(parameters),
@@ -975,24 +892,11 @@ mod tests {
             strikes,
         )
         .unwrap();
-        //let results:Vec<GraphElement>=serde_json::from_str(&results_str).unwrap();
         assert_abs_diff_eq!(results[0].value, 5.78515545, epsilon = 0.0001);
     }
     #[test]
     fn test_monte_carlo() {
         //https://github.com/phillyfan1138/fang_oost_cal_charts/blob/master/docs/OptionCalculation.Rnw
-        /*let parameters: HashMap<String, f64> = vec![
-            ("sigma".to_string(), 0.2),
-            ("lambda".to_string(), 0.5),
-            ("mu_l".to_string(), -0.05),
-            ("sig_l".to_string(), 0.1),
-            ("speed".to_string(), 0.3),
-            ("v0".to_string(), 0.9),
-            ("eta_v".to_string(), 0.2),
-            ("rho".to_string(), -0.5),
-        ]
-        .into_iter()
-        .collect();*/
         let parameters=constraints::MertonParameters{
             sigma:0.2,
             lambda: 0.5,
@@ -1010,7 +914,6 @@ mod tests {
         let rate = 0.03;
         let asset = 50.0;
         let results = get_option_results_as_json(
-            //MERTON,
             CALL_PRICE,
             false,
             &constraints::CFParameters::Merton(parameters),
