@@ -1,5 +1,7 @@
 'use strict'
-const command='sudo docker run --rm -v "$PWD":/var/task -i -e DOCKER_LAMBDA_USE_STDIN=1 lambci/lambda:provided -bootstrap ./target/x86_64-unknown-linux-musl/release/riskmetric'
+const {location}=require('./binaryLocation.json')
+const command=`sudo docker run --rm -v "$PWD":/var/task -i -e DOCKER_LAMBDA_USE_STDIN=1 lambci/lambda:provided -bootstrap ${location}/riskmetric`
+
 const {exec} = require('child_process')
 const spawnCommand=(jsonFile, callback)=>{
     exec('cat '+jsonFile+' | '+command, callback)
