@@ -11,7 +11,7 @@ extern crate serde_derive;
 #[macro_use]
 extern crate serde_json;
 extern crate utils;
-use lambda_http::{lambda, IntoResponse, Request, RequestExt};
+use lambda_http::{lambda, IntoResponse, Request};
 use runtime::{error::HandlerError, Context};
 use std::io;
 use std::error::Error;
@@ -49,7 +49,7 @@ fn density(event: Request) -> Result<Vec<maps::GraphElement>, io::Error> {
         ..
     } = parameters; //destructure
 
-    let default_value = "";
+    /*let default_value = "";
 
     let path_parameters=event.path_parameters();
 
@@ -58,12 +58,12 @@ fn density(event: Request) -> Result<Vec<maps::GraphElement>, io::Error> {
         None => default_value
     };
 
-    let model_indicator = maps::get_model_indicators(&model)?;
+    let model_indicator = maps::get_model_indicators(&model)?;*/
 
     let num_u = (2 as usize).pow(num_u_base as u32);
 
     maps::get_density_results_as_json(
-        model_indicator,
+        //model_indicator,
         &cf_parameters,
         DENSITY_SCALE,
         num_u,

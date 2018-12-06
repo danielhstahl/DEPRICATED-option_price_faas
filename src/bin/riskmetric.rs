@@ -12,7 +12,7 @@ extern crate serde_derive;
 extern crate serde_json;
 extern crate utils;
 
-use lambda_http::{lambda, IntoResponse, Request, RequestExt};
+use lambda_http::{lambda, IntoResponse, Request};
 use runtime::{error::HandlerError, Context};
 use std::error::Error;
 use std::io;
@@ -53,18 +53,18 @@ fn risk_metric(event: Request) -> Result<maps::RiskMeasures, io::Error> {
     let quantile_unwrap = quantile
         .ok_or(constraints::throw_no_exist_error("quantile"))?;
 
-    let default_value = "";
-    let path_parameters=event.path_parameters();
-    let model = match path_parameters.get("model") {
+    //let default_value = "";
+    //let path_parameters=event.path_parameters();
+    /*let model = match path_parameters.get("model") {
         Some(m) => m,
         None => default_value
-    };
-    let model_indicator = maps::get_model_indicators(&model)?;
+    };*/
+    //let model_indicator = maps::get_model_indicators(&model)?;
 
     let num_u = (2 as usize).pow(num_u_base as u32);
 
     maps::get_risk_measure_results_as_json(
-        model_indicator,
+        //model_indicator,
         &cf_parameters,
         DENSITY_SCALE,
         num_u,

@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::collections::VecDeque;
 use std::io;
 use std::io::{Error, ErrorKind};
@@ -9,6 +8,44 @@ pub struct ConstraintsSchema {
     pub upper: f64,
     pub types: String,
 }
+#[derive(Serialize, Deserialize)]
+pub struct CGMYParameters {
+    pub c: f64,
+    pub g: f64,
+    pub m: f64,
+    pub y: f64,
+    pub sigma: f64,
+    pub v0: f64,
+    pub speed: f64,
+    pub eta_v: f64,
+    pub rho: f64
+}
+#[derive(Serialize, Deserialize)]
+pub struct MertonParameters {
+    pub lambda: f64,
+    pub mu_l: f64,
+    pub sig_l: f64,
+    pub sigma: f64,
+    pub v0: f64,
+    pub speed: f64,
+    pub eta_v: f64,
+    pub rho: f64
+}
+#[derive(Serialize, Deserialize)]
+pub struct HestonParameters {
+    pub sigma: f64,
+    pub v0: f64,
+    pub speed: f64,
+    pub eta_v: f64,
+    pub rho: f64
+}
+
+#[derive(Serialize, Deserialize)]
+pub enum CFParameters{
+    Merton(MertonParameters),
+    Heston(HestonParameters),
+    CGMY(CGMYParameters)
+}
 
 #[derive(Serialize, Deserialize)]
 pub struct OptionParameters {
@@ -18,7 +55,7 @@ pub struct OptionParameters {
     pub strikes: Option<VecDeque<f64>>,
     pub quantile: Option<f64>,
     pub num_u: usize, //raised to the power of two.  if this is 8, then there will be 2^8=256 discrete "u"
-    pub cf_parameters: HashMap<String, f64>,
+    pub cf_parameters: CFParameters
 }
 
 pub fn extend_strikes(mut strikes: VecDeque<f64>, asset: f64, x_max: f64) -> Vec<f64> {
@@ -34,6 +71,37 @@ pub struct ParameterConstraints {
     pub maturity: ConstraintsSchema,
     pub num_u: ConstraintsSchema,
     pub quantile: ConstraintsSchema,
+}
+#[derive(Serialize, Deserialize)]
+pub struct MertonConstraints {
+    pub lambda: ConstraintsSchema,
+    pub mu_l: ConstraintsSchema,
+    pub sig_l: ConstraintsSchema,
+    pub sigma: ConstraintsSchema,
+    pub v0: ConstraintsSchema,
+    pub speed: ConstraintsSchema,
+    pub eta_v: ConstraintsSchema,
+    pub rho: ConstraintsSchema
+}
+#[derive(Serialize, Deserialize)]
+pub struct CGMYConstraints {
+    pub c: ConstraintsSchema,
+    pub g: ConstraintsSchema,
+    pub m: ConstraintsSchema,
+    pub y: ConstraintsSchema,
+    pub sigma: ConstraintsSchema,
+    pub v0: ConstraintsSchema,
+    pub speed: ConstraintsSchema,
+    pub eta_v: ConstraintsSchema,
+    pub rho: ConstraintsSchema
+}
+#[derive(Serialize, Deserialize)]
+pub struct HestonConstraints {
+    pub sigma: ConstraintsSchema,
+    pub v0: ConstraintsSchema,
+    pub speed: ConstraintsSchema,
+    pub eta_v: ConstraintsSchema,
+    pub rho: ConstraintsSchema
 }
 
 pub fn get_constraints() -> ParameterConstraints {
@@ -66,200 +134,130 @@ pub fn get_constraints() -> ParameterConstraints {
     }
 }
 
-pub fn get_merton_constraints() -> HashMap<String, ConstraintsSchema> {
-    vec![
-        (
-            "lambda".to_string(),
-            ConstraintsSchema {
-                lower: 0.0,
-                upper: 2.0,
-                types: "float".to_string(),
-            },
-        ),
-        (
-            "mu_l".to_string(),
-            ConstraintsSchema {
-                lower: -1.0,
-                upper: 1.0,
-                types: "float".to_string(),
-            },
-        ),
-        (
-            "sig_l".to_string(),
-            ConstraintsSchema {
-                lower: 0.0,
-                upper: 2.0,
-                types: "float".to_string(),
-            },
-        ),
-        (
-            "sigma".to_string(),
-            ConstraintsSchema {
-                lower: 0.0,
-                upper: 1.0,
-                types: "float".to_string(),
-            },
-        ),
-        (
-            "v0".to_string(),
-            ConstraintsSchema {
-                lower: 0.2,
-                upper: 1.8,
-                types: "float".to_string(),
-            },
-        ),
-        (
-            "speed".to_string(),
-            ConstraintsSchema {
-                lower: 0.0,
-                upper: 3.0,
-                types: "float".to_string(),
-            },
-        ),
-        (
-            "eta_v".to_string(),
-            ConstraintsSchema {
-                lower: 0.0,
-                upper: 3.0,
-                types: "float".to_string(),
-            },
-        ),
-        (
-            "rho".to_string(),
-            ConstraintsSchema {
-                lower: -1.0,
-                upper: 1.0,
-                types: "float".to_string(),
-            },
-        ),
-    ]
-    .into_iter()
-    .collect()
+pub fn get_merton_constraints()->MertonConstraints{
+    MertonConstraints{
+        lambda: ConstraintsSchema {
+            lower: 0.0,
+            upper: 2.0,
+            types: "float".to_string(),
+        },
+        mu_l:ConstraintsSchema {
+            lower: -1.0,
+            upper: 1.0,
+            types: "float".to_string(),
+        },
+        sig_l:ConstraintsSchema {
+            lower: 0.0,
+            upper: 2.0,
+            types: "float".to_string(),
+        },
+        sigma:ConstraintsSchema {
+            lower: 0.0,
+            upper: 1.0,
+            types: "float".to_string(),
+        },
+        v0:ConstraintsSchema{
+            lower: 0.2,
+            upper: 1.8,
+            types: "float".to_string(),
+        },
+        speed:ConstraintsSchema {
+            lower: 0.0,
+            upper: 3.0,
+            types: "float".to_string(),
+        },
+        eta_v:ConstraintsSchema {
+            lower: 0.0,
+            upper: 3.0,
+            types: "float".to_string(),
+        },
+        rho:ConstraintsSchema {
+            lower: -1.0,
+            upper: 1.0,
+            types: "float".to_string(),
+        }
+    }
 }
-pub fn get_cgmy_constraints() -> HashMap<String, ConstraintsSchema> {
-    vec![
-        (
-            "c".to_string(),
-            ConstraintsSchema {
+pub fn get_cgmy_constraints()->CGMYConstraints{
+    CGMYConstraints{
+        c: ConstraintsSchema {
                 lower: 0.0,
                 upper: 2.0,
                 types: "float".to_string(),
-            },
-        ),
-        (
-            "g".to_string(),
-            ConstraintsSchema {
-                lower: 0.0,
-                upper: 20.0,
-                types: "float".to_string(),
-            },
-        ),
-        (
-            "m".to_string(),
-            ConstraintsSchema {
-                lower: 0.0,
-                upper: 20.0,
-                types: "float".to_string(),
-            },
-        ),
-        (
-            "y".to_string(),
-            ConstraintsSchema {
-                lower: -1.0,
-                upper: 2.0,
-                types: "float".to_string(),
-            },
-        ),
-        (
-            "sigma".to_string(),
-            ConstraintsSchema {
-                lower: 0.0,
-                upper: 1.0,
-                types: "float".to_string(),
-            },
-        ),
-        (
-            "v0".to_string(),
-            ConstraintsSchema {
-                lower: 0.2,
-                upper: 1.8,
-                types: "float".to_string(),
-            },
-        ),
-        (
-            "speed".to_string(),
-            ConstraintsSchema {
-                lower: 0.0,
-                upper: 3.0,
-                types: "float".to_string(),
-            },
-        ),
-        (
-            "eta_v".to_string(),
-            ConstraintsSchema {
-                lower: 0.0,
-                upper: 3.0,
-                types: "float".to_string(),
-            },
-        ),
-        (
-            "rho".to_string(),
-            ConstraintsSchema {
-                lower: -1.0,
-                upper: 1.0,
-                types: "float".to_string(),
-            },
-        ),
-    ]
-    .into_iter()
-    .collect()
+        },
+        g:ConstraintsSchema {
+            lower: 0.0,
+            upper: 20.0,
+            types: "float".to_string(),
+        },
+        m:ConstraintsSchema {
+            lower: 0.0,
+            upper: 20.0,
+            types: "float".to_string(),
+        },
+        y:ConstraintsSchema {
+            lower: -1.0,
+            upper: 2.0,
+            types: "float".to_string(),
+        },
+        sigma:ConstraintsSchema {
+            lower: 0.0,
+            upper: 1.0,
+            types: "float".to_string(),
+        },
+        v0:ConstraintsSchema{
+            lower: 0.2,
+            upper: 1.8,
+            types: "float".to_string(),
+        },
+        speed:ConstraintsSchema {
+            lower: 0.0,
+            upper: 3.0,
+            types: "float".to_string(),
+        },
+        eta_v:ConstraintsSchema {
+            lower: 0.0,
+            upper: 3.0,
+            types: "float".to_string(),
+        },
+        rho:ConstraintsSchema {
+            lower: -1.0,
+            upper: 1.0,
+            types: "float".to_string(),
+        }
+    }
 }
-pub fn get_heston_constraints() -> HashMap<String, ConstraintsSchema> {
-    vec![
-        (
-            "sigma".to_string(),
-            ConstraintsSchema {
-                lower: 0.0,
-                upper: 1.0,
-                types: "float".to_string(),
-            },
-        ),
-        (
-            "v0".to_string(),
-            ConstraintsSchema {
-                lower: 0.001,
-                upper: 1.5,
-                types: "float".to_string(),
-            },
-        ),
-        (
-            "speed".to_string(),
-            ConstraintsSchema {
-                lower: 0.0,
-                upper: 3.0,
-                types: "float".to_string(),
-            },
-        ),
-        (
-            "eta_v".to_string(),
-            ConstraintsSchema {
-                lower: 0.0,
-                upper: 3.0,
-                types: "float".to_string(),
-            },
-        ),
-        (
-            "rho".to_string(),
-            ConstraintsSchema {
-                lower: -1.0,
-                upper: 1.0,
-                types: "float".to_string(),
-            },
-        ),
-    ]
-    .into_iter()
-    .collect()
+
+pub fn get_heston_constraints() -> HestonConstraints{
+    HestonConstraints{
+        sigma:ConstraintsSchema {
+            lower: 0.0,
+            upper: 1.0,
+            types: "float".to_string(),
+        },
+        v0:ConstraintsSchema {
+            lower: 0.001,
+            upper: 1.5,
+            types: "float".to_string(),
+        },
+        speed:ConstraintsSchema {
+            lower: 0.0,
+            upper: 3.0,
+            types: "float".to_string(),
+        },
+        eta_v:ConstraintsSchema {
+            lower: 0.0,
+            upper: 3.0,
+            types: "float".to_string(),
+        },
+        rho:ConstraintsSchema {
+            lower: -1.0,
+            upper: 1.0,
+            types: "float".to_string(),
+        }
+    }
 }
+
 
 fn check_constraint<'a>(
     parameter: f64,
@@ -285,6 +283,8 @@ fn check_constraint_option<'a>(
         None => Ok(()),
     }
 }
+
+/*
 fn get_parameter(parameters: &HashMap<String, f64>, key: &String) -> Result<f64, io::Error> {
     match parameters.get(key) {
         Some(parameter) => Ok(*parameter),
@@ -311,7 +311,7 @@ pub fn check_cf_parameters<'a>(
         .iter()
         .try_for_each(|(key, value)| constraint_fn(parameters, key, value))?;
     Ok(())
-}
+}*/
 pub fn check_parameters<'a>(
     parameters: &OptionParameters,
     constraints: &ParameterConstraints,
@@ -321,7 +321,46 @@ pub fn check_parameters<'a>(
     check_constraint(parameters.rate, &constraints.rate, "rate")?;
     check_constraint(parameters.num_u as f64, &constraints.num_u, "num_u")?;
     check_constraint_option(&parameters.quantile, &constraints.quantile, "quantile")?;
-
+    Ok(())
+}
+pub fn check_heston_parameters<'a>(
+    parameters: &HestonParameters,
+    constraints: &HestonConstraints,
+) -> Result<(), io::Error> {
+    check_constraint(parameters.sigma, &constraints.sigma, "sigma")?;
+    check_constraint(parameters.v0, &constraints.v0, "v0")?;
+    check_constraint(parameters.speed, &constraints.speed, "speed")?;
+    check_constraint(parameters.eta_v, &constraints.eta_v, "eta_v")?;
+    check_constraint(parameters.rho, &constraints.rho, "rho")?;
+    Ok(())
+}
+pub fn check_merton_parameters<'a>(
+    parameters: &MertonParameters,
+    constraints: &MertonConstraints,
+) -> Result<(), io::Error> {
+    check_constraint(parameters.lambda, &constraints.lambda, "lambda")?;
+    check_constraint(parameters.mu_l, &constraints.mu_l, "mu_l")?;
+    check_constraint(parameters.sig_l, &constraints.sig_l, "sig_l")?;
+    check_constraint(parameters.sigma, &constraints.sigma, "sigma")?;
+    check_constraint(parameters.v0, &constraints.v0, "v0")?;
+    check_constraint(parameters.speed, &constraints.speed, "speed")?;
+    check_constraint(parameters.eta_v, &constraints.eta_v, "eta_v")?;
+    check_constraint(parameters.rho, &constraints.rho, "rho")?;
+    Ok(())
+}
+pub fn check_cgmy_parameters<'a>(
+    parameters: &CGMYParameters,
+    constraints: &CGMYConstraints,
+) -> Result<(), io::Error> {
+    check_constraint(parameters.c, &constraints.c, "c")?;
+    check_constraint(parameters.g, &constraints.g, "g")?;
+    check_constraint(parameters.m, &constraints.m, "m")?;
+    check_constraint(parameters.y, &constraints.y, "y")?;
+    check_constraint(parameters.sigma, &constraints.sigma, "sigma")?;
+    check_constraint(parameters.v0, &constraints.v0, "v0")?;
+    check_constraint(parameters.speed, &constraints.speed, "speed")?;
+    check_constraint(parameters.eta_v, &constraints.eta_v, "eta_v")?;
+    check_constraint(parameters.rho, &constraints.rho, "rho")?;
     Ok(())
 }
 
@@ -374,17 +413,134 @@ mod tests {
         assert_eq!(result.unwrap_err().to_string(), "Parameter hello out of bounds".to_string());
     }
     #[test]
-    fn test_check_cf_parameters_missing() {
-        let mut parameters = HashMap::new();
-        parameters.insert("lambda".to_string(), 0.4);
-        let result = check_cf_parameters(&parameters, &get_merton_constraints());
-        assert!(result.is_err());
+    fn test_check_parameters_ok() {
+        let parameters = OptionParameters{
+            rate: 0.05,
+            asset: Some(50.0),
+            strikes: None,
+            quantile: None,
+            num_u: 8,
+            maturity:1.0,
+            cf_parameters: CFParameters::Heston(HestonParameters{
+                sigma:0.3,
+                v0:0.2,
+                speed:0.5,
+                eta_v:0.3,
+                rho:-0.2
+            })
+        };
+        let result=check_parameters(&parameters, &get_constraints());
+        assert!(result.is_ok());
     }
     #[test]
-    fn test_check_cf_parameters_out_bounds() {
-        let mut parameters = HashMap::new();
-        parameters.insert("lambda".to_string(), -50.0);
-        let result = check_cf_parameters(&parameters, &get_merton_constraints());
+    fn test_check_parameters_err() {
+        let parameters = OptionParameters{
+            rate: -0.05,
+            asset: Some(50.0),
+            strikes: None,
+            quantile: None,
+            maturity:1.0,
+            num_u: 8,
+            cf_parameters: CFParameters::Heston(HestonParameters{
+                sigma:0.3,
+                v0:0.2,
+                speed:0.5,
+                eta_v:0.3,
+                rho:-0.2
+            })
+        };
+        let result=check_parameters(&parameters, &get_constraints());
         assert!(result.is_err());
+        assert_eq!(result.unwrap_err().to_string(), "Parameter rate out of bounds");
     }
+    #[test]
+    fn test_check_heston_parameters_ok() {
+        let parameters = HestonParameters{
+            sigma:0.3,
+            v0:0.2,
+            speed:0.5,
+            eta_v:0.3,
+            rho:-0.2
+        };
+        let result=check_heston_parameters(&parameters, &get_heston_constraints());
+        assert!(result.is_ok());
+    }
+    #[test]
+    fn test_check_heston_parameters_err() {
+        let parameters = HestonParameters{
+            sigma: -0.3,
+            v0:0.2,
+            speed:0.5,
+            eta_v:0.3,
+            rho:-0.2
+        };
+        let result=check_heston_parameters(&parameters, &get_heston_constraints());
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().to_string(), "Parameter sigma out of bounds");
+    }
+    #[test]
+    fn test_check_merton_parameters_ok() {
+        let parameters = MertonParameters{
+            lambda:0.5,
+            mu_l:-0.05,
+            sig_l:0.2,
+            sigma:0.3,
+            v0:0.2,
+            speed:0.5,
+            eta_v:0.3,
+            rho:-0.2
+        };
+        let result=check_merton_parameters(&parameters, &get_merton_constraints());
+        assert!(result.is_ok());
+    }
+    #[test]
+    fn test_check_merton_parameters_err() {
+        let parameters = MertonParameters{
+            lambda:0.5,
+            mu_l:-0.05,
+            sig_l:0.2,
+            sigma:-0.3,
+            v0:0.2,
+            speed:0.5,
+            eta_v:0.3,
+            rho:-0.2
+        };
+        let result=check_merton_parameters(&parameters, &get_merton_constraints());
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().to_string(), "Parameter sigma out of bounds");
+    }
+    #[test]
+    fn test_check_cgmy_parameters_ok() {
+        let parameters = CGMYParameters{
+            c:0.5,
+            g:3.0,
+            m:3.0,
+            y:0.2,
+            sigma:0.3,
+            v0:0.2,
+            speed:0.5,
+            eta_v:0.3,
+            rho:-0.2
+        };
+        let result=check_cgmy_parameters(&parameters, &get_cgmy_constraints());
+        assert!(result.is_ok());
+    }
+    #[test]
+    fn test_check_cgmy_parameters_err() {
+        let parameters = CGMYParameters{
+            c:0.5,
+            g:3.0,
+            m:3.0,
+            y:0.2,
+            sigma:-0.3,
+            v0:0.2,
+            speed:0.5,
+            eta_v:0.3,
+            rho:-0.2
+        };
+        let result=check_cgmy_parameters(&parameters, &get_cgmy_constraints());
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().to_string(), "Parameter sigma out of bounds");
+    }
+    
 }
