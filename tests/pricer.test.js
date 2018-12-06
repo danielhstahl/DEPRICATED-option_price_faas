@@ -1,12 +1,12 @@
 'use strict'
-const {location}=require('./binaryLocation.json')
+const {location, timeout}=require('./binaryLocation.json')
 const command=`sudo docker run --rm -v "$PWD":/var/task -i -e DOCKER_LAMBDA_USE_STDIN=1 lambci/lambda:provided -bootstrap ${location}/pricer`
 
 const {exec} = require('child_process')
 const spawnCommand=(jsonFile, callback)=>{
     exec('cat '+jsonFile+' | '+command, callback)
 }
-jest.setTimeout(20000)
+jest.setTimeout(timeout)
 
 describe('option prices', ()=>{
     it('returns array of value and points', done=>{

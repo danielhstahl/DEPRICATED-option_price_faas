@@ -1,11 +1,11 @@
 'use strict'
-const {location}=require('./binaryLocation.json')
+const {location, timeout}=require('./binaryLocation.json')
 const command=`sudo docker run --rm -v "$PWD":/var/task -i -e DOCKER_LAMBDA_USE_STDIN=1 lambci/lambda:provided -bootstrap ${location}/constraints`
 const {exec} = require('child_process')
 const spawnCommand=(jsonFile, callback)=>{
     exec('cat '+jsonFile+' | '+command, callback)
 }
-jest.setTimeout(20000)
+jest.setTimeout(timeout)
 it('returns constraints for cgmy', done=>{
     spawnCommand('./tests/parameter5.json', (err, result)=>{
         if(err){

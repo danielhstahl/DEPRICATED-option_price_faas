@@ -1,12 +1,12 @@
 'use strict'
-const {location}=require('./binaryLocation.json')
+const {location, timeout}=require('./binaryLocation.json')
 const command=`sudo docker run --rm -v "$PWD":/var/task -i -e DOCKER_LAMBDA_USE_STDIN=1 lambci/lambda:provided -bootstrap ${location}/riskmetric`
 
 const {exec} = require('child_process')
 const spawnCommand=(jsonFile, callback)=>{
     exec('cat '+jsonFile+' | '+command, callback)
 }
-jest.setTimeout(20000)
+jest.setTimeout(timeout)
 describe('risk_measures', ()=>{
     it('returns risk_measures', done=>{
         spawnCommand('./tests/parameter4.json', (err, result)=>{
