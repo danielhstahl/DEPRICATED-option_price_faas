@@ -65,10 +65,6 @@
           "type": "number"
         },
         "example":[50]
-      },
-      "quantile": {
-        "type": "number",
-        "example": 0.01
       }
     },
     "required": [
@@ -77,8 +73,7 @@
       "maturity",
       "asset",
       "cf_parameters",
-      "strikes",
-      "quantile"
+      "strikes"
     ],
     "additionalProperties": false
   }

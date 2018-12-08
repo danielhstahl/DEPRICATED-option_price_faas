@@ -148,9 +148,6 @@ paths:
                     type: number
                   example:
                     - 50
-                quantile:
-                  type: number
-                  example: 0.01
               required:
                 - num_u
                 - rate
@@ -158,7 +155,6 @@ paths:
                 - asset
                 - cf_parameters
                 - strikes
-                - quantile
               additionalProperties: false
   '/v1/heston/calculator/{optionType}/{sensitivity}':
     post:
