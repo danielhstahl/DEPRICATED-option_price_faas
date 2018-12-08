@@ -16,8 +16,8 @@ use runtime::{error::HandlerError, Context};
 use std::error::Error;
 use std::io;
 use utils::constraints;
-use utils::maps;
 use utils::http_helper;
+use utils::maps;
 
 const OPTION_SCALE: f64 = 10.0;
 
@@ -26,17 +26,16 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 fn price_options_wrapper(event: Request, _ctx: Context) -> Result<impl IntoResponse, HandlerError> {
-    match price_options(event){
-        Ok(res)=>Ok(http_helper::build_response(200, &json!(res).to_string())),
-        Err(e)=>Ok(http_helper::build_response(
-            400, 
-            &http_helper::construct_error(&e.to_string())
-        ))
+    match price_options(event) {
+        Ok(res) => Ok(http_helper::build_response(200, &json!(res).to_string())),
+        Err(e) => Ok(http_helper::build_response(
+            400,
+            &http_helper::construct_error(&e.to_string()),
+        )),
     }
 }
 fn price_options(event: Request) -> Result<Vec<maps::GraphElement>, io::Error> {
-    let parameters: constraints::OptionParameters =
-        serde_json::from_reader(event.body().as_ref())?;
+    let parameters: constraints::OptionParameters = serde_json::from_reader(event.body().as_ref())?;
 
     constraints::check_parameters(&parameters, &constraints::get_constraints())?;
 
@@ -50,28 +49,26 @@ fn price_options(event: Request) -> Result<Vec<maps::GraphElement>, io::Error> {
         ..
     } = parameters; //destructure
 
-    let strikes_unwrap = strikes
-        .ok_or(constraints::throw_no_exist_error("strikes"))?;
-    let asset_unwrap = asset
-        .ok_or(constraints::throw_no_exist_error("asset"))?;
+    let strikes_unwrap = strikes.ok_or(constraints::throw_no_exist_error("strikes"))?;
+    let asset_unwrap = asset.ok_or(constraints::throw_no_exist_error("asset"))?;
 
     let default_value = "";
 
-    let path_parameters=event.path_parameters();
-    let query_string_parameters=event.query_string_parameters();
-    
+    let path_parameters = event.path_parameters();
+    let query_string_parameters = event.query_string_parameters();
+
     let sensitivity = match path_parameters.get("sensitivity") {
         Some(m) => m,
         None => default_value,
     };
-    let option_type =match path_parameters.get("optionType") {
+    let option_type = match path_parameters.get("optionType") {
         Some(m) => m,
         None => default_value,
     };
-    
+
     let fn_indicator = maps::get_fn_indicators(&option_type, &sensitivity)?;
 
-    let query =match query_string_parameters.get("includeImpliedVolatility") {
+    let query = match query_string_parameters.get("includeImpliedVolatility") {
         Some(m) => m,
         None => default_value,
     };

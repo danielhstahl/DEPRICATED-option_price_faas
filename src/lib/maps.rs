@@ -18,7 +18,6 @@ use self::rand::distributions::Uniform;
 use self::rand::{SeedableRng, StdRng};
 use self::rayon::prelude::*;
 use constraints;
-//use std::collections::HashMap;
 use std::collections::VecDeque;
 use std::io;
 use std::io::{Error, ErrorKind};
@@ -42,31 +41,6 @@ pub const CALL_THETA: i32 = 7;
 pub const DENSITY: i32 = 8;
 pub const RISK_MEASURES: i32 = 9;
 
-
-/// Gets indicators for which model
-/// to retrieve
-/// # Examples
-///
-/// ```
-/// extern crate utils;
-/// use utils::maps;
-/// # fn main() {
-/// let model = maps::get_model_indicators(
-///     "cgmy"
-/// ).unwrap();
-/// # }
-/// ```
-pub fn get_model_indicators(model: &str) -> Result<i32, io::Error> {
-    match model {
-        "cgmy" => Ok(CGMY),
-        "merton" => Ok(MERTON),
-        "heston" => Ok(HESTON),
-        _ => Err(Error::new(
-            ErrorKind::Other,
-            format!("No matches for model {}!", model),
-        )),
-    }
-}
 /// Gets indicators for which sensitivity
 /// to retrieve
 /// # Examples
@@ -96,7 +70,7 @@ pub fn get_fn_indicators(option_type: &str, sensitivity: &str) -> Result<i32, io
         "riskmetric_" => Ok(RISK_MEASURES),
         _ => Err(Error::new(
             ErrorKind::Other,
-            format!("No matches for types {}!", combine_types),
+            format!("No matches for types {}", combine_types),
         )),
     }
 }
@@ -124,14 +98,22 @@ fn get_cgmy_cf(
     cf_parameters: &constraints::CGMYParameters,
     maturity: f64,
     rate: f64,
-) -> Result<(impl Fn(&Complex<f64>) -> Complex<f64>, f64), io::Error>
-{
+) -> Result<(impl Fn(&Complex<f64>) -> Complex<f64>, f64), io::Error> {
     constraints::check_cgmy_parameters(&cf_parameters, &constraints::get_cgmy_constraints())?;
-    let constraints::CGMYParameters{
-        c, g, m, y, sigma, v0, speed, eta_v, rho
-    }=cf_parameters;
-    let cf_inst =
-        cf_functions::cgmy_time_change_cf(maturity, rate, *c, *g, *m, *y, *sigma, *v0, *speed, *eta_v, *rho);
+    let constraints::CGMYParameters {
+        c,
+        g,
+        m,
+        y,
+        sigma,
+        v0,
+        speed,
+        eta_v,
+        rho,
+    } = cf_parameters;
+    let cf_inst = cf_functions::cgmy_time_change_cf(
+        maturity, rate, *c, *g, *m, *y, *sigma, *v0, *speed, *eta_v, *rho,
+    );
     let vol = cf_functions::cgmy_diffusion_vol(*sigma, *c, *g, *m, *y, maturity);
     Ok((cf_inst, vol))
 }
@@ -141,9 +123,16 @@ fn get_merton_cf(
     rate: f64,
 ) -> Result<(impl Fn(&Complex<f64>) -> Complex<f64>, f64), io::Error> {
     constraints::check_merton_parameters(&cf_parameters, &constraints::get_merton_constraints())?;
-    let constraints::MertonParameters{
-        lambda, mu_l, sig_l, sigma, v0, speed, eta_v, rho
-    }=cf_parameters;
+    let constraints::MertonParameters {
+        lambda,
+        mu_l,
+        sig_l,
+        sigma,
+        v0,
+        speed,
+        eta_v,
+        rho,
+    } = cf_parameters;
     let cf_inst = cf_functions::merton_time_change_cf(
         maturity, rate, *lambda, *mu_l, *sig_l, *sigma, *v0, *speed, *eta_v, *rho,
     );
@@ -156,15 +145,18 @@ fn get_heston_cf(
     rate: f64,
 ) -> Result<(impl Fn(&Complex<f64>) -> Complex<f64>, f64), io::Error> {
     constraints::check_heston_parameters(&cf_parameters, &constraints::get_heston_constraints())?;
-    let constraints::HestonParameters{
-        sigma, v0, speed, eta_v, rho
-    }=cf_parameters;
+    let constraints::HestonParameters {
+        sigma,
+        v0,
+        speed,
+        eta_v,
+        rho,
+    } = cf_parameters;
     let cf_inst = cf_functions::heston_cf(maturity, rate, *sigma, *v0, *speed, *eta_v, *rho);
     Ok((cf_inst, *sigma))
 }
 
 pub fn get_option_results_as_json(
-    //cf_indicator: i32,
     fn_choice: i32,
     include_iv: bool,
     cf_parameters: &constraints::CFParameters,
@@ -218,14 +210,9 @@ pub fn get_option_results_as_json(
                 &cf_inst,
             )
         }
-        /*_ => Err(Error::new(
-            ErrorKind::Other,
-            format!("No matches for cf indicator {}!", cf_indicator),
-        ))*/
     }
 }
 pub fn get_density_results_as_json(
-    //cf_indicator: i32,
     cf_parameters: &constraints::CFParameters,
     density_scale: f64,
     num_u: usize,
@@ -248,15 +235,10 @@ pub fn get_density_results_as_json(
             let x_max_density = vol * density_scale;
             get_density_results(num_u, x_max_density, &cf_inst)
         }
-        /*_ => Err(Error::new(
-            ErrorKind::Other,
-            format!("No matches for cf indicator {}!", cf_indicator),
-        )),*/
     }
 }
 pub fn get_risk_measure_results_as_json(
-    //cf_indicator: i32,
-    cf_parameters:  &constraints::CFParameters,
+    cf_parameters: &constraints::CFParameters,
     density_scale: f64,
     num_u: usize,
     maturity: f64,
@@ -279,21 +261,17 @@ pub fn get_risk_measure_results_as_json(
             let x_max_density = vol * density_scale;
             get_risk_measure_results(num_u, x_max_density, quantile, &cf_inst)
         }
-        /*_ => Err(Error::new(
-            ErrorKind::Other,
-            format!("No matches for cf indicator {}!", cf_indicator),
-        )),*/
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct GraphElement {
     at_point: f64,
     value: f64,
     #[serde(skip_serializing_if = "Option::is_none")] //skip when iv is not provided
     iv: Option<f64>,
 }
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct RiskMeasures {
     value_at_risk: f64,
     expected_shortfall: f64,
@@ -455,7 +433,7 @@ fn get_option_results(
         )),
         _ => Err(Error::new(
             ErrorKind::Other,
-            format!("No matches for function indicator {}!", fn_choice),
+            format!("No matches for function indicator {}", fn_choice),
         )),
     }
 }
@@ -491,11 +469,6 @@ fn get_risk_measure_results(
 #[cfg(test)]
 mod tests {
     use maps::*;
-    #[test]
-    fn get_model_indicators_gets_match() {
-        let model = get_model_indicators("cgmy").unwrap();
-        assert_eq!(model, CGMY);
-    }
     #[test]
     fn get_fn_indicators_gets_match() {
         let model = get_fn_indicators("put", "price").unwrap();
@@ -586,7 +559,6 @@ mod tests {
                     num_bad = num_bad + 1;
                     break;
                 }
-                //assert_eq!(!option_price.is_nan());
             }
         });
         let bad_rate = (num_bad as f64) / (num_total as f64);
@@ -667,32 +639,27 @@ mod tests {
     }
     #[test]
     fn get_fn_indicators_no_match() {
-        assert!(
-            get_fn_indicators(&"something".to_string(), &"somethingelse".to_string()).is_err(),
-            "there should be no match!"
-        );
-    }
-    #[test]
-    fn get_model_indicators_no_match() {
-        assert!(
-            get_model_indicators(&"something".to_string()).is_err(),
-            "there should be no match!"
+        assert_eq!(
+            get_fn_indicators(&"something".to_string(), &"somethingelse".to_string())
+                .unwrap_err()
+                .to_string(),
+            "No matches for types something_somethingelse"
         );
     }
     #[test]
     fn test_cgmy_price_1() {
         //https://mpra.ub.uni-muenchen.de/8914/4/MPRA_paper_8914.pdf pg 18
         //S0 = 100, K = 100, r = 0.1, q = 0, C = 1, G = 5, M = 5, T = 1, Y=0.5
-        let parameters=constraints::CGMYParameters{
-            sigma:0.0,
+        let parameters = constraints::CGMYParameters {
+            sigma: 0.0,
             c: 1.0,
-            g:5.0,
-            m:5.0,
-            y:0.5,
+            g: 5.0,
+            m: 5.0,
+            y: 0.5,
             speed: 0.0,
-            v0:1.0,
-            eta_v:0.0,
-            rho:0.0
+            v0: 1.0,
+            eta_v: 0.0,
+            rho: 0.0,
         };
         let mut strikes: VecDeque<f64> = VecDeque::new();
         strikes.push_back(100.0);
@@ -718,16 +685,16 @@ mod tests {
     fn test_cgmy_price_2() {
         //https://mpra.ub.uni-muenchen.de/8914/4/MPRA_paper_8914.pdf pg 18
         //S0 = 100, K = 100, r = 0.1, q = 0, C = 1, G = 5, M = 5, T = 1, Y=1.5
-        let parameters=constraints::CGMYParameters{
-            sigma:0.0,
+        let parameters = constraints::CGMYParameters {
+            sigma: 0.0,
             c: 1.0,
-            g:5.0,
-            m:5.0,
-            y:1.5,
+            g: 5.0,
+            m: 5.0,
+            y: 1.5,
             speed: 0.0,
-            v0:1.0,
-            eta_v:0.0,
-            rho:0.0
+            v0: 1.0,
+            eta_v: 0.0,
+            rho: 0.0,
         };
         let mut strikes: VecDeque<f64> = VecDeque::new();
         strikes.push_back(100.0);
@@ -753,16 +720,16 @@ mod tests {
     fn test_cgmy_price_3() {
         //https://mpra.ub.uni-muenchen.de/8914/4/MPRA_paper_8914.pdf pg 18
         //S0 = 100, K = 100, r = 0.1, q = 0, C = 1, G = 5, M = 5, T = 1, Y=1.98
-        let parameters=constraints::CGMYParameters{
-            sigma:0.0,
+        let parameters = constraints::CGMYParameters {
+            sigma: 0.0,
             c: 1.0,
-            g:5.0,
-            m:5.0,
-            y:1.98,
+            g: 5.0,
+            m: 5.0,
+            y: 1.98,
             speed: 0.0,
-            v0:1.0,
-            eta_v:0.0,
-            rho:0.0
+            v0: 1.0,
+            eta_v: 0.0,
+            rho: 0.0,
         };
         let mut strikes: VecDeque<f64> = VecDeque::new();
         strikes.push_back(100.0);
@@ -789,15 +756,15 @@ mod tests {
         //https://www.upo.es/personal/jfernav/papers/Jumps_JOD_.pdf pg 8
         let sig_l = 0.05_f64.sqrt();
         let mu_l = -sig_l.powi(2) * 0.5;
-        let parameters=constraints::MertonParameters{
-            sigma:sig_l,
+        let parameters = constraints::MertonParameters {
+            sigma: sig_l,
             lambda: 1.0,
             mu_l,
             sig_l,
             speed: 0.0,
-            v0:1.0,
-            eta_v:0.0,
-            rho:0.0
+            v0: 1.0,
+            eta_v: 0.0,
+            rho: 0.0,
         };
         let mut strikes: VecDeque<f64> = VecDeque::new();
         strikes.push_back(35.0);
@@ -829,15 +796,15 @@ mod tests {
         let c = 0.5751;
         let rho = -0.5711;
         let v0 = 0.0175;
-        let parameters=constraints::MertonParameters{
-            sigma:b.sqrt(),
+        let parameters = constraints::MertonParameters {
+            sigma: b.sqrt(),
             lambda: 0.0,
             mu_l,
             sig_l,
             speed: a,
-            v0:v0/b,
-            eta_v:c/b.sqrt(),
-            rho
+            v0: v0 / b,
+            eta_v: c / b.sqrt(),
+            rho,
         };
         let mut strikes: VecDeque<f64> = VecDeque::new();
         strikes.push_back(100.0);
@@ -867,12 +834,12 @@ mod tests {
         let c = 0.5751;
         let rho = -0.5711;
         let v0 = 0.0175;
-        let parameters=constraints::HestonParameters{
-            sigma:b.sqrt(),
+        let parameters = constraints::HestonParameters {
+            sigma: b.sqrt(),
             speed: a,
             v0,
-            eta_v:c,
-            rho
+            eta_v: c,
+            rho,
         };
         let mut strikes: VecDeque<f64> = VecDeque::new();
         strikes.push_back(100.0);
@@ -897,15 +864,15 @@ mod tests {
     #[test]
     fn test_monte_carlo() {
         //https://github.com/phillyfan1138/fang_oost_cal_charts/blob/master/docs/OptionCalculation.Rnw
-        let parameters=constraints::MertonParameters{
-            sigma:0.2,
+        let parameters = constraints::MertonParameters {
+            sigma: 0.2,
             lambda: 0.5,
-            mu_l:-0.05,
-            sig_l:0.1,
+            mu_l: -0.05,
+            sig_l: 0.1,
             speed: 0.3,
-            v0:0.9,
-            eta_v:0.2,
-            rho:-0.5
+            v0: 0.9,
+            eta_v: 0.2,
+            rho: -0.5,
         };
         let mut strikes: VecDeque<f64> = VecDeque::new();
         strikes.push_back(50.0);
@@ -932,26 +899,67 @@ mod tests {
     #[test]
     fn test_risk_measures() {
         //https://github.com/phillyfan1138/levy-functions/issues/27
-        let parameters=constraints::MertonParameters{
-            sigma:0.3183,
-            lambda:0.204516,
-            mu_l:-0.302967,
-            sig_l:0.220094,
+        let parameters = constraints::MertonParameters {
+            sigma: 0.3183,
+            lambda: 0.204516,
+            mu_l: -0.302967,
+            sig_l: 0.220094,
             speed: 2.6726,
-            v0:0.237187,
-            eta_v:0.0,
-            rho:-0.182754
+            v0: 0.237187,
+            eta_v: 0.0,
+            rho: -0.182754,
         };
         let num_u: usize = 256;
         let t = 0.187689;
         let rate = 0.004;
         let quantile = 0.01;
-        let results =
-            get_risk_measure_results_as_json(
-                &constraints::CFParameters::Merton(parameters), 
-                5.0, num_u, t, rate, quantile
-            )
-            .unwrap();
+        let results = get_risk_measure_results_as_json(
+            &constraints::CFParameters::Merton(parameters),
+            5.0,
+            num_u,
+            t,
+            rate,
+            quantile,
+        )
+        .unwrap();
         assert_abs_diff_eq!(results.value_at_risk, 0.261503, epsilon = 0.00001);
+    }
+    #[test]
+    fn test_error_for_out_of_bounds_constant() {
+        let sig_l = 0.05_f64.sqrt();
+        let mu_l = -sig_l.powi(2) * 0.5;
+        let parameters = constraints::MertonParameters {
+            sigma: sig_l,
+            lambda: 1.0,
+            mu_l,
+            sig_l,
+            speed: 0.0,
+            v0: 1.0,
+            eta_v: 0.0,
+            rho: 0.0,
+        };
+        let mut strikes: VecDeque<f64> = VecDeque::new();
+        strikes.push_back(35.0);
+        let num_u: usize = 256;
+        let t = 0.5;
+        let rate = 0.1;
+        let asset = 38.0;
+        let integer_that_is_not_an_option = -1;
+        let results = get_option_results_as_json(
+            integer_that_is_not_an_option,
+            false,
+            &constraints::CFParameters::Merton(parameters),
+            10.0,
+            num_u,
+            asset,
+            t,
+            rate,
+            strikes,
+        );
+        assert!(results.is_err());
+        assert_eq!(
+            results.unwrap_err().to_string(),
+            "No matches for function indicator -1"
+        );
     }
 }

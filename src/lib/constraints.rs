@@ -18,7 +18,7 @@ pub struct CGMYParameters {
     pub v0: f64,
     pub speed: f64,
     pub eta_v: f64,
-    pub rho: f64
+    pub rho: f64,
 }
 #[derive(Serialize, Deserialize)]
 pub struct MertonParameters {
@@ -29,7 +29,7 @@ pub struct MertonParameters {
     pub v0: f64,
     pub speed: f64,
     pub eta_v: f64,
-    pub rho: f64
+    pub rho: f64,
 }
 #[derive(Serialize, Deserialize)]
 pub struct HestonParameters {
@@ -37,15 +37,15 @@ pub struct HestonParameters {
     pub v0: f64,
     pub speed: f64,
     pub eta_v: f64,
-    pub rho: f64
+    pub rho: f64,
 }
 
 #[derive(Serialize, Deserialize)]
 #[serde(untagged)]
-pub enum CFParameters{
-    Merton(MertonParameters), 
+pub enum CFParameters {
+    Merton(MertonParameters),
     CGMY(CGMYParameters),
-    Heston(HestonParameters)
+    Heston(HestonParameters),
 }
 
 #[derive(Serialize, Deserialize)]
@@ -56,7 +56,7 @@ pub struct OptionParameters {
     pub strikes: Option<VecDeque<f64>>,
     pub quantile: Option<f64>,
     pub num_u: usize, //raised to the power of two.  if this is 8, then there will be 2^8=256 discrete "u"
-    pub cf_parameters: CFParameters
+    pub cf_parameters: CFParameters,
 }
 
 pub fn extend_strikes(mut strikes: VecDeque<f64>, asset: f64, x_max: f64) -> Vec<f64> {
@@ -83,7 +83,7 @@ pub struct MertonConstraints {
     pub v0: ConstraintsSchema,
     pub speed: ConstraintsSchema,
     pub eta_v: ConstraintsSchema,
-    pub rho: ConstraintsSchema
+    pub rho: ConstraintsSchema,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -96,7 +96,7 @@ pub struct CGMYConstraints {
     pub v0: ConstraintsSchema,
     pub speed: ConstraintsSchema,
     pub eta_v: ConstraintsSchema,
-    pub rho: ConstraintsSchema
+    pub rho: ConstraintsSchema,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -105,7 +105,7 @@ pub struct HestonConstraints {
     pub v0: ConstraintsSchema,
     pub speed: ConstraintsSchema,
     pub eta_v: ConstraintsSchema,
-    pub rho: ConstraintsSchema
+    pub rho: ConstraintsSchema,
 }
 
 pub fn get_constraints() -> ParameterConstraints {
@@ -138,130 +138,129 @@ pub fn get_constraints() -> ParameterConstraints {
     }
 }
 
-pub fn get_merton_constraints()->MertonConstraints{
-    MertonConstraints{
+pub fn get_merton_constraints() -> MertonConstraints {
+    MertonConstraints {
         lambda: ConstraintsSchema {
             lower: 0.0,
             upper: 2.0,
             types: "float".to_string(),
         },
-        mu_l:ConstraintsSchema {
+        mu_l: ConstraintsSchema {
             lower: -1.0,
             upper: 1.0,
             types: "float".to_string(),
         },
-        sig_l:ConstraintsSchema {
+        sig_l: ConstraintsSchema {
             lower: 0.0,
             upper: 2.0,
             types: "float".to_string(),
         },
-        sigma:ConstraintsSchema {
+        sigma: ConstraintsSchema {
             lower: 0.0,
             upper: 1.0,
             types: "float".to_string(),
         },
-        v0:ConstraintsSchema{
+        v0: ConstraintsSchema {
             lower: 0.2,
             upper: 1.8,
             types: "float".to_string(),
         },
-        speed:ConstraintsSchema {
+        speed: ConstraintsSchema {
             lower: 0.0,
             upper: 3.0,
             types: "float".to_string(),
         },
-        eta_v:ConstraintsSchema {
+        eta_v: ConstraintsSchema {
             lower: 0.0,
             upper: 3.0,
             types: "float".to_string(),
         },
-        rho:ConstraintsSchema {
+        rho: ConstraintsSchema {
             lower: -1.0,
             upper: 1.0,
             types: "float".to_string(),
-        }
+        },
     }
 }
-pub fn get_cgmy_constraints()->CGMYConstraints{
-    CGMYConstraints{
+pub fn get_cgmy_constraints() -> CGMYConstraints {
+    CGMYConstraints {
         c: ConstraintsSchema {
-                lower: 0.0,
-                upper: 2.0,
-                types: "float".to_string(),
+            lower: 0.0,
+            upper: 2.0,
+            types: "float".to_string(),
         },
-        g:ConstraintsSchema {
+        g: ConstraintsSchema {
             lower: 0.0,
             upper: 20.0,
             types: "float".to_string(),
         },
-        m:ConstraintsSchema {
+        m: ConstraintsSchema {
             lower: 0.0,
             upper: 20.0,
             types: "float".to_string(),
         },
-        y:ConstraintsSchema {
+        y: ConstraintsSchema {
             lower: -1.0,
             upper: 2.0,
             types: "float".to_string(),
         },
-        sigma:ConstraintsSchema {
+        sigma: ConstraintsSchema {
             lower: 0.0,
             upper: 1.0,
             types: "float".to_string(),
         },
-        v0:ConstraintsSchema{
+        v0: ConstraintsSchema {
             lower: 0.2,
             upper: 1.8,
             types: "float".to_string(),
         },
-        speed:ConstraintsSchema {
+        speed: ConstraintsSchema {
             lower: 0.0,
             upper: 3.0,
             types: "float".to_string(),
         },
-        eta_v:ConstraintsSchema {
+        eta_v: ConstraintsSchema {
             lower: 0.0,
             upper: 3.0,
             types: "float".to_string(),
         },
-        rho:ConstraintsSchema {
+        rho: ConstraintsSchema {
             lower: -1.0,
             upper: 1.0,
             types: "float".to_string(),
-        }
+        },
     }
 }
 
-pub fn get_heston_constraints() -> HestonConstraints{
-    HestonConstraints{
-        sigma:ConstraintsSchema {
+pub fn get_heston_constraints() -> HestonConstraints {
+    HestonConstraints {
+        sigma: ConstraintsSchema {
             lower: 0.0,
             upper: 1.0,
             types: "float".to_string(),
         },
-        v0:ConstraintsSchema {
+        v0: ConstraintsSchema {
             lower: 0.001,
             upper: 1.5,
             types: "float".to_string(),
         },
-        speed:ConstraintsSchema {
+        speed: ConstraintsSchema {
             lower: 0.0,
             upper: 3.0,
             types: "float".to_string(),
         },
-        eta_v:ConstraintsSchema {
+        eta_v: ConstraintsSchema {
             lower: 0.0,
             upper: 3.0,
             types: "float".to_string(),
         },
-        rho:ConstraintsSchema {
+        rho: ConstraintsSchema {
             lower: -1.0,
             upper: 1.0,
             types: "float".to_string(),
-        }
+        },
     }
 }
-
 
 fn check_constraint<'a>(
     parameter: f64,
@@ -340,10 +339,11 @@ pub fn check_cgmy_parameters<'a>(
     Ok(())
 }
 
-pub fn throw_no_exist_error(
-    message:&str
-)->io::Error{
-    Error::new(ErrorKind::Other, format!("Parameter {} does not exist", message))
+pub fn throw_no_exist_error(message: &str) -> io::Error {
+    Error::new(
+        ErrorKind::Other,
+        format!("Parameter {} does not exist", message),
+    )
 }
 
 #[cfg(test)]
@@ -386,141 +386,156 @@ mod tests {
         let parameter = Some(5.0);
         let result = check_constraint_option(&parameter, &constraint, "hello");
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().to_string(), "Parameter hello out of bounds".to_string());
+        assert_eq!(
+            result.unwrap_err().to_string(),
+            "Parameter hello out of bounds".to_string()
+        );
     }
     #[test]
     fn test_check_parameters_ok() {
-        let parameters = OptionParameters{
+        let parameters = OptionParameters {
             rate: 0.05,
             asset: Some(50.0),
             strikes: None,
             quantile: None,
             num_u: 8,
-            maturity:1.0,
-            cf_parameters: CFParameters::Heston(HestonParameters{
-                sigma:0.3,
-                v0:0.2,
-                speed:0.5,
-                eta_v:0.3,
-                rho:-0.2
-            })
+            maturity: 1.0,
+            cf_parameters: CFParameters::Heston(HestonParameters {
+                sigma: 0.3,
+                v0: 0.2,
+                speed: 0.5,
+                eta_v: 0.3,
+                rho: -0.2,
+            }),
         };
-        let result=check_parameters(&parameters, &get_constraints());
+        let result = check_parameters(&parameters, &get_constraints());
         assert!(result.is_ok());
     }
     #[test]
     fn test_check_parameters_err() {
-        let parameters = OptionParameters{
+        let parameters = OptionParameters {
             rate: -0.05,
             asset: Some(50.0),
             strikes: None,
             quantile: None,
-            maturity:1.0,
+            maturity: 1.0,
             num_u: 8,
-            cf_parameters: CFParameters::Heston(HestonParameters{
-                sigma:0.3,
-                v0:0.2,
-                speed:0.5,
-                eta_v:0.3,
-                rho:-0.2
-            })
+            cf_parameters: CFParameters::Heston(HestonParameters {
+                sigma: 0.3,
+                v0: 0.2,
+                speed: 0.5,
+                eta_v: 0.3,
+                rho: -0.2,
+            }),
         };
-        let result=check_parameters(&parameters, &get_constraints());
+        let result = check_parameters(&parameters, &get_constraints());
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().to_string(), "Parameter rate out of bounds");
+        assert_eq!(
+            result.unwrap_err().to_string(),
+            "Parameter rate out of bounds"
+        );
     }
     #[test]
     fn test_check_heston_parameters_ok() {
-        let parameters = HestonParameters{
-            sigma:0.3,
-            v0:0.2,
-            speed:0.5,
-            eta_v:0.3,
-            rho:-0.2
+        let parameters = HestonParameters {
+            sigma: 0.3,
+            v0: 0.2,
+            speed: 0.5,
+            eta_v: 0.3,
+            rho: -0.2,
         };
-        let result=check_heston_parameters(&parameters, &get_heston_constraints());
+        let result = check_heston_parameters(&parameters, &get_heston_constraints());
         assert!(result.is_ok());
     }
     #[test]
     fn test_check_heston_parameters_err() {
-        let parameters = HestonParameters{
+        let parameters = HestonParameters {
             sigma: -0.3,
-            v0:0.2,
-            speed:0.5,
-            eta_v:0.3,
-            rho:-0.2
+            v0: 0.2,
+            speed: 0.5,
+            eta_v: 0.3,
+            rho: -0.2,
         };
-        let result=check_heston_parameters(&parameters, &get_heston_constraints());
+        let result = check_heston_parameters(&parameters, &get_heston_constraints());
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().to_string(), "Parameter sigma out of bounds");
+        assert_eq!(
+            result.unwrap_err().to_string(),
+            "Parameter sigma out of bounds"
+        );
     }
     #[test]
     fn test_check_merton_parameters_ok() {
-        let parameters = MertonParameters{
-            lambda:0.5,
-            mu_l:-0.05,
-            sig_l:0.2,
-            sigma:0.3,
-            v0:0.2,
-            speed:0.5,
-            eta_v:0.3,
-            rho:-0.2
+        let parameters = MertonParameters {
+            lambda: 0.5,
+            mu_l: -0.05,
+            sig_l: 0.2,
+            sigma: 0.3,
+            v0: 0.2,
+            speed: 0.5,
+            eta_v: 0.3,
+            rho: -0.2,
         };
-        let result=check_merton_parameters(&parameters, &get_merton_constraints());
+        let result = check_merton_parameters(&parameters, &get_merton_constraints());
         assert!(result.is_ok());
     }
     #[test]
     fn test_check_merton_parameters_err() {
-        let parameters = MertonParameters{
-            lambda:0.5,
-            mu_l:-0.05,
-            sig_l:0.2,
-            sigma:-0.3,
-            v0:0.2,
-            speed:0.5,
-            eta_v:0.3,
-            rho:-0.2
+        let parameters = MertonParameters {
+            lambda: 0.5,
+            mu_l: -0.05,
+            sig_l: 0.2,
+            sigma: -0.3,
+            v0: 0.2,
+            speed: 0.5,
+            eta_v: 0.3,
+            rho: -0.2,
         };
-        let result=check_merton_parameters(&parameters, &get_merton_constraints());
+        let result = check_merton_parameters(&parameters, &get_merton_constraints());
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().to_string(), "Parameter sigma out of bounds");
+        assert_eq!(
+            result.unwrap_err().to_string(),
+            "Parameter sigma out of bounds"
+        );
     }
     #[test]
     fn test_check_cgmy_parameters_ok() {
-        let parameters = CGMYParameters{
-            c:0.5,
-            g:3.0,
-            m:3.0,
-            y:0.2,
-            sigma:0.3,
-            v0:0.2,
-            speed:0.5,
-            eta_v:0.3,
-            rho:-0.2
+        let parameters = CGMYParameters {
+            c: 0.5,
+            g: 3.0,
+            m: 3.0,
+            y: 0.2,
+            sigma: 0.3,
+            v0: 0.2,
+            speed: 0.5,
+            eta_v: 0.3,
+            rho: -0.2,
         };
-        let result=check_cgmy_parameters(&parameters, &get_cgmy_constraints());
+        let result = check_cgmy_parameters(&parameters, &get_cgmy_constraints());
         assert!(result.is_ok());
     }
     #[test]
     fn test_check_cgmy_parameters_err() {
-        let parameters = CGMYParameters{
-            c:0.5,
-            g:3.0,
-            m:3.0,
-            y:0.2,
-            sigma:-0.3,
-            v0:0.2,
-            speed:0.5,
-            eta_v:0.3,
-            rho:-0.2
+        let parameters = CGMYParameters {
+            c: 0.5,
+            g: 3.0,
+            m: 3.0,
+            y: 0.2,
+            sigma: -0.3,
+            v0: 0.2,
+            speed: 0.5,
+            eta_v: 0.3,
+            rho: -0.2,
         };
-        let result=check_cgmy_parameters(&parameters, &get_cgmy_constraints());
+        let result = check_cgmy_parameters(&parameters, &get_cgmy_constraints());
         assert!(result.is_err());
-        assert_eq!(result.unwrap_err().to_string(), "Parameter sigma out of bounds");
+        assert_eq!(
+            result.unwrap_err().to_string(),
+            "Parameter sigma out of bounds"
+        );
     }
     #[test]
-    fn test_serialization_heston(){
-        let json_str=r#"{
+    fn test_serialization_heston() {
+        let json_str = r#"{
             "maturity": 0.5,
             "rate": 0.05,
             "num_u": 8,
@@ -532,19 +547,17 @@ mod tests {
                 "rho":-0.5
             }
         }"#;
-        let parameters: OptionParameters =
-        serde_json::from_str(json_str).unwrap();
-        match parameters.cf_parameters{
-            CFParameters::Heston(cf_params)=>{
+        let parameters: OptionParameters = serde_json::from_str(json_str).unwrap();
+        match parameters.cf_parameters {
+            CFParameters::Heston(cf_params) => {
                 assert_eq!(cf_params.sigma, 0.5);
-            },
-            _=>assert!(false)
+            }
+            _ => assert!(false),
         }
-        
-    } 
+    }
     #[test]
-    fn test_serialization_merton(){
-        let json_str=r#"{
+    fn test_serialization_merton() {
+        let json_str = r#"{
             "maturity": 0.5,
             "rate": 0.05,
             "num_u": 8,
@@ -559,18 +572,17 @@ mod tests {
                 "sig_l": 0.3
             }
         }"#;
-        let parameters: OptionParameters =
-        serde_json::from_str(json_str).unwrap();
-        match parameters.cf_parameters{
-            CFParameters::Merton(cf_params)=>{
+        let parameters: OptionParameters = serde_json::from_str(json_str).unwrap();
+        match parameters.cf_parameters {
+            CFParameters::Merton(cf_params) => {
                 assert_eq!(cf_params.sigma, 0.5);
-            },
-            _=>assert!(false)
+            }
+            _ => assert!(false),
         }
-    } 
+    }
     #[test]
-    fn test_serialization_cgmy(){
-        let json_str=r#"{
+    fn test_serialization_cgmy() {
+        let json_str = r#"{
             "maturity": 0.5,
             "rate": 0.05,
             "num_u": 8,
@@ -586,14 +598,12 @@ mod tests {
                 "y":0.5
             }
         }"#;
-        let parameters: OptionParameters =
-        serde_json::from_str(json_str).unwrap();
-        match parameters.cf_parameters{
-            CFParameters::CGMY(cf_params)=>{
+        let parameters: OptionParameters = serde_json::from_str(json_str).unwrap();
+        match parameters.cf_parameters {
+            CFParameters::CGMY(cf_params) => {
                 assert_eq!(cf_params.sigma, 0.5);
-            },
-            _=>assert!(false)
+            }
+            _ => assert!(false),
         }
-        
-    } 
+    }
 }

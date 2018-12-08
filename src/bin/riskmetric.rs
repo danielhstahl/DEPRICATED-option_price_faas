@@ -17,8 +17,8 @@ use runtime::{error::HandlerError, Context};
 use std::error::Error;
 use std::io;
 use utils::constraints;
-use utils::maps;
 use utils::http_helper;
+use utils::maps;
 
 const DENSITY_SCALE: f64 = 5.0;
 
@@ -27,17 +27,16 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 fn risk_metric_wrapper(event: Request, _ctx: Context) -> Result<impl IntoResponse, HandlerError> {
-    match risk_metric(event){
-        Ok(res)=>Ok(http_helper::build_response(200, &json!(res).to_string())),
-        Err(e)=>Ok(http_helper::build_response(
-            400, 
-            &http_helper::construct_error(&e.to_string())
-        ))
+    match risk_metric(event) {
+        Ok(res) => Ok(http_helper::build_response(200, &json!(res).to_string())),
+        Err(e) => Ok(http_helper::build_response(
+            400,
+            &http_helper::construct_error(&e.to_string()),
+        )),
     }
 }
 fn risk_metric(event: Request) -> Result<maps::RiskMeasures, io::Error> {
-    let parameters: constraints::OptionParameters =
-        serde_json::from_reader(event.body().as_ref())?;
+    let parameters: constraints::OptionParameters = serde_json::from_reader(event.body().as_ref())?;
 
     constraints::check_parameters(&parameters, &constraints::get_constraints())?;
 
@@ -50,8 +49,7 @@ fn risk_metric(event: Request) -> Result<maps::RiskMeasures, io::Error> {
         ..
     } = parameters; //destructure
 
-    let quantile_unwrap = quantile
-        .ok_or(constraints::throw_no_exist_error("quantile"))?;
+    let quantile_unwrap = quantile.ok_or(constraints::throw_no_exist_error("quantile"))?;
 
     let num_u = (2 as usize).pow(num_u_base as u32);
 
