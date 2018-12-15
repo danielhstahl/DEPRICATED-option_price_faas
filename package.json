@@ -34,9 +34,5 @@
     "js-yaml": "^3.12.0",
     "json-refs": "^3.0.10",
     "serverless-domain-manager": "^2.6.5"
-  },
-  "dependencies": {
-    "adm-zip": "^0.4.13",
-    "fs-extra": "^7.0.1"
   }
 }

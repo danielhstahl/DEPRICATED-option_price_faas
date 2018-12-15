@@ -1,6 +1,3 @@
-//const fs=require('fs-extra')
-//const admZip=require('adm-zip')
-//const zip=new admZip()
 const {exec}=require('child_process')
 const origBinaryLocation='./target/x86_64-unknown-linux-musl/release'
 const newZipLocation='.'
