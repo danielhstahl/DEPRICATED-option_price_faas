@@ -19,8 +19,6 @@ use self::rand::{SeedableRng, StdRng};
 use self::rayon::prelude::*;
 use constraints;
 use std::collections::VecDeque;
-use std::io;
-use std::io::{Error, ErrorKind};
 
 pub const CGMY: i32 = 0;
 pub const MERTON: i32 = 1;
@@ -55,8 +53,8 @@ pub const RISK_MEASURES: i32 = 9;
 /// ).unwrap();
 /// # }
 /// ```
-pub fn get_fn_indicators(option_type: &str, sensitivity: &str) -> Result<i32, io::Error> {
-    let combine_types = format!("{}_{}", option_type, sensitivity); //.as_str();
+pub fn get_fn_indicators(option_type: &str, sensitivity: &str) -> Result<i32, constraints::ParameterError> {
+    let combine_types = format!("{}_{}", option_type, sensitivity); 
     match combine_types.as_str() {
         "put_price" => Ok(PUT_PRICE),
         "call_price" => Ok(CALL_PRICE),
@@ -68,10 +66,7 @@ pub fn get_fn_indicators(option_type: &str, sensitivity: &str) -> Result<i32, io
         "call_theta" => Ok(CALL_THETA),
         "density_" => Ok(DENSITY),
         "riskmetric_" => Ok(RISK_MEASURES),
-        _ => Err(Error::new(
-            ErrorKind::Other,
-            format!("No matches for types {}", combine_types),
-        )),
+        _ => Err(constraints::ParameterError::FunctionError(combine_types)),
     }
 }
 /// Gets whether implied volatility should be included
@@ -98,7 +93,7 @@ fn get_cgmy_cf(
     cf_parameters: &constraints::CGMYParameters,
     maturity: f64,
     rate: f64,
-) -> Result<(impl Fn(&Complex<f64>) -> Complex<f64>, f64), io::Error> {
+) -> Result<(impl Fn(&Complex<f64>) -> Complex<f64>, f64), constraints::ParameterError> {
     constraints::check_cgmy_parameters(&cf_parameters, &constraints::get_cgmy_constraints())?;
     let constraints::CGMYParameters {
         c,
@@ -121,7 +116,7 @@ fn get_merton_cf(
     cf_parameters: &constraints::MertonParameters,
     maturity: f64,
     rate: f64,
-) -> Result<(impl Fn(&Complex<f64>) -> Complex<f64>, f64), io::Error> {
+) -> Result<(impl Fn(&Complex<f64>) -> Complex<f64>, f64), constraints::ParameterError> {
     constraints::check_merton_parameters(&cf_parameters, &constraints::get_merton_constraints())?;
     let constraints::MertonParameters {
         lambda,
@@ -143,7 +138,7 @@ fn get_heston_cf(
     cf_parameters: &constraints::HestonParameters,
     maturity: f64,
     rate: f64,
-) -> Result<(impl Fn(&Complex<f64>) -> Complex<f64>, f64), io::Error> {
+) -> Result<(impl Fn(&Complex<f64>) -> Complex<f64>, f64), constraints::ParameterError> {
     constraints::check_heston_parameters(&cf_parameters, &constraints::get_heston_constraints())?;
     let constraints::HestonParameters {
         sigma,
@@ -166,7 +161,7 @@ pub fn get_option_results_as_json(
     maturity: f64,
     rate: f64,
     strikes: VecDeque<f64>,
-) -> Result<Vec<GraphElement>, io::Error> {
+) -> Result<Vec<GraphElement>, constraints::ParameterError> {
     match cf_parameters {
         constraints::CFParameters::CGMY(cf_params) => {
             let (cf_inst, vol) = get_cgmy_cf(cf_params, maturity, rate)?;
@@ -218,7 +213,7 @@ pub fn get_density_results_as_json(
     num_u: usize,
     maturity: f64,
     rate: f64,
-) -> Result<Vec<GraphElement>, io::Error> {
+) -> Result<Vec<GraphElement>, constraints::ParameterError> {
     match cf_parameters {
         constraints::CFParameters::CGMY(cf_params) => {
             let (cf_inst, vol) = get_cgmy_cf(cf_params, maturity, rate)?;
@@ -244,7 +239,7 @@ pub fn get_risk_measure_results_as_json(
     maturity: f64,
     rate: f64,
     quantile: f64,
-) -> Result<RiskMeasures, io::Error> {
+) -> Result<RiskMeasures, constraints::ParameterError> {
     match cf_parameters {
         constraints::CFParameters::CGMY(cf_params) => {
             let (cf_inst, vol) = get_cgmy_cf(cf_params, maturity, rate)?;
@@ -385,7 +380,7 @@ fn get_option_results(
     maturity: f64,
     strikes: &[f64],
     inst_cf: &(Fn(&Complex<f64>) -> Complex<f64> + std::marker::Sync),
-) -> Result<Vec<GraphElement>, io::Error> {
+) -> Result<Vec<GraphElement>, constraints::ParameterError> {
     match fn_choice {
         CALL_PRICE => {
             let prices = option_pricing::fang_oost_call_price(
@@ -431,17 +426,14 @@ fn get_option_results(
             &strikes,
             &option_pricing::fang_oost_put_theta(num_u, asset, &strikes, rate, maturity, &inst_cf),
         )),
-        _ => Err(Error::new(
-            ErrorKind::Other,
-            format!("No matches for function indicator {}", fn_choice),
-        )),
+        _ => Err(constraints::ParameterError::FunctionError(format!("{}", fn_choice))),
     }
 }
 fn get_density_results(
     num_u: usize,
     x_max_density: f64,
     inst_cf: &(Fn(&Complex<f64>) -> Complex<f64> + std::marker::Sync),
-) -> Result<Vec<GraphElement>, io::Error> {
+) -> Result<Vec<GraphElement>, constraints::ParameterError> {
     Ok(adjust_density(num_u, x_max_density, &inst_cf))
 }
 const MAX_SIMS: usize = 100;
@@ -452,7 +444,7 @@ fn get_risk_measure_results(
     x_max_density: f64,
     quantile: f64,
     inst_cf: &(Fn(&Complex<f64>) -> Complex<f64> + std::marker::Sync),
-) -> Result<RiskMeasures, io::Error> {
+) -> Result<RiskMeasures, constraints::ParameterError> {
     Ok(risk_measure_as_json(
         cf_dist_utils::get_expected_shortfall_and_value_at_risk(
             quantile,
@@ -643,7 +635,7 @@ mod tests {
             get_fn_indicators(&"something".to_string(), &"somethingelse".to_string())
                 .unwrap_err()
                 .to_string(),
-            "No matches for types something_somethingelse"
+            "Function indicator something_somethingelse does not exist"
         );
     }
     #[test]
@@ -959,7 +951,7 @@ mod tests {
         assert!(results.is_err());
         assert_eq!(
             results.unwrap_err().to_string(),
-            "No matches for function indicator -1"
+            "Function indicator -1 does not exist"
         );
     }
 }

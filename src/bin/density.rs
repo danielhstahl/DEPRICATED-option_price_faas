@@ -14,8 +14,6 @@ extern crate utils;
 use lambda_http::{lambda, IntoResponse, Request};
 use runtime::{error::HandlerError, Context};
 use std::error::Error;
-use std::io;
-
 use utils::constraints;
 use utils::http_helper;
 use utils::maps;
@@ -35,7 +33,7 @@ fn density_wrapper(event: Request, _ctx: Context) -> Result<impl IntoResponse, H
         )),
     }
 }
-fn density(event: Request) -> Result<Vec<maps::GraphElement>, io::Error> {
+fn density(event: Request) -> Result<Vec<maps::GraphElement>, Box<dyn Error>> {
     let parameters: constraints::OptionParameters = serde_json::from_reader(event.body().as_ref())?;
 
     constraints::check_parameters(&parameters, &constraints::get_constraints())?;
@@ -50,5 +48,6 @@ fn density(event: Request) -> Result<Vec<maps::GraphElement>, io::Error> {
 
     let num_u = (2 as usize).pow(num_u_base as u32);
 
-    maps::get_density_results_as_json(&cf_parameters, DENSITY_SCALE, num_u, maturity, rate)
+    let results=maps::get_density_results_as_json(&cf_parameters, DENSITY_SCALE, num_u, maturity, rate)?;
+    Ok(results)
 }

@@ -14,7 +14,6 @@ extern crate utils;
 use lambda_http::{lambda, IntoResponse, Request, RequestExt};
 use runtime::{error::HandlerError, Context};
 use std::error::Error;
-use std::io;
 use utils::constraints;
 use utils::http_helper;
 use utils::maps;
@@ -34,7 +33,7 @@ fn price_options_wrapper(event: Request, _ctx: Context) -> Result<impl IntoRespo
         )),
     }
 }
-fn price_options(event: Request) -> Result<Vec<maps::GraphElement>, io::Error> {
+fn price_options(event: Request) -> Result<Vec<maps::GraphElement>, Box<dyn Error>> {
     let parameters: constraints::OptionParameters = serde_json::from_reader(event.body().as_ref())?;
 
     constraints::check_parameters(&parameters, &constraints::get_constraints())?;
@@ -77,7 +76,7 @@ fn price_options(event: Request) -> Result<Vec<maps::GraphElement>, io::Error> {
 
     let num_u = (2 as usize).pow(num_u_base as u32);
 
-    maps::get_option_results_as_json(
+    let results=maps::get_option_results_as_json(
         fn_indicator,
         include_iv,
         &cf_parameters,
@@ -87,5 +86,6 @@ fn price_options(event: Request) -> Result<Vec<maps::GraphElement>, io::Error> {
         maturity,
         rate,
         strikes_unwrap,
-    )
+    )?;
+    Ok(results)
 }

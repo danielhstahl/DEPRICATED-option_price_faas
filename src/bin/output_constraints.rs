@@ -6,7 +6,6 @@ extern crate utils;
 use lambda_http::{lambda, IntoResponse, Request, RequestExt};
 use runtime::{error::HandlerError, Context};
 use std::error::Error;
-use std::io;
 use utils::constraints;
 use utils::http_helper;
 
@@ -27,7 +26,7 @@ fn output_constraints_wrapper(
     }
 }
 
-fn output_constraints(event: Request) -> Result<String, io::Error> {
+fn output_constraints(event: Request) -> Result<String, Box<dyn Error>> {
     let default_model = "";
     let path_parameters = event.path_parameters();
     let model = match path_parameters.get("model") {
