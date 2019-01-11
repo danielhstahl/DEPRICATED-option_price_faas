@@ -2,19 +2,25 @@ use std::collections::VecDeque;
 use std::error::Error;
 use std::fmt;
 
-#[derive(Debug,PartialEq)]
-pub enum ParameterError{
+#[derive(Debug, PartialEq)]
+pub enum ParameterError {
     OutOfBounds(String),
     NoExist(String),
-    FunctionError(String)
+    FunctionError(String),
 }
 
 impl fmt::Display for ParameterError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self{
-            ParameterError::OutOfBounds(parameter)=>write!(f, "Parameter {} out of bounds", parameter),
-            ParameterError::NoExist(parameter)=>write!(f, "Parameter {} does not exist", parameter),
-            ParameterError::FunctionError(parameter)=>write!(f, "Function indicator {} does not exist", parameter)
+        match self {
+            ParameterError::OutOfBounds(parameter) => {
+                write!(f, "Parameter {} out of bounds", parameter)
+            }
+            ParameterError::NoExist(parameter) => {
+                write!(f, "Parameter {} does not exist", parameter)
+            }
+            ParameterError::FunctionError(parameter) => {
+                write!(f, "Function indicator {} does not exist", parameter)
+            }
         }
     }
 }
@@ -23,7 +29,6 @@ impl Error for ParameterError {
         "Parameter error!"
     }
 }
-
 
 #[derive(Serialize, Deserialize)]
 pub struct ConstraintsSchema {
@@ -310,7 +315,7 @@ fn check_constraint_option<'a>(
 pub fn check_parameters<'a>(
     parameters: &OptionParameters,
     constraints: &ParameterConstraints,
-) -> Result<(),  ParameterError> {
+) -> Result<(), ParameterError> {
     check_constraint_option(&parameters.asset, &constraints.asset, "asset")?;
     check_constraint(parameters.maturity, &constraints.maturity, "maturity")?;
     check_constraint(parameters.rate, &constraints.rate, "rate")?;
@@ -321,7 +326,7 @@ pub fn check_parameters<'a>(
 pub fn check_heston_parameters<'a>(
     parameters: &HestonParameters,
     constraints: &HestonConstraints,
-) -> Result<(),  ParameterError> {
+) -> Result<(), ParameterError> {
     check_constraint(parameters.sigma, &constraints.sigma, "sigma")?;
     check_constraint(parameters.v0, &constraints.v0, "v0")?;
     check_constraint(parameters.speed, &constraints.speed, "speed")?;
@@ -332,7 +337,7 @@ pub fn check_heston_parameters<'a>(
 pub fn check_merton_parameters<'a>(
     parameters: &MertonParameters,
     constraints: &MertonConstraints,
-) -> Result<(),  ParameterError> {
+) -> Result<(), ParameterError> {
     check_constraint(parameters.lambda, &constraints.lambda, "lambda")?;
     check_constraint(parameters.mu_l, &constraints.mu_l, "mu_l")?;
     check_constraint(parameters.sig_l, &constraints.sig_l, "sig_l")?;
@@ -346,7 +351,7 @@ pub fn check_merton_parameters<'a>(
 pub fn check_cgmy_parameters<'a>(
     parameters: &CGMYParameters,
     constraints: &CGMYConstraints,
-) -> Result<(),  ParameterError> {
+) -> Result<(), ParameterError> {
     check_constraint(parameters.c, &constraints.c, "c")?;
     check_constraint(parameters.g, &constraints.g, "g")?;
     check_constraint(parameters.m, &constraints.m, "m")?;

@@ -48,6 +48,7 @@ fn density(event: Request) -> Result<Vec<maps::GraphElement>, Box<dyn Error>> {
 
     let num_u = (2 as usize).pow(num_u_base as u32);
 
-    let results=maps::get_density_results_as_json(&cf_parameters, DENSITY_SCALE, num_u, maturity, rate)?;
+    let results =
+        maps::get_density_results_as_json(&cf_parameters, DENSITY_SCALE, num_u, maturity, rate)?;
     Ok(results)
 }

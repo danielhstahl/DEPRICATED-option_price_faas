@@ -76,7 +76,7 @@ fn price_options(event: Request) -> Result<Vec<maps::GraphElement>, Box<dyn Erro
 
     let num_u = (2 as usize).pow(num_u_base as u32);
 
-    let results=maps::get_option_results_as_json(
+    let results = maps::get_option_results_as_json(
         fn_indicator,
         include_iv,
         &cf_parameters,

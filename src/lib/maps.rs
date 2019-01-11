@@ -53,8 +53,11 @@ pub const RISK_MEASURES: i32 = 9;
 /// ).unwrap();
 /// # }
 /// ```
-pub fn get_fn_indicators(option_type: &str, sensitivity: &str) -> Result<i32, constraints::ParameterError> {
-    let combine_types = format!("{}_{}", option_type, sensitivity); 
+pub fn get_fn_indicators(
+    option_type: &str,
+    sensitivity: &str,
+) -> Result<i32, constraints::ParameterError> {
+    let combine_types = format!("{}_{}", option_type, sensitivity);
     match combine_types.as_str() {
         "put_price" => Ok(PUT_PRICE),
         "call_price" => Ok(CALL_PRICE),
@@ -426,7 +429,10 @@ fn get_option_results(
             &strikes,
             &option_pricing::fang_oost_put_theta(num_u, asset, &strikes, rate, maturity, &inst_cf),
         )),
-        _ => Err(constraints::ParameterError::FunctionError(format!("{}", fn_choice))),
+        _ => Err(constraints::ParameterError::FunctionError(format!(
+            "{}",
+            fn_choice
+        ))),
     }
 }
 fn get_density_results(
