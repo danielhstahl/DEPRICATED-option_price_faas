@@ -30,6 +30,7 @@ script:
 after_success: |
   if [ "$TRAVIS_RUST_VERSION" = "nightly" ]; then
     bash <(curl -s https://codecov.io/bash) 
+    cargo bench
     cargo tarpaulin --out Xml
     bash <(curl -s https://codecov.io/bash)
   fi
