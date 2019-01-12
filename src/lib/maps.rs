@@ -463,11 +463,10 @@ fn get_risk_measure_results(
         ),
     ))
 }
-extern crate test;
+
 #[cfg(test)]
 mod tests {
     use maps::*;
-    use maps::test::Bencher;
     #[test]
     fn get_fn_indicators_gets_match() {
         let model = get_fn_indicators("put", "price").unwrap();
@@ -960,40 +959,5 @@ mod tests {
             results.unwrap_err().to_string(),
             "Function indicator -1 does not exist"
         );
-    }
-    #[bench]
-    fn bench_option_price(b: &mut Bencher){
-        b.iter(|| {
-            let mut strikes: VecDeque<f64> = VecDeque::new();
-            strikes.push_back(50.0);
-            let num_u: usize = 256;
-            let t = 1.0;
-            let rate = 0.03;
-            let asset = 50.0;
-            let parameters = constraints::MertonParameters {
-                sigma: 0.2,
-                lambda: 0.5,
-                mu_l: -0.05,
-                sig_l: 0.1,
-                speed: 0.3,
-                v0: 0.9,
-                eta_v: 0.2,
-                rho: -0.5,
-            };
-            get_option_results_as_json(
-                CALL_PRICE,
-                false,
-                &constraints::CFParameters::Merton(parameters),
-                10.0,
-                num_u,
-                asset,
-                t,
-                rate,
-                strikes,
-            )
-            .unwrap()
-            
-        });
-    }
-    
+    }    
 }
