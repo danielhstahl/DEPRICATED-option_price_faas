@@ -28,7 +28,7 @@ describe('risk_measures', ()=>{
             }
             const res=JSON.parse(JSON.parse(result).body)
             expect(res.err).toBeDefined()
-            expect(res.err).toEqual("Parameter quantile does not exist")
+            expect(res.err).toEqual("Parameter quantile does not exist.")
             done()
         })
     })

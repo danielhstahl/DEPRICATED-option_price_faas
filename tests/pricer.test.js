@@ -43,7 +43,7 @@ describe('option prices', ()=>{
             }
             const res=JSON.parse(JSON.parse(result).body)
             expect(res.err).toBeDefined()
-            expect(res.err).toEqual("Parameter strikes does not exist")
+            expect(res.err).toEqual("Parameter strikes does not exist.")
             done()
         })
     })
