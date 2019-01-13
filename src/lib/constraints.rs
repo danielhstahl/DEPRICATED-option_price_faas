@@ -3,30 +3,54 @@ use std::error::Error;
 use std::fmt;
 
 #[derive(Debug, PartialEq)]
-pub enum ParameterError {
+pub enum ErrorType {
     OutOfBounds(String),
     NoExist(String),
     FunctionError(String),
 }
 
-impl fmt::Display for ParameterError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+#[derive(Debug, PartialEq)]
+pub struct ParameterError {
+    msg: String,
+}
+
+impl ParameterError {
+    pub fn new(error_type: &ErrorType) -> Self {
+        ParameterError {
+            msg: match error_type {
+                ErrorType::OutOfBounds(parameter) => {
+                    format!("Parameter {} out of bounds.", parameter)
+                }
+                ErrorType::NoExist(parameter) => format!("Parameter {} does not exist.", parameter),
+                ErrorType::FunctionError(parameter) => {
+                    format!("Function indicator {} does not exist.", parameter)
+                }
+            },
+        }
+    }
+    /*fn get_error_description(&self)->String {
         match self {
             ParameterError::OutOfBounds(parameter) => {
-                write!(f, "Parameter {} out of bounds", parameter)
+                format!("Parameter {} out of bounds.", parameter)
             }
             ParameterError::NoExist(parameter) => {
-                write!(f, "Parameter {} does not exist", parameter)
+                format!("Parameter {} does not exist.", parameter)
             }
             ParameterError::FunctionError(parameter) => {
-                write!(f, "Function indicator {} does not exist", parameter)
+                format!("Function indicator {} does not exist.", parameter)
             }
         }
+    }*/
+}
+
+impl fmt::Display for ParameterError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.msg)
     }
 }
 impl Error for ParameterError {
     fn description(&self) -> &str {
-        "Parameter error!"
+        &self.msg
     }
 }
 
@@ -298,7 +322,9 @@ fn check_constraint<'a>(
     if parameter >= constraint.lower && parameter <= constraint.upper {
         Ok(())
     } else {
-        Err(ParameterError::OutOfBounds(parameter_name.to_string()))
+        Err(ParameterError::new(&ErrorType::OutOfBounds(
+            parameter_name.to_string(),
+        )))
     }
 }
 fn check_constraint_option<'a>(
@@ -365,7 +391,7 @@ pub fn check_cgmy_parameters<'a>(
 }
 
 pub fn throw_no_exist_error(parameter: &str) -> ParameterError {
-    ParameterError::NoExist(parameter.to_string())
+    ParameterError::new(&ErrorType::NoExist(parameter.to_string()))
 }
 
 #[cfg(test)]
@@ -374,7 +400,7 @@ mod tests {
     #[test]
     fn test_throw_no_exist_error() {
         let err = throw_no_exist_error("hello");
-        assert_eq!(err.to_string(), "Parameter hello does not exist");
+        assert_eq!(err.to_string(), "Parameter hello does not exist.");
     }
     #[test]
     fn test_check_constraint_option() {
@@ -410,7 +436,7 @@ mod tests {
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err().to_string(),
-            "Parameter hello out of bounds".to_string()
+            "Parameter hello out of bounds.".to_string()
         );
     }
     #[test]
@@ -454,7 +480,7 @@ mod tests {
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err().to_string(),
-            "Parameter rate out of bounds"
+            "Parameter rate out of bounds."
         );
     }
     #[test]
@@ -482,7 +508,7 @@ mod tests {
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err().to_string(),
-            "Parameter sigma out of bounds"
+            "Parameter sigma out of bounds."
         );
     }
     #[test]
@@ -516,7 +542,7 @@ mod tests {
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err().to_string(),
-            "Parameter sigma out of bounds"
+            "Parameter sigma out of bounds."
         );
     }
     #[test]
@@ -552,7 +578,7 @@ mod tests {
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err().to_string(),
-            "Parameter sigma out of bounds"
+            "Parameter sigma out of bounds."
         );
     }
     #[test]

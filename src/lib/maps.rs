@@ -69,7 +69,9 @@ pub fn get_fn_indicators(
         "call_theta" => Ok(CALL_THETA),
         "density_" => Ok(DENSITY),
         "riskmetric_" => Ok(RISK_MEASURES),
-        _ => Err(constraints::ParameterError::FunctionError(combine_types)),
+        _ => Err(constraints::ParameterError::new(
+            &constraints::ErrorType::FunctionError(combine_types),
+        )),
     }
 }
 /// Gets whether implied volatility should be included
@@ -429,10 +431,9 @@ fn get_option_results(
             &strikes,
             &option_pricing::fang_oost_put_theta(num_u, asset, &strikes, rate, maturity, &inst_cf),
         )),
-        _ => Err(constraints::ParameterError::FunctionError(format!(
-            "{}",
-            fn_choice
-        ))),
+        _ => Err(constraints::ParameterError::new(
+            &constraints::ErrorType::FunctionError(format!("{}", fn_choice)),
+        )),
     }
 }
 fn get_density_results(
@@ -641,7 +642,7 @@ mod tests {
             get_fn_indicators(&"something".to_string(), &"somethingelse".to_string())
                 .unwrap_err()
                 .to_string(),
-            "Function indicator something_somethingelse does not exist"
+            "Function indicator something_somethingelse does not exist."
         );
     }
     #[test]
@@ -957,7 +958,7 @@ mod tests {
         assert!(results.is_err());
         assert_eq!(
             results.unwrap_err().to_string(),
-            "Function indicator -1 does not exist"
+            "Function indicator -1 does not exist."
         );
-    }    
+    }
 }

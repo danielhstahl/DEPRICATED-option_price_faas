@@ -1,13 +1,13 @@
 #[macro_use]
 extern crate bencher;
-extern crate utils;
 extern crate num_complex;
+extern crate utils;
+use bencher::Bencher;
 use num_complex::Complex;
+use std::collections::VecDeque;
 use utils::constraints;
 use utils::maps;
-use bencher::Bencher;
-use std::collections::VecDeque;
-fn bench_option_price(b: &mut Bencher){
+fn bench_option_price(b: &mut Bencher) {
     b.iter(|| {
         let mut strikes: VecDeque<f64> = VecDeque::new();
         strikes.push_back(50.0);
@@ -37,10 +37,9 @@ fn bench_option_price(b: &mut Bencher){
             strikes,
         )
         .unwrap()
-        
     });
 }
 benchmark_group!(benches, bench_option_price);
 benchmark_main!(benches);
 #[cfg(never)]
-fn main() { }
+fn main() {}
