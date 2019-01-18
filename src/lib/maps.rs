@@ -19,6 +19,7 @@ use self::rand::{SeedableRng, StdRng};
 use self::rayon::prelude::*;
 use constraints;
 use std::collections::VecDeque;
+use std::error::Error;
 
 pub const CGMY: i32 = 0;
 pub const MERTON: i32 = 1;
@@ -244,22 +245,25 @@ pub fn get_risk_measure_results_as_json(
     maturity: f64,
     rate: f64,
     quantile: f64,
-) -> Result<RiskMeasures, constraints::ParameterError> {
+) -> Result<cf_dist_utils::RiskMetric, Box<dyn Error>> {
     match cf_parameters {
         constraints::CFParameters::CGMY(cf_params) => {
             let (cf_inst, vol) = get_cgmy_cf(cf_params, maturity, rate)?;
             let x_max_density = vol * density_scale;
-            get_risk_measure_results(num_u, x_max_density, quantile, &cf_inst)
+            let result=get_risk_measure_results(num_u, x_max_density, quantile, &cf_inst)?;
+            Ok(result)
         }
         constraints::CFParameters::Merton(cf_params) => {
             let (cf_inst, vol) = get_merton_cf(cf_params, maturity, rate)?;
             let x_max_density = vol * density_scale;
-            get_risk_measure_results(num_u, x_max_density, quantile, &cf_inst)
+            let result=get_risk_measure_results(num_u, x_max_density, quantile, &cf_inst)?;
+            Ok(result)
         }
         constraints::CFParameters::Heston(cf_params) => {
             let (cf_inst, vol) = get_heston_cf(cf_params, maturity, rate)?;
             let x_max_density = vol * density_scale;
-            get_risk_measure_results(num_u, x_max_density, quantile, &cf_inst)
+            let result=get_risk_measure_results(num_u, x_max_density, quantile, &cf_inst)?;
+            Ok(result)
         }
     }
 }
@@ -270,19 +274,6 @@ pub struct GraphElement {
     value: f64,
     #[serde(skip_serializing_if = "Option::is_none")] //skip when iv is not provided
     iv: Option<f64>,
-}
-#[derive(Serialize, Deserialize, Debug)]
-pub struct RiskMeasures {
-    value_at_risk: f64,
-    expected_shortfall: f64,
-}
-
-fn risk_measure_as_json(risk_measure: (f64, f64)) -> RiskMeasures {
-    let (expected_shortfall, value_at_risk) = risk_measure;
-    RiskMeasures {
-        value_at_risk,
-        expected_shortfall,
-    }
 }
 
 fn create_generic_iterator<'a, 'b: 'a>(
@@ -451,18 +442,16 @@ fn get_risk_measure_results(
     x_max_density: f64,
     quantile: f64,
     inst_cf: &(Fn(&Complex<f64>) -> Complex<f64> + std::marker::Sync),
-) -> Result<RiskMeasures, constraints::ParameterError> {
-    Ok(risk_measure_as_json(
-        cf_dist_utils::get_expected_shortfall_and_value_at_risk(
-            quantile,
-            num_u,
-            -x_max_density,
-            x_max_density,
-            MAX_SIMS,
-            PRECISION,
-            &inst_cf,
-        ),
-    ))
+) -> Result<cf_dist_utils::RiskMetric, cf_dist_utils::ValueAtRiskError> {
+    cf_dist_utils::get_expected_shortfall_and_value_at_risk(
+        quantile,
+        num_u,
+        -x_max_density,
+        x_max_density,
+        MAX_SIMS,
+        PRECISION,
+        &inst_cf,
+    )
 }
 
 #[cfg(test)]

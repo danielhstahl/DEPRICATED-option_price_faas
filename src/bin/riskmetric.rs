@@ -34,7 +34,7 @@ fn risk_metric_wrapper(event: Request, _ctx: Context) -> Result<impl IntoRespons
         )),
     }
 }
-fn risk_metric(event: Request) -> Result<maps::RiskMeasures, Box<dyn Error>> {
+fn risk_metric(event: Request) -> Result<cf_dist_utils::RiskMetric, Box<dyn Error>> {
     let parameters: constraints::OptionParameters = serde_json::from_reader(event.body().as_ref())?;
 
     constraints::check_parameters(&parameters, &constraints::get_constraints())?;

@@ -28,19 +28,6 @@ impl ParameterError {
             },
         }
     }
-    /*fn get_error_description(&self)->String {
-        match self {
-            ParameterError::OutOfBounds(parameter) => {
-                format!("Parameter {} out of bounds.", parameter)
-            }
-            ParameterError::NoExist(parameter) => {
-                format!("Parameter {} does not exist.", parameter)
-            }
-            ParameterError::FunctionError(parameter) => {
-                format!("Function indicator {} does not exist.", parameter)
-            }
-        }
-    }*/
 }
 
 impl fmt::Display for ParameterError {
