@@ -29,7 +29,7 @@ approx = "0.2.0"
 bencher = "0.1.5"
 
 [badges]
-travis-ci = { repository = "phillyfan1138/option_price_faas" }
+travis-ci = { repository = "realoptions/option_price_faas" }
 
 [[bin]]
 name = "constraints"

@@ -83,6 +83,6 @@ deploy:
     - "./docs/openapi_merged.yml"
     skip_cleanup: true
     on:
-      repo: phillyfan1138/option_price_faas
+      repo: realoptions/option_price_faas
       tags: true
       rust: 'stable'
