@@ -1,6 +1,7 @@
 use std::collections::VecDeque;
 use std::error::Error;
 use std::fmt;
+use serde_derive::{Serialize, Deserialize};
 
 #[derive(Debug, PartialEq)]
 pub enum ErrorType {

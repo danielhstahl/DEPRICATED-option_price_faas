@@ -1,23 +1,8 @@
-extern crate black_scholes;
-extern crate cf_dist_utils;
-extern crate cf_functions;
-extern crate fang_oost;
-extern crate fang_oost_option;
-extern crate lambda_http;
-extern crate lambda_runtime as runtime;
-extern crate num_complex;
-extern crate rayon;
-extern crate serde_derive;
-#[macro_use]
-extern crate serde_json;
-extern crate utils;
-
+use serde_json::json;
 use lambda_http::{lambda, IntoResponse, Request};
-use runtime::{error::HandlerError, Context};
+use lambda_runtime::{error::HandlerError, Context};
 use std::error::Error;
-use utils::constraints;
-use utils::http_helper;
-use utils::maps;
+use utils::{constraints, http_helper, maps};
 
 const DENSITY_SCALE: f64 = 5.0;
 

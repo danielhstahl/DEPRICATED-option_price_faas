@@ -1,6 +1,6 @@
 [package]
 name = "pricer"
-version = "1.0.0"
+version = "2.0.0"
 authors = ["Daniel Stahl <danstahl1138@gmail.com>"]
 homepage = "https://github.com/phillyfan1138/option_price_faas"
 repository = "https://github.com/phillyfan1138/option_price_faas"
@@ -8,6 +8,7 @@ readme = "README.md"
 license = "MIT"
 description = "Option pricer"
 autobins = false
+edition = "2018"
 
 [dependencies]
 fang_oost_option = "0.27"
@@ -20,8 +21,8 @@ rayon = "1.0.1"
 black_scholes = "0.3.0"
 cf_functions = "0.10"
 num-complex = "0.2"
-lambda_http = { git = "https://github.com/awslabs/aws-lambda-rust-runtime" }
-lambda_runtime = { git = "https://github.com/awslabs/aws-lambda-rust-runtime" }
+lambda_http = "0.1.0"
+lambda_runtime = "0.2.0"
 
 [dev-dependencies]
 rand = "0.5"
