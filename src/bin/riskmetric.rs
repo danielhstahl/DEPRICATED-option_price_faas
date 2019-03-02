@@ -1,24 +1,8 @@
-extern crate black_scholes;
-extern crate cf_dist_utils;
-extern crate cf_functions;
-extern crate fang_oost;
-extern crate fang_oost_option;
-extern crate lambda_http;
-extern crate lambda_runtime as runtime;
-extern crate num_complex;
-extern crate rayon;
-extern crate serde_derive;
-#[macro_use]
-extern crate serde_json;
-extern crate utils;
-
+use serde_json::json;
 use lambda_http::{lambda, IntoResponse, Request};
-use runtime::{error::HandlerError, Context};
+use lambda_runtime::{error::HandlerError, Context};
 use std::error::Error;
-use std::io;
-use utils::constraints;
-use utils::http_helper;
-use utils::maps;
+use utils::{constraints, http_helper, maps};
 
 const DENSITY_SCALE: f64 = 5.0;
 
@@ -35,7 +19,7 @@ fn risk_metric_wrapper(event: Request, _ctx: Context) -> Result<impl IntoRespons
         )),
     }
 }
-fn risk_metric(event: Request) -> Result<maps::RiskMeasures, io::Error> {
+fn risk_metric(event: Request) -> Result<cf_dist_utils::RiskMetric, Box<dyn Error>> {
     let parameters: constraints::OptionParameters = serde_json::from_reader(event.body().as_ref())?;
 
     constraints::check_parameters(&parameters, &constraints::get_constraints())?;
@@ -53,12 +37,13 @@ fn risk_metric(event: Request) -> Result<maps::RiskMeasures, io::Error> {
 
     let num_u = (2 as usize).pow(num_u_base as u32);
 
-    maps::get_risk_measure_results_as_json(
+    let results = maps::get_risk_measure_results_as_json(
         &cf_parameters,
         DENSITY_SCALE,
         num_u,
         maturity,
         rate,
         quantile_unwrap,
-    )
+    )?;
+    Ok(results)
 }

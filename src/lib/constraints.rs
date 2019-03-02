@@ -1,6 +1,46 @@
 use std::collections::VecDeque;
-use std::io;
-use std::io::{Error, ErrorKind};
+use std::error::Error;
+use std::fmt;
+use serde_derive::{Serialize, Deserialize};
+
+#[derive(Debug, PartialEq)]
+pub enum ErrorType {
+    OutOfBounds(String),
+    NoExist(String),
+    FunctionError(String),
+}
+
+#[derive(Debug, PartialEq)]
+pub struct ParameterError {
+    msg: String,
+}
+
+impl ParameterError {
+    pub fn new(error_type: &ErrorType) -> Self {
+        ParameterError {
+            msg: match error_type {
+                ErrorType::OutOfBounds(parameter) => {
+                    format!("Parameter {} out of bounds.", parameter)
+                }
+                ErrorType::NoExist(parameter) => format!("Parameter {} does not exist.", parameter),
+                ErrorType::FunctionError(parameter) => {
+                    format!("Function indicator {} does not exist.", parameter)
+                }
+            },
+        }
+    }
+}
+
+impl fmt::Display for ParameterError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.msg)
+    }
+}
+impl Error for ParameterError {
+    fn description(&self) -> &str {
+        &self.msg
+    }
+}
 
 #[derive(Serialize, Deserialize)]
 pub struct ConstraintsSchema {
@@ -266,21 +306,20 @@ fn check_constraint<'a>(
     parameter: f64,
     constraint: &'a ConstraintsSchema,
     parameter_name: &'a str,
-) -> Result<(), io::Error> {
+) -> Result<(), ParameterError> {
     if parameter >= constraint.lower && parameter <= constraint.upper {
         Ok(())
     } else {
-        Err(Error::new(
-            ErrorKind::Other,
-            format!("Parameter {} out of bounds", parameter_name),
-        ))
+        Err(ParameterError::new(&ErrorType::OutOfBounds(
+            parameter_name.to_string(),
+        )))
     }
 }
 fn check_constraint_option<'a>(
     parameter: &Option<f64>,
     constraint: &'a ConstraintsSchema,
     parameter_name: &'a str,
-) -> Result<(), io::Error> {
+) -> Result<(), ParameterError> {
     match parameter {
         Some(param) => check_constraint(*param, constraint, parameter_name),
         None => Ok(()),
@@ -290,7 +329,7 @@ fn check_constraint_option<'a>(
 pub fn check_parameters<'a>(
     parameters: &OptionParameters,
     constraints: &ParameterConstraints,
-) -> Result<(), io::Error> {
+) -> Result<(), ParameterError> {
     check_constraint_option(&parameters.asset, &constraints.asset, "asset")?;
     check_constraint(parameters.maturity, &constraints.maturity, "maturity")?;
     check_constraint(parameters.rate, &constraints.rate, "rate")?;
@@ -301,7 +340,7 @@ pub fn check_parameters<'a>(
 pub fn check_heston_parameters<'a>(
     parameters: &HestonParameters,
     constraints: &HestonConstraints,
-) -> Result<(), io::Error> {
+) -> Result<(), ParameterError> {
     check_constraint(parameters.sigma, &constraints.sigma, "sigma")?;
     check_constraint(parameters.v0, &constraints.v0, "v0")?;
     check_constraint(parameters.speed, &constraints.speed, "speed")?;
@@ -312,7 +351,7 @@ pub fn check_heston_parameters<'a>(
 pub fn check_merton_parameters<'a>(
     parameters: &MertonParameters,
     constraints: &MertonConstraints,
-) -> Result<(), io::Error> {
+) -> Result<(), ParameterError> {
     check_constraint(parameters.lambda, &constraints.lambda, "lambda")?;
     check_constraint(parameters.mu_l, &constraints.mu_l, "mu_l")?;
     check_constraint(parameters.sig_l, &constraints.sig_l, "sig_l")?;
@@ -326,7 +365,7 @@ pub fn check_merton_parameters<'a>(
 pub fn check_cgmy_parameters<'a>(
     parameters: &CGMYParameters,
     constraints: &CGMYConstraints,
-) -> Result<(), io::Error> {
+) -> Result<(), ParameterError> {
     check_constraint(parameters.c, &constraints.c, "c")?;
     check_constraint(parameters.g, &constraints.g, "g")?;
     check_constraint(parameters.m, &constraints.m, "m")?;
@@ -339,11 +378,8 @@ pub fn check_cgmy_parameters<'a>(
     Ok(())
 }
 
-pub fn throw_no_exist_error(message: &str) -> io::Error {
-    Error::new(
-        ErrorKind::Other,
-        format!("Parameter {} does not exist", message),
-    )
+pub fn throw_no_exist_error(parameter: &str) -> ParameterError {
+    ParameterError::new(&ErrorType::NoExist(parameter.to_string()))
 }
 
 #[cfg(test)]
@@ -352,7 +388,7 @@ mod tests {
     #[test]
     fn test_throw_no_exist_error() {
         let err = throw_no_exist_error("hello");
-        assert_eq!(err.to_string(), "Parameter hello does not exist");
+        assert_eq!(err.to_string(), "Parameter hello does not exist.");
     }
     #[test]
     fn test_check_constraint_option() {
@@ -388,7 +424,7 @@ mod tests {
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err().to_string(),
-            "Parameter hello out of bounds".to_string()
+            "Parameter hello out of bounds.".to_string()
         );
     }
     #[test]
@@ -432,7 +468,7 @@ mod tests {
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err().to_string(),
-            "Parameter rate out of bounds"
+            "Parameter rate out of bounds."
         );
     }
     #[test]
@@ -460,7 +496,7 @@ mod tests {
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err().to_string(),
-            "Parameter sigma out of bounds"
+            "Parameter sigma out of bounds."
         );
     }
     #[test]
@@ -494,7 +530,7 @@ mod tests {
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err().to_string(),
-            "Parameter sigma out of bounds"
+            "Parameter sigma out of bounds."
         );
     }
     #[test]
@@ -530,7 +566,7 @@ mod tests {
         assert!(result.is_err());
         assert_eq!(
             result.unwrap_err().to_string(),
-            "Parameter sigma out of bounds"
+            "Parameter sigma out of bounds."
         );
     }
     #[test]

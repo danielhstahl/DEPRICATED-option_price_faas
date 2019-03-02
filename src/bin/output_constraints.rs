@@ -1,14 +1,9 @@
-#[macro_use]
-extern crate serde_json;
-extern crate lambda_http;
-extern crate lambda_runtime as runtime;
-extern crate utils;
+use serde_json::json;
 use lambda_http::{lambda, IntoResponse, Request, RequestExt};
-use runtime::{error::HandlerError, Context};
+use lambda_runtime::{error::HandlerError, Context};
 use std::error::Error;
-use std::io;
-use utils::constraints;
-use utils::http_helper;
+use utils::{constraints, http_helper};
+//use utils::;
 
 fn main() -> Result<(), Box<dyn Error>> {
     lambda!(output_constraints_wrapper);
@@ -27,7 +22,7 @@ fn output_constraints_wrapper(
     }
 }
 
-fn output_constraints(event: Request) -> Result<String, io::Error> {
+fn output_constraints(event: Request) -> Result<String, Box<dyn Error>> {
     let default_model = "";
     let path_parameters = event.path_parameters();
     let model = match path_parameters.get("model") {

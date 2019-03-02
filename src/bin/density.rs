@@ -1,25 +1,9 @@
-extern crate black_scholes;
-extern crate cf_dist_utils;
-extern crate cf_functions;
-extern crate fang_oost;
-extern crate fang_oost_option;
-extern crate lambda_http;
-extern crate lambda_runtime as runtime;
-extern crate num_complex;
-extern crate rayon;
-extern crate serde_derive;
-#[macro_use]
-extern crate serde_json;
-extern crate utils;
 use lambda_http::{lambda, IntoResponse, Request};
-use runtime::{error::HandlerError, Context};
-use std::error::Error;
-use std::io;
+use lambda_runtime::{error::HandlerError, Context};
+use serde_json::json;
+use utils::{constraints, http_helper, maps};
 
-use utils::constraints;
-use utils::http_helper;
-use utils::maps;
-
+use std::{error::Error};
 const DENSITY_SCALE: f64 = 5.0;
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -35,7 +19,7 @@ fn density_wrapper(event: Request, _ctx: Context) -> Result<impl IntoResponse, H
         )),
     }
 }
-fn density(event: Request) -> Result<Vec<maps::GraphElement>, io::Error> {
+fn density(event: Request) -> Result<Vec<maps::GraphElement>, Box<dyn Error>> {
     let parameters: constraints::OptionParameters = serde_json::from_reader(event.body().as_ref())?;
 
     constraints::check_parameters(&parameters, &constraints::get_constraints())?;
@@ -50,5 +34,7 @@ fn density(event: Request) -> Result<Vec<maps::GraphElement>, io::Error> {
 
     let num_u = (2 as usize).pow(num_u_base as u32);
 
-    maps::get_density_results_as_json(&cf_parameters, DENSITY_SCALE, num_u, maturity, rate)
+    let results =
+        maps::get_density_results_as_json(&cf_parameters, DENSITY_SCALE, num_u, maturity, rate)?;
+    Ok(results)
 }

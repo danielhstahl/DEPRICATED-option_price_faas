@@ -1,6 +1,5 @@
-extern crate lambda_http;
-use self::lambda_http::{Body, IntoResponse, Response};
-
+use lambda_http::{Body, IntoResponse, Response};
+use serde_json::json;
 pub fn build_response(code: u16, body: &str) -> impl IntoResponse {
     Response::builder()
         .status(code)
