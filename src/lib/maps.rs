@@ -298,18 +298,15 @@ fn graph_iv_as_json(
 ) -> Result<Vec<GraphElement>, crate::constraints::ParameterError> {
     create_generic_iterator(x_values, values)
         .map(|(_, (strike, price))| {
-            let iv = iv_fn(*price, *strike);
-            if iv.is_ok() {
-                Ok(GraphElement {
+            iv_fn(*price, *strike).map(|iv|{
+                GraphElement {
                     at_point: *strike,
                     value: *price,
-                    iv: Some(iv.unwrap()),
-                })
-            }
-            else {
-                Err(crate::constraints::throw_no_convergence_error())
-                
-            }
+                    iv: Some(iv),
+                }
+            }).map_err(|_err|{
+                crate::constraints::throw_no_convergence_error()
+            })
         })
         .collect()
 }
