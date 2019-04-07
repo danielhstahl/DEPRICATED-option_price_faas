@@ -284,9 +284,9 @@ fn density_as_json(x_values: &[f64], values: &[f64]) -> Vec<GraphElement> {
 
 fn graph_no_iv_as_json(x_values: &[f64], values: &[f64]) -> Vec<GraphElement> {
     create_generic_iterator(x_values, values)
-        .map(|(_, (x_val, val))| GraphElement {
-            at_point: *x_val,
-            value: *val,
+        .map(|(_, (strike, price))| GraphElement {
+            at_point: *strike,
+            value: *price,
             iv: None,
         })
         .collect::<Vec<_>>()
@@ -294,18 +294,24 @@ fn graph_no_iv_as_json(x_values: &[f64], values: &[f64]) -> Vec<GraphElement> {
 fn graph_iv_as_json(
     x_values: &[f64],
     values: &[f64],
-    iv_fn: &Fn(f64, f64) -> f64,
-) -> Vec<GraphElement> {
+    iv_fn: &Fn(f64, f64) -> Result<f64, f64>,
+) -> Result<Vec<GraphElement>, crate::constraints::ParameterError> {
     create_generic_iterator(x_values, values)
         .map(|(_, (strike, price))| {
             let iv = iv_fn(*price, *strike);
-            GraphElement {
-                at_point: *strike,
-                value: *price,
-                iv: Some(iv),
+            if iv.is_ok() {
+                Ok(GraphElement {
+                    at_point: *strike,
+                    value: *price,
+                    iv: Some(iv.unwrap()),
+                })
+            }
+            else {
+                Err(crate::constraints::throw_no_convergence_error())
+                
             }
         })
-        .collect::<Vec<_>>()
+        .collect()
 }
 
 fn call_iv_as_json(
@@ -314,7 +320,7 @@ fn call_iv_as_json(
     asset: f64,
     rate: f64,
     maturity: f64,
-) -> Vec<GraphElement> {
+) -> Result<Vec<GraphElement>, crate::constraints::ParameterError> {
     graph_iv_as_json(x_values, values, &|price, strike| {
         black_scholes::call_iv(price, asset, strike, rate, maturity)
     })
@@ -325,7 +331,7 @@ fn put_iv_as_json(
     asset: f64,
     rate: f64,
     maturity: f64,
-) -> Vec<GraphElement> {
+) -> Result<Vec<GraphElement>, crate::constraints::ParameterError> {
     graph_iv_as_json(x_values, values, &|price, strike| {
         black_scholes::put_iv(price, asset, strike, rate, maturity)
     })
@@ -365,7 +371,7 @@ fn get_option_results(
                 num_u, asset, &strikes, rate, maturity, &inst_cf,
             );
             if include_iv {
-                Ok(call_iv_as_json(&strikes, &prices, asset, rate, maturity))
+                call_iv_as_json(&strikes, &prices, asset, rate, maturity)
             } else {
                 Ok(graph_no_iv_as_json(&strikes, &prices))
             }
@@ -375,7 +381,7 @@ fn get_option_results(
                 num_u, asset, &strikes, rate, maturity, &inst_cf,
             );
             if include_iv {
-                Ok(put_iv_as_json(&strikes, &prices, asset, rate, maturity))
+                put_iv_as_json(&strikes, &prices, asset, rate, maturity)
             } else {
                 Ok(graph_no_iv_as_json(&strikes, &prices))
             }
@@ -607,7 +613,8 @@ mod tests {
         let num_u = 256;
         let prices =
             option_pricing::fang_oost_call_price(num_u, asset, &strikes, rate, maturity, &inst_cf);
-        call_iv_as_json(&strikes, &prices, asset, rate, maturity);
+        let result=call_iv_as_json(&strikes, &prices, asset, rate, maturity);
+        assert!(result.is_ok());
     }
     #[test]
     fn get_fn_indicators_no_match() {
