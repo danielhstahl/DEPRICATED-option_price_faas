@@ -13,7 +13,7 @@ RUN cargo build --verbose $CARGO_OPTIONS
 RUN cargo test --verbose $CARGO_OPTIONS
 RUN apt-get update
 RUN apt-get install -y zip
-RUN zip -0 ccov.zip `find . \( -name "pricer*.gc*" \) -print`
+RUN zip -0 ccov.zip `find . \( -name "pricer*.gc*" -o -name "riskmetric*.gc*" -o -name "density*.gc*" -o -name "utils*.gc*" \) -print`
 RUN unzip -l ccov.zip
 RUN ./grcov ccov.zip -s . -t lcov --llvm --branch --ignore-not-existing --ignore-dir "/*" -o lcov.info
 
