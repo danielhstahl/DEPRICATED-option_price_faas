@@ -6,3 +6,5 @@ quandlkey.txt
 .serverless
 coverage
 *.zip
+grcov
+*.info
