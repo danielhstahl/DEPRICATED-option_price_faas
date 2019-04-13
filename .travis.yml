@@ -7,7 +7,7 @@ services:
 script:
   - sudo docker build . -t rusttest -f testCoverage.Dockerfile
   - sudo docker create -ti --name dummy rusttest bash
-  - sudo docker cp dummy:/code/cobertura.xml ./
+  - sudo docker cp dummy:/code/lcov.info ./
   - sudo docker cp dummy:/code/target ./
   - sudo docker rm -fv dummy
   - bash <(curl -s https://codecov.io/bash) -f lcov.info
