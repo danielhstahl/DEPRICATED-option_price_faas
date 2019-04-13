@@ -1,11 +1,9 @@
 language: node_js
+sudo: required
 node_js:
   - "11"
-sudo: required
-
 services:
   - docker
-
 script:
   - sudo docker build . -t rusttest -f testCoverage.Dockerfile
   - sudo docker create -ti --name dummy rusttest bash
@@ -31,16 +29,15 @@ after_deploy:
       -H "Authorization: token ${TRAVIS_TOKEN}" \
       -d "$body" \
       https://api.travis-ci.com/repo/realoptions%2Fmain_site/requests;
-    
 
- deploy:
+deploy:
   - provider: releases
     api_key: $github_token
     file_glob: true
     file:
-    - "./target/lambda/release/*"
-    - "./serverless.yml"
-    - "./docs/openapi_merged.yml"
+      - ./target/lambda/release/*
+      - ./serverless.yml
+      - ./docs/openapi_merged.yml
     skip_cleanup: true
     on:
       repo: realoptions/option_price_faas
