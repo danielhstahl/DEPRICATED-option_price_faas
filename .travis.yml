@@ -1,91 +1,46 @@
-language: rust
+language: node_js
 sudo: required
-rust:
-- stable
-- beta
-- nightly
-
+node_js:
+  - "11"
 services:
   - docker
-  
-before_install:
-- wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
-- nvm install 8
-- node --version
-- rustup target add x86_64-unknown-linux-musl
-- >
-  if [ "$TRAVIS_RUST_VERSION" = "nightly" ]; then
-    sudo apt-get install -y gcc-multilib
-  fi
-
-before_cache: |
-  if [ "$TRAVIS_RUST_VERSION" = "nightly" ]; then
-    RUSTFLAGS="--cfg procmacro2_semver_exempt" cargo install cargo-tarpaulin
-  fi
-
 script:
-  - cargo clean
-  - cargo test
-  - cargo build --release --target=x86_64-unknown-linux-musl
-  - sudo docker pull lambci/lambda:provided  #this is to download the docker image if it doesnt exist yet
-  - npm install
+  - sudo docker build . -t rusttest -f testCoverage.Dockerfile
+  - sudo docker create -ti --name dummy rusttest bash
+  - sudo docker cp dummy:/code/lcov.info ./
+  - sudo docker cp dummy:/code/target ./
+  - sudo docker rm -fv dummy
+  - bash <(curl -s https://codecov.io/bash) -f lcov.info
+  - sudo docker pull lambci/lambda:provided
+  - npm ci
   - npm test
 
-after_success: |
-  if [ "$TRAVIS_RUST_VERSION" = "nightly" ]; then
-    bash <(curl -s https://codecov.io/bash) 
-    cargo bench
-    cargo tarpaulin --out Xml
-    bash <(curl -s https://codecov.io/bash)
-  fi
-
 before_deploy: 
-  - > #ensure only runs once :|
-    if  [ "$TRAVIS_RUST_VERSION" = "stable" ]; then
-      node ./src/js/copyBinaries;
-      npm install -g serverless;
-      sls deploy;
-    fi
-
+  - node ./src/js/copyBinaries
+  - npm install -g serverless
+  - sls deploy
+    
 after_deploy:
-  - > #ensure only runs once :|
-    if  [ "$TRAVIS_RUST_VERSION" = "stable" ]; then
-      body='{"request":{"branch":"master"}}';
-      curl -s -X POST \
-        -H "Content-Type: application/json" \
-        -H "Accept: application/json" \
-        -H "Travis-API-Version: 3" \
-        -H "Authorization: token ${TRAVIS_TOKEN}" \
-        -d "$body" \
-        https://api.travis-ci.com/repo/realoptions%2Fmain_site/requests;
-    fi
-
-addons:
-  apt:
-    packages:
-    - libcurl4-openssl-dev
-    - libelf-dev
-    - libdw-dev
-    - libssl-dev #codecov
-    - cmake
-    - gcc
-    - pkg-config #codecov
-    - zlib1g-dev #codecov
-    - binutils-dev
-    - libiberty-dev
-    - musl-tools
-    - musl-dev
+  - > 
+    body='{"request":{"branch":"master"}}';
+    curl -s -X POST \
+      -H "Content-Type: application/json" \
+      -H "Accept: application/json" \
+      -H "Travis-API-Version: 3" \
+      -H "Authorization: token ${TRAVIS_TOKEN}" \
+      -d "$body" \
+      https://api.travis-ci.com/repo/realoptions%2Fmain_site/requests;
 
 deploy:
   - provider: releases
     api_key: $github_token
     file_glob: true
     file:
-    - "./target/lambda/release/*"
-    - "./serverless.yml"
-    - "./docs/openapi_merged.yml"
+      - ./target/lambda/release/*
+      - ./serverless.yml
+      - ./docs/openapi_merged.yml
     skip_cleanup: true
     on:
       repo: realoptions/option_price_faas
       tags: true
-      rust: 'stable'
+      branch: master
