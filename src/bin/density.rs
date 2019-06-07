@@ -3,7 +3,7 @@ use lambda_runtime::{error::HandlerError, Context};
 use serde_json::json;
 use utils::{constraints, http_helper, maps};
 
-use std::{error::Error};
+use std::error::Error;
 const DENSITY_SCALE: f64 = 5.0;
 
 fn main() -> Result<(), Box<dyn Error>> {

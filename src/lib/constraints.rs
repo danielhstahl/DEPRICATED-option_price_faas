@@ -1,13 +1,14 @@
+use serde_derive::{Deserialize, Serialize};
 use std::collections::VecDeque;
 use std::error::Error;
 use std::fmt;
-use serde_derive::{Serialize, Deserialize};
 
 #[derive(Debug, PartialEq)]
 pub enum ErrorType {
     OutOfBounds(String),
     NoExist(String),
     FunctionError(String),
+    NoConvergence(),
 }
 
 #[derive(Debug, PartialEq)]
@@ -26,6 +27,7 @@ impl ParameterError {
                 ErrorType::FunctionError(parameter) => {
                     format!("Function indicator {} does not exist.", parameter)
                 }
+                ErrorType::NoConvergence() => format!("Root does not exist for implied volatility"),
             },
         }
     }
@@ -381,6 +383,9 @@ pub fn check_cgmy_parameters<'a>(
 pub fn throw_no_exist_error(parameter: &str) -> ParameterError {
     ParameterError::new(&ErrorType::NoExist(parameter.to_string()))
 }
+pub fn throw_no_convergence_error() -> ParameterError {
+    ParameterError::new(&ErrorType::NoConvergence())
+}
 
 #[cfg(test)]
 mod tests {
@@ -389,6 +394,14 @@ mod tests {
     fn test_throw_no_exist_error() {
         let err = throw_no_exist_error("hello");
         assert_eq!(err.to_string(), "Parameter hello does not exist.");
+    }
+    #[test]
+    fn test_check_convergence_error() {
+        let err = throw_no_convergence_error();
+        assert_eq!(
+            err.to_string(),
+            "Root does not exist for implied volatility"
+        );
     }
     #[test]
     fn test_check_constraint_option() {
@@ -569,6 +582,7 @@ mod tests {
             "Parameter sigma out of bounds."
         );
     }
+
     #[test]
     fn test_serialization_heston() {
         let json_str = r#"{
