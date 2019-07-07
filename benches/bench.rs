@@ -3,7 +3,7 @@ extern crate bencher;
 extern crate num_complex;
 extern crate utils;
 use bencher::Bencher;
-use num_complex::Complex;
+//use num_complex::Complex;
 use std::collections::VecDeque;
 use utils::constraints;
 use utils::maps;
