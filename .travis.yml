@@ -51,4 +51,3 @@ deploy:
     local_dir: target/criterion
     on:
         branch: master
-        rust: stable

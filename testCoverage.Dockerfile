@@ -28,5 +28,7 @@ RUN apt-get update
 RUN apt-get install -y gcc
 RUN apt-get install -y musl-tools
 RUN apt-get install -y musl-dev
+RUN apt-get install -y gnuplot
 RUN cargo build --release --target=x86_64-unknown-linux-musl
+RUN cargo bench
 COPY --from=0 /code/lcov.info .
