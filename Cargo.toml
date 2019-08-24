@@ -27,7 +27,7 @@ lambda_runtime = "0.2.0"
 [dev-dependencies]
 rand = "0.5"
 approx = "0.2.0"
-bencher = "0.1.5"
+criterion = "0.2"
 
 [badges]
 travis-ci = { repository = "realoptions/option_price_faas" }
@@ -53,5 +53,5 @@ name = "utils"
 path = "src/lib/lib.rs"
 
 [[bench]]
-name = "bench"
+name = "option_price_bench_faas"
 harness = false

@@ -15,13 +15,13 @@ script:
   - npm ci
   - npm test
 
-before_deploy: 
+before_deploy:
   - node ./src/js/copyBinaries
   - npm install -g serverless
   - sls deploy
-    
+
 after_deploy:
-  - > 
+  - >
     body='{"request":{"branch":"master"}}';
     curl -s -X POST \
       -H "Content-Type: application/json" \
@@ -44,3 +44,11 @@ deploy:
       repo: realoptions/option_price_faas
       tags: true
       branch: master
+  - provider: pages
+    skip_cleanup: true
+    github_token: "$github_token"
+    keep_history: true
+    local_dir: target/criterion
+    on:
+        branch: master
+        rust: stable
