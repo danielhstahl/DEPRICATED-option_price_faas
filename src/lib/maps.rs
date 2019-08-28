@@ -303,7 +303,7 @@ fn graph_no_iv_as_json(x_values: &[f64], values: &[f64]) -> Vec<GraphElement> {
 fn graph_iv_as_json(
     x_values: &[f64],
     values: &[f64],
-    iv_fn: &Fn(f64, f64) -> Result<f64, f64>,
+    iv_fn: &dyn Fn(f64, f64) -> Result<f64, f64>,
 ) -> Result<Vec<GraphElement>, crate::constraints::ParameterError> {
     create_generic_iterator(x_values, values)
         .map(|(_, (strike, price))| {
@@ -367,7 +367,7 @@ fn get_option_results(
     rate: f64,
     maturity: f64,
     strikes: &[f64],
-    inst_cf: &(Fn(&Complex<f64>) -> Complex<f64> + std::marker::Sync),
+    inst_cf: &(dyn Fn(&Complex<f64>) -> Complex<f64> + std::marker::Sync),
 ) -> Result<Vec<GraphElement>, crate::constraints::ParameterError> {
     match fn_choice {
         CALL_PRICE => {
@@ -422,7 +422,7 @@ fn get_option_results(
 fn get_density_results(
     num_u: usize,
     x_max_density: f64,
-    inst_cf: &(Fn(&Complex<f64>) -> Complex<f64> + std::marker::Sync),
+    inst_cf: &(dyn Fn(&Complex<f64>) -> Complex<f64> + std::marker::Sync),
 ) -> Result<Vec<GraphElement>, crate::constraints::ParameterError> {
     Ok(adjust_density(num_u, x_max_density, &inst_cf))
 }
@@ -433,7 +433,7 @@ fn get_risk_measure_results(
     num_u: usize,
     x_max_density: f64,
     quantile: f64,
-    inst_cf: &(Fn(&Complex<f64>) -> Complex<f64> + std::marker::Sync),
+    inst_cf: &(dyn Fn(&Complex<f64>) -> Complex<f64> + std::marker::Sync),
 ) -> Result<cf_dist_utils::RiskMetric, cf_dist_utils::ValueAtRiskError> {
     cf_dist_utils::get_expected_shortfall_and_value_at_risk(
         quantile,
