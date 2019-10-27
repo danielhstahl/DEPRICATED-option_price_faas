@@ -12,6 +12,7 @@ jobs:
             - name: test
               run: |
                 cargo test
+                cargo build --release  
                 docker pull lambci/lambda:provided
                 npm ci
                 npm test
@@ -33,7 +34,7 @@ jobs:
                 ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
                 BRANCH: gh-pages
                 FOLDER: target/criterion
-                
+
             - name: deploy aws
               run: |
                 node ./src/js/copyBinaries

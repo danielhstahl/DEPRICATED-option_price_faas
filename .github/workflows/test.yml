@@ -16,7 +16,9 @@ jobs:
                 zip -0 ccov.zip `find . \( -name "pricer*.gc*" -o -name "riskmetric*.gc*" -o -name "density*.gc*" -o -name "utils*.gc*" \) -print`
                 unzip -l ccov.zip
                 ./grcov ccov.zip -s . -t lcov --llvm --branch --ignore-not-existing --ignore-dir "/*" -o lcov.info
-                bash <(curl -s https://codecov.io/bash) -f lcov.info -t ${{ secrets.CODECOV_TOKEN }}               
+                bash <(curl -s https://codecov.io/bash) -f lcov.info -t ${{ secrets.CODECOV_TOKEN }}   
+                rustup default stable
+                cargo build --release            
                 docker pull lambci/lambda:provided
                 npm ci
                 npm test
