@@ -26,4 +26,4 @@ jobs:
         with:
           artifacts: "./target/lambda/release/*,./serverless.yml,./docs/openapi_merged.yml"
           bodyFile: "body.md"
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.ACCESS_TOKEN }}
