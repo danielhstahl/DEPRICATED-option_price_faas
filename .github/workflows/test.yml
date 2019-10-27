@@ -8,11 +8,18 @@ jobs:
             - uses: actions/checkout@v1
             - name: test coverage
               run: |
-                docker build . -t rusttest -f testCoverage.Dockerfile
-                docker create -ti --name dummy rusttest bash
-                docker cp dummy:/code/lcov.info ./
-                docker rm -fv dummy
-                bash <(curl -s https://codecov.io/bash) -f lcov.info -t ${{ secrets.CODECOV_TOKEN }}
+                rustup toolchain install nightly
+                rustup default nightly
+                cargo clean
+                curl -L https://github.com/mozilla/grcov/releases/download/v0.4.3/grcov-linux-x86_64.tar.bz2 | tar jxf -
+                cargo test --verbose $CARGO_OPTIONS
+                zip -0 ccov.zip `find . \( -name "pricer*.gc*" -o -name "riskmetric*.gc*" -o -name "density*.gc*" -o -name "utils*.gc*" \) -print`
+                unzip -l ccov.zip
+                ./grcov ccov.zip -s . -t lcov --llvm --branch --ignore-not-existing --ignore-dir "/*" -o lcov.info
+                bash <(curl -s https://codecov.io/bash) -f lcov.info -t ${{ secrets.CODECOV_TOKEN }}               
                 docker pull lambci/lambda:provided
                 npm ci
                 npm test
+              env:
+                CARGO_INCREMENTAL: 0
+                RUSTFLAGS: -Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=on -Zno-landing-pads
