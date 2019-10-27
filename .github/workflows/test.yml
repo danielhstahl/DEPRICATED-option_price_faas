@@ -17,11 +17,13 @@ jobs:
                 unzip -l ccov.zip
                 ./grcov ccov.zip -s . -t lcov --llvm --branch --ignore-not-existing --ignore-dir "/*" -o lcov.info
                 bash <(curl -s https://codecov.io/bash) -f lcov.info -t ${{ secrets.CODECOV_TOKEN }}   
+              env:
+                CARGO_INCREMENTAL: 0
+                RUSTFLAGS: -Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=on -Zno-landing-pads
+            - name: test integration
+              run: |
                 rustup default stable
                 cargo build --release            
                 docker pull lambci/lambda:provided
                 npm ci
                 npm test
-              env:
-                CARGO_INCREMENTAL: 0
-                RUSTFLAGS: -Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=on -Zno-landing-pads
