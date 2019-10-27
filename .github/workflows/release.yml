@@ -1,0 +1,29 @@
+name: release
+on:
+    release:
+        types: [published]
+
+jobs:
+  release: 
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: test
+        run: |
+          docker build . -t rusttest -f testCoverage.Dockerfile
+          docker pull lambci/lambda:provided
+          npm ci
+          npm test
+
+      - name: extract benchmarks
+        run: |
+          docker create -ti --name dummy rusttest bash
+          docker cp dummy:/code/target ./
+          docker rm -fv dummy
+
+      - name: release files
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "./target/lambda/release/*,./serverless.yml,./docs/openapi_merged.yml"
+          bodyFile: "body.md"
+          token: ${{ secrets.GITHUB_TOKEN }}

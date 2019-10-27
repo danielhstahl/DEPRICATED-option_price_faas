@@ -44,6 +44,7 @@ deploy:
       repo: realoptions/option_price_faas
       tags: true
       branch: master
+      
   - provider: pages
     skip_cleanup: true
     github_token: "$github_token"
