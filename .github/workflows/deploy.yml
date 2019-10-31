@@ -24,9 +24,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - uses: hecrj/setup-rust-action@master
+    - uses: phillyfan1138/musl-rust-actions@master
     - name: test
-      uses: phillyfan1138/musl-rust-actions@master
       run: |
         docker pull lambci/lambda:provided
         npm ci
