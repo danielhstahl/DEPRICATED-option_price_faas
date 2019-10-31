@@ -3,7 +3,6 @@ use lambda_runtime::{error::HandlerError, Context};
 use serde_json::json;
 use std::error::Error;
 use utils::{constraints, http_helper};
-//use utils::;
 
 fn main() -> Result<(), Box<dyn Error>> {
     lambda!(output_constraints_wrapper);

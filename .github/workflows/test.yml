@@ -26,9 +26,9 @@ jobs:
         env:
           CARGO_INCREMENTAL: 0
           RUSTFLAGS: -Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off -Zno-landing-pads
-          CRATE_NAME: pricer
+          CRATE_NAME: utils
         run: |
-          cargo test
+          cargo test --verbose $CARGO_OPTIONS
           curl -L https://github.com/mozilla/grcov/releases/download/v0.5.5/grcov-linux-x86_64.tar.bz2 | tar jxf -
           zip -0 ccov.zip `find . \( -name "${CRATE_NAME}*.gc*" \) -print`
           ./grcov ccov.zip -s . -t lcov --llvm --branch --ignore-not-existing --ignore "/*" -o lcov.info
