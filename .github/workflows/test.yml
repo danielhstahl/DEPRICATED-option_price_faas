@@ -34,9 +34,11 @@ jobs:
           ./grcov ccov.zip -s . -t lcov --llvm --branch --ignore-not-existing --ignore "/*" -o lcov.info
           bash <(curl -s https://codecov.io/bash) -f lcov.info -t ${{ secrets.CODECOV_TOKEN }}
     integrations:
-      - uses: phillyfan1138/musl-rust-actions@master
-      - name: Run integration tests
-        run: |
-          docker pull lambci/lambda:provided
-          npm ci
-          npm test
+      runs-on: ubuntu-latest
+      steps:
+        - uses: phillyfan1138/musl-rust-actions@master
+        - name: Run integration tests
+          run: |
+            docker pull lambci/lambda:provided
+            npm ci
+            npm test
