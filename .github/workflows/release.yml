@@ -26,11 +26,11 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         
     - name: release files
-        uses: ncipollo/release-action@v1
-        with:
-          artifacts: "./target/x86_64-unknown-linux-musl/release/*,./serverless.yml,./docs/openapi_merged.yml"
-          # bodyFile: "body.md"
-          token: ${{ secrets.ACCESS_TOKEN }}
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "./target/x86_64-unknown-linux-musl/release/*,./serverless.yml,./docs/openapi_merged.yml"
+        # bodyFile: "body.md"
+        token: ${{ secrets.ACCESS_TOKEN }}
 
     - name: kickoff main site job
       run: |
