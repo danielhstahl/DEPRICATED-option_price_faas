@@ -19,35 +19,7 @@ jobs:
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         BRANCH: gh-pages
         FOLDER: target/criterion
-  
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v1
-    - uses: phillyfan1138/musl-rust-action@master
-    - name: test
-      run: |
-        docker pull lambci/lambda:provided
-        npm ci
-        npm test 
-        cargo test
-
-    - name: deploy aws
-      run: |
-        node ./src/js/copyBinaries
-        npx serverless deploy
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-    - name: kickoff main site job
-      run: |
-        curl -s -X POST \
-          -H "Content-Type: application/json" \
-          -H "Accept: application/vnd.github.everest-preview+json" \
-          -H "Authorization: token  ${{ secrets.ACCESS_TOKEN }}" \
-          -d '{"event_type": "on-demand-test"}'
-          https://api.github.com/repos/realoptions/main_site/dispatches
+    
 
             
 
