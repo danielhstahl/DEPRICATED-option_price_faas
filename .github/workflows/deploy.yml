@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - uses: phillyfan1138/musl-rust-actions@master
+    - uses: phillyfan1138/musl-rust-action@master
     - name: test
       run: |
         docker pull lambci/lambda:provided
