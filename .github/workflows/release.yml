@@ -12,13 +12,12 @@ jobs:
         with:
           targets: x86_64-unknown-linux-musl
       - name: test
+        uses: phillyfan1138/musl-rust-actions@master
         run: |
-          cargo test
-          cargo build --release --target=x86_64-unknown-linux-musl
           docker pull lambci/lambda:provided
           npm ci
-          npm test
-
+          npm test 
+          cargo test
       - name: release files
         uses: ncipollo/release-action@v1
         with:

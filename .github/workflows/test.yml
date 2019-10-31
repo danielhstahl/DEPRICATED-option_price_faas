@@ -13,7 +13,7 @@ jobs:
       - uses: hecrj/setup-rust-action@master
         with:
           rust-version: ${{ matrix.rust }}
-          targets: x86_64-unknown-linux-musl
+
       - name: Build
         run: cargo build
 
@@ -34,9 +34,9 @@ jobs:
           ./grcov ccov.zip -s . -t lcov --llvm --branch --ignore-not-existing --ignore "/*" -o lcov.info
           bash <(curl -s https://codecov.io/bash) -f lcov.info -t ${{ secrets.CODECOV_TOKEN }}
       - name: Run integration tests
+        uses: phillyfan1138/musl-rust-actions@master
         if: matrix.rust == 'stable'
         run: |
-          cargo build --release --target=x86_64-unknown-linux-musl            
           docker pull lambci/lambda:provided
           npm ci
           npm test
