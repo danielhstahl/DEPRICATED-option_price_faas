@@ -1,0 +1,23 @@
+name: release
+on:
+    release:
+        types: [published]
+
+jobs:
+  release: 
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: phillyfan1138/musl-rust-action@master
+      - name: test
+        run: |
+          docker pull lambci/lambda:provided
+          npm ci
+          npm test 
+          cargo test
+      - name: release files
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "./target/x86_64-unknown-linux-musl/release/*,./serverless.yml,./docs/openapi_merged.yml"
+          # bodyFile: "body.md"
+          token: ${{ secrets.ACCESS_TOKEN }}
