@@ -8,15 +8,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
+      - uses: hecrj/setup-rust-action@master
+        with:
+          targets: x86_64-unknown-linux-musl
       - name: test
         run: |
-          rustup target add x86_64-unknown-linux-musl
           cargo test
           cargo build --release --target=x86_64-unknown-linux-musl
           docker pull lambci/lambda:provided
           npm ci
           npm test
-          
+
       - name: release files
         uses: ncipollo/release-action@v1
         with:

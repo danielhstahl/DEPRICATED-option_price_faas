@@ -24,11 +24,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-
+    - uses: hecrj/setup-rust-action@master
+      with:
+        targets: x86_64-unknown-linux-musl
     - name: Run tests stable
       run: |
         cargo test
-        rustup target add x86_64-unknown-linux-musl
         ## results of build are also used for deploying to aws
         cargo build --release --target=x86_64-unknown-linux-musl            
         docker pull lambci/lambda:provided

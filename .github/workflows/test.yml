@@ -13,13 +13,13 @@ jobs:
       - uses: hecrj/setup-rust-action@master
         with:
           rust-version: ${{ matrix.rust }}
-          
+          targets: x86_64-unknown-linux-musl
       - name: Build
-        run: cargo build --verbose
+        run: cargo build
 
       - name: Run tests stable
         if: matrix.rust == 'stable'
-        run: cargo test --verbose
+        run: cargo test
 
       - name: Run tests nightly with coverage
         if: matrix.rust == 'nightly' 
@@ -36,7 +36,6 @@ jobs:
       - name: Run integration tests
         if: matrix.rust == 'stable'
         run: |
-          rustup target add x86_64-unknown-linux-musl
           cargo build --release --target=x86_64-unknown-linux-musl            
           docker pull lambci/lambda:provided
           npm ci
