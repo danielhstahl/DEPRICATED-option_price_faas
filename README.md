@@ -2,8 +2,8 @@
 | :---------------: | :-----------------: |
 | ![lin-badge]      | ![cov-badge]        |
 
-[lin-badge]: https://travis-ci.com/realoptions/option_price_faas.svg "Travis build status"
-[lin-link]:  https://travis-ci.com/realoptions/option_price_faas "Travis build status"
+[lin-badge]: https://github.com/realoptions/option_price_faas/workflows/test/badge.svg
+[lin-link]:  https://github.com/realoptions/option_price_faas/actions
 [cov-badge]: https://codecov.io/gh/realoptions/option_price_faas/branch/master/graph/badge.svg
 [cov-link]:  https://codecov.io/gh/realoptions/option_price_faas
 

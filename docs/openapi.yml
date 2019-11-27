@@ -169,7 +169,7 @@ paths:
               schema:
                 $ref: './PostDensityResponse.json'
               example:
-                $ref: './PostOptionsExampleResponse.json'
+                $ref: './PostDensityExampleResponse.json'
         '400':
           description: Error for incorrect request
           content:
@@ -195,7 +195,7 @@ paths:
               schema:
                 $ref: './PostDensityResponse.json'
               example:
-                $ref: './PostOptionsExampleResponse.json'
+                $ref: './PostDensityExampleResponse.json'
         '400':
           description: Error for incorrect request
           content:
@@ -221,7 +221,7 @@ paths:
               schema:
                 $ref: './PostDensityResponse.json'
               example:
-                $ref: './PostOptionsExampleResponse.json'
+                $ref: './PostDensityExampleResponse.json'
         '400':
           description: Error for incorrect request
           content:
