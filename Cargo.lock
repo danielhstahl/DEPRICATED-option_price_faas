@@ -490,14 +490,14 @@ dependencies = [
 
 [[package]]
 name = "lambda_http"
-version = "0.1.0"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "base64 0.10.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "failure 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "failure_derive 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "http 0.1.16 (registry+https://github.com/rust-lang/crates.io-index)",
- "lambda_runtime 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "lambda_runtime 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.89 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 1.0.89 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.39 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -507,7 +507,7 @@ dependencies = [
 
 [[package]]
 name = "lambda_runtime"
-version = "0.2.0"
+version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "failure 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -844,8 +844,8 @@ dependencies = [
  "criterion 0.2.11 (registry+https://github.com/rust-lang/crates.io-index)",
  "fang_oost 0.13.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "fang_oost_option 0.27.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "lambda_http 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "lambda_runtime 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "lambda_http 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "lambda_runtime 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "num-complex 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.5.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "rayon 1.0.3 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1542,8 +1542,8 @@ dependencies = [
 "checksum itertools 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)" = "5b8467d9c1cebe26feb08c640139247fac215782d35371ade9a2136ed6085358"
 "checksum itoa 0.4.3 (registry+https://github.com/rust-lang/crates.io-index)" = "1306f3464951f30e30d12373d31c79fbd52d236e5e896fd92f96ec7babbbe60b"
 "checksum kernel32-sys 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "7507624b29483431c0ba2d82aece8ca6cdba9382bff4ddd0f7490560c056098d"
-"checksum lambda_http 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "c5614ea28ebeb9c08efa98c2fd5302153adc9792c45ee81f352ffcfbedef6c96"
-"checksum lambda_runtime 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "eb6f5263f79e29c69b349c6cd906381674871a03625a04fbcb686af363a7cd03"
+"checksum lambda_http 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)" = "a935998dc010d1d7e8d466d3e3dddae9bd51dc111da487634efd3265fe20d6ac"
+"checksum lambda_runtime 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "077b8819fe6998266342efdc5154192551143f390ab758007cc7421992e61b07"
 "checksum lambda_runtime_client 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "aeecd7fe8331642af52f39f62f762605e1dd5a62e7f288b2bb939b7cc7fb7544"
 "checksum lambda_runtime_core 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)" = "754758eccf7a245db273db7255cdc461e28332cf78591fec738f335e940eaa2c"
 "checksum lambda_runtime_errors 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "edc65224e35e9f86514394e8c4db27f3f0fce02a40b0f2d7d54b0f1528c0a606"
