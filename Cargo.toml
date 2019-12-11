@@ -21,8 +21,8 @@ rayon = "1.0.1"
 black_scholes = "0.5.0"
 cf_functions = "0.10"
 num-complex = "0.2"
-lambda_http = "0.1.1"
-lambda_runtime = "0.2.1"
+lambda_http = { git = "https://github.com/phillyfan1138/aws-lambda-rust-runtime", rev = "b7e5da5" }
+lambda_runtime = { git = "https://github.com/phillyfan1138/aws-lambda-rust-runtime", rev = "b7e5da5" }
 
 [dev-dependencies]
 rand = "0.5"
@@ -30,7 +30,7 @@ approx = "0.2.0"
 criterion = "0.2"
 
 [badges]
-travis-ci = { repository = "realoptions/option_price_faas" }
+codecov = { repository = "realoptions/option_price_faas", branch = "master", service = "github" }
 
 [[bin]]
 name = "constraints"
