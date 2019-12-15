@@ -2,15 +2,11 @@
 extern crate hyper;
 extern crate pretty_env_logger;
 use hyper::service::{make_service_fn, service_fn};
-use hyper::{Body, Request, Response, Server, StatusCode};
+use hyper::{Body, Request, Response, Server};
 use serde_json::json;
-//use std::convert::Infallible;
 use std::env;
-use utils::{constraints, maps};
-
-//use std::error::Error;
+use utils::{constraints, http_utils, maps};
 const DENSITY_SCALE: f64 = 5.0;
-
 #[tokio::main]
 pub async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     pretty_env_logger::init();
@@ -29,26 +25,15 @@ pub async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 
     Ok(())
 }
-//static INCORRECT_BODY: &[u8] = b"Incorrect Body";
-async fn density(body: Request<Body>) -> Result<Response<Body>, hyper::Error> {
-    let b = hyper::body::to_bytes(body).await?;
+async fn density(req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
+    let b = hyper::body::to_bytes(req).await?;
     let parameters: constraints::OptionParameters = match serde_json::from_reader(b.as_ref()) {
         Ok(v) => v,
-        Err(e) => {
-            return Ok(Response::builder()
-                .status(StatusCode::BAD_REQUEST)
-                .body(e.to_string().into())
-                .unwrap())
-        }
+        Err(e) => return http_utils::http_fail(e),
     };
     match constraints::check_parameters(&parameters, &constraints::get_constraints()) {
         Ok(_) => (),
-        Err(e) => {
-            return Ok(Response::builder()
-                .status(StatusCode::BAD_REQUEST)
-                .body(e.to_string().into())
-                .unwrap())
-        }
+        Err(e) => return http_utils::http_fail(e),
     };
 
     let constraints::OptionParameters {
@@ -69,12 +54,7 @@ async fn density(body: Request<Body>) -> Result<Response<Body>, hyper::Error> {
         rate,
     ) {
         Ok(v) => v,
-        Err(e) => {
-            return Ok(Response::builder()
-                .status(StatusCode::BAD_REQUEST)
-                .body(e.to_string().into())
-                .unwrap())
-        }
+        Err(e) => return http_utils::http_fail(e),
     };
     Ok(Response::new(Body::from(json!(results).to_string())))
 }

@@ -2,7 +2,7 @@ use fang_oost_option::option_pricing;
 use num_complex::Complex;
 use rayon::prelude::*;
 use serde_derive::{Deserialize, Serialize};
-use std::{collections::VecDeque, error::Error};
+use std::collections::VecDeque;
 pub const CGMY: i32 = 0;
 pub const MERTON: i32 = 1;
 pub const HESTON: i32 = 2;
@@ -236,22 +236,25 @@ pub fn get_risk_measure_results_as_json(
     maturity: f64,
     rate: f64,
     quantile: f64,
-) -> Result<cf_dist_utils::RiskMetric, Box<dyn Error>> {
+) -> Result<cf_dist_utils::RiskMetric, cf_dist_utils::ValueAtRiskError> {
     match cf_parameters {
         crate::constraints::CFParameters::CGMY(cf_params) => {
-            let (cf_inst, vol) = get_cgmy_cf(cf_params, maturity, rate)?;
+            let (cf_inst, vol) = get_cgmy_cf(cf_params, maturity, rate)
+                .map_err(|e| cf_dist_utils::ValueAtRiskError::new(&e.to_string()))?;
             let x_max_density = vol * density_scale;
             let result = get_risk_measure_results(num_u, x_max_density, quantile, &cf_inst)?;
             Ok(result)
         }
         crate::constraints::CFParameters::Merton(cf_params) => {
-            let (cf_inst, vol) = get_merton_cf(cf_params, maturity, rate)?;
+            let (cf_inst, vol) = get_merton_cf(cf_params, maturity, rate)
+                .map_err(|e| cf_dist_utils::ValueAtRiskError::new(&e.to_string()))?;
             let x_max_density = vol * density_scale;
             let result = get_risk_measure_results(num_u, x_max_density, quantile, &cf_inst)?;
             Ok(result)
         }
         crate::constraints::CFParameters::Heston(cf_params) => {
-            let (cf_inst, vol) = get_heston_cf(cf_params, maturity, rate)?;
+            let (cf_inst, vol) = get_heston_cf(cf_params, maturity, rate)
+                .map_err(|e| cf_dist_utils::ValueAtRiskError::new(&e.to_string()))?;
             let x_max_density = vol * density_scale;
             let result = get_risk_measure_results(num_u, x_max_density, quantile, &cf_inst)?;
             Ok(result)
