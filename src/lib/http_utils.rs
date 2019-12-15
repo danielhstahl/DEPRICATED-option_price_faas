@@ -10,11 +10,6 @@ pub fn http_fail<T: Error>(e: T) -> Result<Response<Body>, hyper::Error> {
         .unwrap())
 }
 
-/*
-pub fn get_query_params(request_url: &Url) -> HashMap<String, String> {
-    request_url.query_pairs().into_owned().collect()
-}*/
-
 //this would be inefficient except that I only ever get a single key
 pub fn get_query_param(uri: &hyper::Uri, key: &str) -> String {
     let default_value = String::from("");
@@ -25,10 +20,6 @@ pub fn get_query_param(uri: &hyper::Uri, key: &str) -> String {
     params.get(key).unwrap_or(&default_value).to_string()
 }
 
-/*pub fn get_last_2_path_parameters(request_url: &hyper::Uri) -> (&str, &str) {
-    let last_2: Vec<&str> = request_url.path().rsplit("/").take(2).collect();
-    (last_2[1], last_2[0]) //reverse order
-}*/
 pub fn get_last_2_path_parameters(uri: &hyper::Uri) -> (&str, &str) {
     let last_2: Vec<&str> = uri.path().rsplit("/").take(2).collect();
     (last_2[1], last_2[0]) //reverse order
