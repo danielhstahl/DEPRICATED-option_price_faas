@@ -4,7 +4,9 @@ FROM rust:1.39.0
 
 # Copy local code to the container image.
 WORKDIR /usr/src/app
-COPY . .
+COPY src src
+COPY Cargo.lock Cargo.lock
+COPY Cargo.toml Cargo.toml
 
 # Install production dependencies and build a release artifact.
 RUN cargo build --release
