@@ -1,15 +1,37 @@
-use lambda_http::{lambda, IntoResponse, Request};
-use lambda_runtime::{error::HandlerError, Context};
+#![deny(warnings)]
+extern crate hyper;
+extern crate pretty_env_logger;
+
+use hyper::service::service_fn_ok;
+use hyper::{Body, Request, Response, Server};
 use serde_json::json;
-use std::error::Error;
-use utils::{constraints, http_helper, maps};
+use std::env;
+use utils::{constraints, maps};
 
 const DENSITY_SCALE: f64 = 5.0;
 
-fn main() -> Result<(), Box<dyn Error>> {
-    lambda!(risk_metric_wrapper);
+#[tokio::main]
+pub async fn main() {
+    pretty_env_logger::init();
+    let port = match env::var("PORT") {
+        Ok(p) => p.parse::<u16>(),
+        Err(e) => Err(e),
+    }
+    .map_err(|e| eprintln!("port error: {}", e));
+    let addr = ([0, 0, 0, 0], port).into();
+    let make_svc = make_service_fn(|_conn| {
+        // This is the `Service` that will handle the connection.
+        // `service_fn` is a helper to convert a function that
+        // returns a Response into a `Service`.
+        async { Ok::<_, Infallible>(service_fn(risk_metric)) }
+    });
+    let server = Server::bind(&addr).serve(make_svc);
+
+    server.await?;
+
     Ok(())
 }
+/*
 fn risk_metric_wrapper(event: Request, _ctx: Context) -> Result<impl IntoResponse, HandlerError> {
     match risk_metric(event) {
         Ok(res) => Ok(http_helper::build_response(200, &json!(res).to_string())),
@@ -18,8 +40,8 @@ fn risk_metric_wrapper(event: Request, _ctx: Context) -> Result<impl IntoRespons
             &http_helper::construct_error(&e.to_string()),
         )),
     }
-}
-fn risk_metric(event: Request) -> Result<cf_dist_utils::RiskMetric, Box<dyn Error>> {
+}*/
+async fn risk_metric(body: Request<Body>) -> Result<Response<Body>, Infallible> {
     let parameters: constraints::OptionParameters = serde_json::from_reader(event.body().as_ref())?;
 
     constraints::check_parameters(&parameters, &constraints::get_constraints())?;
@@ -45,5 +67,5 @@ fn risk_metric(event: Request) -> Result<cf_dist_utils::RiskMetric, Box<dyn Erro
         rate,
         quantile_unwrap,
     )?;
-    Ok(results)
+    Ok(Response::new(results))
 }
