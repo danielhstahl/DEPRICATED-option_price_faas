@@ -5,6 +5,7 @@ FROM rust:1.39.0
 # Copy local code to the container image.
 WORKDIR /usr/src/app
 COPY src src
+COPY benches benches
 COPY Cargo.lock Cargo.lock
 COPY Cargo.toml Cargo.toml
 
