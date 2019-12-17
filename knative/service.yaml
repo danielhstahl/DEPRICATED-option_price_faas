@@ -9,7 +9,7 @@ runLatest:
   revisionTemplate:
     spec:
     container:
-      image: docker.io/{username}/constraints-rust
+      image: docker.io/phillyfan1138/option_price_faas
       #env:
       #  - name: TARGET
       #value: "Rust Sample v1"

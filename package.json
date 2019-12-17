@@ -33,6 +33,7 @@
     "jest": "^24.8.0",
     "js-yaml": "^3.13.1",
     "json-refs": "^3.0.13",
+    "request": "^2.88.0",
     "serverless-domain-manager": "^2.6.5"
   }
 }
