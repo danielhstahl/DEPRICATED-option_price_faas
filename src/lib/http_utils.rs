@@ -20,13 +20,25 @@ pub fn get_query_param(uri: &hyper::Uri, key: &str) -> String {
     params.get(key).unwrap_or(&default_value).to_string()
 }
 
-pub fn get_last_2_path_parameters(uri: &hyper::Uri) -> (&str, &str) {
+pub fn get_last_2_path_parameters(uri: &hyper::Uri) -> Option<(&str, &str)> {
     let last_2: Vec<&str> = uri.path().rsplit("/").take(2).collect();
-    (last_2[1], last_2[0]) //reverse order
+    let last = last_2.get(0)?;
+    let second_to_last = last_2.get(1)?;
+    Some((second_to_last, last)) //reverse order
 }
-pub fn get_first_3_parameters(uri: &hyper::Uri) -> (&str, &str, &str) {
+pub fn get_first_3_parameters(uri: &hyper::Uri) -> Option<(&str, &str, &str)> {
     let first_3: Vec<&str> = uri.path().split("/").take(3).collect();
-    (first_3[0], first_3[1], first_3[2])
+    let first = first_3.get(0)?;
+    let second = first_3.get(1)?;
+    let third = first_3.get(2)?;
+    Some((first, second, third))
+}
+
+pub fn http_no_such_endpoint() -> Result<Response<Body>, hyper::Error> {
+    Ok(Response::builder()
+        .status(StatusCode::NOT_FOUND)
+        .body("No such endpoint".into())
+        .unwrap())
 }
 
 #[cfg(test)]
@@ -60,7 +72,7 @@ mod tests {
             .uri("https://www.rust-lang.org/hello/world")
             .body(())
             .unwrap();
-        let (first, second) = get_last_2_path_parameters(&req.uri());
+        let (first, second) = get_last_2_path_parameters(&req.uri()).unwrap();
         assert_eq!(first, "hello");
         assert_eq!(second, "world");
     }
@@ -71,9 +83,18 @@ mod tests {
             .uri("https://www.rust-lang.org/hello/world/again")
             .body(())
             .unwrap();
-        let (first, second) = get_last_2_path_parameters(&req.uri());
+        let (first, second) = get_last_2_path_parameters(&req.uri()).unwrap();
         assert_eq!(first, "world");
         assert_eq!(second, "again");
+    }
+    #[test]
+    fn get_none_with_one_slashes() {
+        let req = Request::builder()
+            .method("GET")
+            .uri("/world")
+            .body(())
+            .unwrap();
+        assert_eq!(get_last_2_path_parameters(&req.uri()), None);
     }
     #[test]
     fn get_first_3_path_parameters_works_with_slashes() {
@@ -82,9 +103,18 @@ mod tests {
             .uri("https://www.rust-lang.org/hello/world")
             .body(())
             .unwrap();
-        let (first, second, third) = get_first_3_parameters(&req.uri());
+        let (first, second, third) = get_first_3_parameters(&req.uri()).unwrap();
         assert_eq!(first, "www.rust-lang.org");
         assert_eq!(second, "hello");
         assert_eq!(third, "world");
+    }
+    #[test]
+    fn get_first_3_get_none_with_one_slashes() {
+        let req = Request::builder()
+            .method("GET")
+            .uri("/world")
+            .body(())
+            .unwrap();
+        assert_eq!(get_first_3_parameters(&req.uri()), None);
     }
 }

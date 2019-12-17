@@ -2,7 +2,7 @@
 extern crate hyper;
 extern crate pretty_env_logger;
 use hyper::service::{make_service_fn, service_fn};
-use hyper::{Body, Method, Request, Response, Server, StatusCode};
+use hyper::{Body, Method, Request, Response, Server};
 use serde_json::json;
 use std::env;
 use utils::{constraints, http_utils, maps};
@@ -28,16 +28,16 @@ pub async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 }
 
 async fn coordinate_url(req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
-    let (_, _, path) = http_utils::get_first_3_parameters(&req.uri());
+    let (_, _, path) = match http_utils::get_first_3_parameters(&req.uri()) {
+        Some(v) => v,
+        None => return http_utils::http_no_such_endpoint(),
+    };
     match (req.method(), path) {
         (&Method::GET, "parameters") => output_constraints(req),
         (&Method::POST, "riskmetric") => risk_metric(req).await,
         (&Method::POST, "density") => density(req).await,
         (&Method::POST, "calculator") => price_options(req).await,
-        _ => Ok(Response::builder()
-            .status(StatusCode::NOT_FOUND)
-            .body("No such endpoint".into())
-            .unwrap()),
+        _ => http_utils::http_no_such_endpoint(),
     }
 }
 fn output_constraints(req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
@@ -126,7 +126,10 @@ async fn price_options(req: Request<Body>) -> Result<Response<Body>, hyper::Erro
     let iv_parameter = http_utils::get_query_param(&req.uri(), "includeImpliedVolatility");
 
     let include_iv = maps::get_iv_choice(&iv_parameter);
-    let (option_type, sensitivity) = http_utils::get_last_2_path_parameters(&req.uri());
+    let (option_type, sensitivity) = match http_utils::get_last_2_path_parameters(&req.uri()) {
+        Some(v) => v,
+        None => return http_utils::http_no_such_endpoint(), //should never get here
+    };
     let fn_indicator = match maps::get_fn_indicators(option_type, sensitivity) {
         Ok(v) => v,
         Err(e) => return http_utils::http_fail(e),
