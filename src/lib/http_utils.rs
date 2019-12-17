@@ -27,10 +27,10 @@ pub fn get_last_2_path_parameters(uri: &hyper::Uri) -> Option<(&str, &str)> {
     Some((second_to_last, last)) //reverse order
 }
 pub fn get_first_3_parameters(uri: &hyper::Uri) -> Option<(&str, &str, &str)> {
-    let first_3: Vec<&str> = uri.path().split("/").take(3).collect();
-    let first = first_3.get(0)?;
-    let second = first_3.get(1)?;
-    let third = first_3.get(2)?;
+    let first_3: Vec<&str> = uri.path().split("/").take(4).collect(); //take 4 because the url path starts with a slash
+    let first = first_3.get(1)?;
+    let second = first_3.get(2)?;
+    let third = first_3.get(3)?;
     Some((first, second, third))
 }
 
@@ -88,10 +88,10 @@ mod tests {
         assert_eq!(second, "again");
     }
     #[test]
-    fn get_none_with_one_slashes() {
+    fn get_none_with_no_slashes() {
         let req = Request::builder()
             .method("GET")
-            .uri("/world")
+            .uri("world")
             .body(())
             .unwrap();
         assert_eq!(get_last_2_path_parameters(&req.uri()), None);
@@ -100,13 +100,25 @@ mod tests {
     fn get_first_3_path_parameters_works_with_slashes() {
         let req = Request::builder()
             .method("GET")
-            .uri("https://www.rust-lang.org/hello/world")
+            .uri("https://www.rust-lang.org/hello/world/again")
             .body(())
             .unwrap();
         let (first, second, third) = get_first_3_parameters(&req.uri()).unwrap();
-        assert_eq!(first, "www.rust-lang.org");
-        assert_eq!(second, "hello");
-        assert_eq!(third, "world");
+        assert_eq!(first, "hello");
+        assert_eq!(second, "world");
+        assert_eq!(third, "again");
+    }
+    #[test]
+    fn get_first_3_path_parameters_works_with_real_url() {
+        let req = Request::builder()
+            .method("GET")
+            .uri("http://localhost:8080/v1/cgmy/parameters/parameter_ranges")
+            .body(())
+            .unwrap();
+        let (first, second, third) = get_first_3_parameters(&req.uri()).unwrap();
+        assert_eq!(first, "v1");
+        assert_eq!(second, "cgmy");
+        assert_eq!(third, "parameters");
     }
     #[test]
     fn get_first_3_get_none_with_one_slashes() {
