@@ -24,6 +24,10 @@ pub fn get_last_2_path_parameters(uri: &hyper::Uri) -> (&str, &str) {
     let last_2: Vec<&str> = uri.path().rsplit("/").take(2).collect();
     (last_2[1], last_2[0]) //reverse order
 }
+pub fn get_first_3_parameters(uri: &hyper::Uri) -> (&str, &str, &str) {
+    let first_3: Vec<&str> = uri.path().split("/").take(3).collect();
+    (first_3[0], first_3[1], first_3[2])
+}
 
 #[cfg(test)]
 mod tests {
@@ -70,5 +74,17 @@ mod tests {
         let (first, second) = get_last_2_path_parameters(&req.uri());
         assert_eq!(first, "world");
         assert_eq!(second, "again");
+    }
+    #[test]
+    fn get_first_3_path_parameters_works_with_slashes() {
+        let req = Request::builder()
+            .method("GET")
+            .uri("https://www.rust-lang.org/hello/world")
+            .body(())
+            .unwrap();
+        let (first, second, third) = get_first_3_parameters(&req.uri());
+        assert_eq!(first, "www.rust-lang.org");
+        assert_eq!(second, "hello");
+        assert_eq!(third, "world");
     }
 }

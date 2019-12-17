@@ -17,4 +17,4 @@ RUN cargo build --release
 ENV PORT 8080
 
 # Run the web service on container startup.
-CMD ["./target/release/constraints"]
+CMD ["./target/release/option_price"]

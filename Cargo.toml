@@ -35,20 +35,9 @@ criterion = "0.2"
 codecov = { repository = "realoptions/option_price_faas", branch = "master", service = "github" }
 
 [[bin]]
-name = "constraints"
-path = "src/bin/output_constraints.rs"
+name = "option_price"
+path = "src/bin/option_price.rs"
 
-[[bin]]
-name = "pricer"
-path = "src/bin/pricer.rs"
-
-[[bin]]
-name = "riskmetric"
-path = "src/bin/riskmetric.rs"
-
-[[bin]]
-name = "density"
-path = "src/bin/density.rs"
 
 [lib]
 name = "utils"
