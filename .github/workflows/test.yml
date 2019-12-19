@@ -38,8 +38,9 @@ jobs:
       steps:
         - uses: actions/checkout@v1
         - uses: phillyfan1138/musl-rust-action@master
+        - name: Build
+          run: cargo build --release
         - name: Run integration tests
           run: |
-            docker pull lambci/lambda:provided
             npm ci
             npm test
