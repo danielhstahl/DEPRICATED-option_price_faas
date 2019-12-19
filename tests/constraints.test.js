@@ -1,54 +1,67 @@
 'use strict'
-const {location, timeout}=require('./binaryLocation.json')
-const command=`sudo docker run --rm -v "$PWD":/var/task -i -e DOCKER_LAMBDA_USE_STDIN=1 lambci/lambda:provided -bootstrap ${location}/constraints`
-const {exec} = require('child_process')
-const spawnCommand=(jsonFile, callback)=>{
-    exec('cat '+jsonFile+' | '+command, callback)
-}
+const { location, timeout } = require('./binaryLocation.json')
+const command = `./${location}`
+const request = require('request')
+const { spawn } = require('child_process')
 jest.setTimeout(timeout)
-it('returns constraints for cgmy', done=>{
-    spawnCommand('./tests/parameter5.json', (err, result)=>{
-        if(err){
-            throw(err)
-        }
-        const res=JSON.parse(JSON.parse(result).body)
-        expect(res.c).toBeDefined()
-        expect(res.c).toBeTruthy()
-        done()
+let server
+beforeEach(() => {
+    server = spawn(command, [], { env: { PORT: '8080' } })
+});
+
+afterEach(() => {
+    server.kill()
+});
+describe('risk_measures', () => {
+    it('returns constraints for cgmy', done => {
+
+        request.get({ url: 'http://localhost:8080/v1/cgmy/parameters/parameter_ranges', json: true }, (err, { body }) => {
+            if (err) {
+                throw (err)
+            }
+            expect(body.c).toBeDefined()
+            expect(body.c).toBeTruthy()
+            done()
+        })
+
     })
-})
-it('returns constraints for heston', done=>{
-    spawnCommand('./tests/parameter6.json', (err, result)=>{
-        if(err){
-            throw(err)
-        }
-        const res=JSON.parse(JSON.parse(result).body)
-        expect(res.v0).toBeDefined()
-        expect(res.c).toBeUndefined()
-        expect(res.mu_l).toBeUndefined()
-        expect(res.v0).toBeTruthy()
-        done()
+    it('returns constraints for heston', done => {
+
+        request.get({ url: 'http://localhost:8080/v1/heston/parameters/parameter_ranges', json: true }, (err, { body }) => {
+            if (err) {
+                throw (err)
+            }
+            expect(body.v0).toBeDefined()
+            expect(body.c).toBeUndefined()
+            expect(body.mu_l).toBeUndefined()
+            expect(body.v0).toBeTruthy()
+            done()
+        })
+
     })
-})
-it('returns constraints for merton', done=>{
-    spawnCommand('./tests/parameter7.json', (err, result)=>{
-        if(err){
-            throw(err)
-        }
-        const res=JSON.parse(JSON.parse(result).body)
-        expect(res.mu_l).toBeDefined()
-        expect(res.mu_l).toBeTruthy()
-        done()
+    it('returns constraints for merton', done => {
+
+        request.get({ url: 'http://localhost:8080/v1/merton/parameters/parameter_ranges', json: true }, (err, { body }) => {
+            if (err) {
+                throw (err)
+            }
+            expect(body.mu_l).toBeDefined()
+            expect(body.mu_l).toBeTruthy()
+            done()
+        })
+
     })
-})
-it('returns constraints for market', done=>{
-    spawnCommand('./tests/parameter8.json', (err, result)=>{
-        if(err){
-            throw(err)
-        }
-        const res=JSON.parse(JSON.parse(result).body)
-        expect(res.asset).toBeDefined()
-        expect(res.asset).toBeTruthy()
-        done()
+    it('returns constraints for market', done => {
+
+        request.get({ url: 'http://localhost:8080/v1/market/parameters/parameter_ranges', json: true }, (err, { body }) => {
+            if (err) {
+                throw (err)
+            }
+            expect(body.asset).toBeDefined()
+            expect(body.asset).toBeTruthy()
+            done()
+        })
+
     })
+
 })

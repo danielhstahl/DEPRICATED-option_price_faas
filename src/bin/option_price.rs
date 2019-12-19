@@ -41,8 +41,11 @@ async fn coordinate_url(req: Request<Body>) -> Result<Response<Body>, hyper::Err
     }
 }
 fn output_constraints(req: Request<Body>) -> Result<Response<Body>, hyper::Error> {
-    let model = http_utils::get_query_param(req.uri(), "model");
-    let results = match model.as_str() {
+    let (_, model, _) = match http_utils::get_first_3_parameters(&req.uri()) {
+        Some(v) => v,
+        None => return http_utils::http_no_such_endpoint(),
+    };
+    let results = match model {
         "heston" => json!(constraints::get_heston_constraints()).to_string(),
         "cgmy" => json!(constraints::get_cgmy_constraints()).to_string(),
         "merton" => json!(constraints::get_merton_constraints()).to_string(),
