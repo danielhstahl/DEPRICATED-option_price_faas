@@ -12,11 +12,6 @@ jobs:
     - name: Run cargo test
       run: cargo test
     - uses: phillyfan1138/musl-rust-action@master
-    - name: Integration test
-      run: |
-        docker pull lambci/lambda:provided
-        npm ci
-        npm test 
     - name: deploy constraints docker
       uses: jerray/publish-docker-action@v1.0.3
       with:
