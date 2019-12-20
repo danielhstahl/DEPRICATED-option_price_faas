@@ -9,3 +9,5 @@ coverage
 grcov
 *.info
 *.xml
+.terraform
+terraform.tfstate*
