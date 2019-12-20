@@ -4,6 +4,8 @@ provider "google" {
   region      = "us-central1"
 }
 
+data "google_client_config" "default" {
+}
 resource "google_cloud_run_service" "option_price_faas" {
   name     = "option-pricer"
   location = "us-central1"
@@ -26,7 +28,11 @@ resource "google_cloud_run_service" "option_price_faas" {
     percent         = 100
     latest_revision = true
   }
-  depends_on = [google_project_service.run, google_storage_bucket_iam_binding.container_registry_viewer]
+  //host  = "https://finside.org"
+  token = data.google_client_config.default.access_token
+  cluster_ca_certificate = base64decode(
+    data.google_container_cluster.my_cluster.master_auth[0].cluster_ca_certificate,
+  )
 }
 resource "google_cloud_run_service_iam_member" "allUsers" {
   service  = google_cloud_run_service.option_price_faas.name
