@@ -13,12 +13,10 @@ jobs:
       run: cargo test
     - uses: phillyfan1138/musl-rust-action@master
     - name: deploy constraints docker
-      uses: jerray/publish-docker-action@master
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-        dockerfile: docker/option_price.Dockerfile
-        auto_tag: true
+      run: |
+        docker login --username=${{ secrets.DOCKER_USERNAME }} -p=${{ secrets.DOCKER_PASSWORD }}
+        docker build . -f docker/option_price.Dockerfile -t ${{ GITHUB_REPOSITORY }}:${{ GITHUB_REF }}
+        docker tag ${{ GITHUB_REPOSITORY }}:${{ GITHUB_REF }} ${{ GITHUB_REPOSITORY }}:latest
     
     #- name: deploy aws
     #  run: |
