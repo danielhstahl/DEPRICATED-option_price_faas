@@ -15,8 +15,8 @@ jobs:
     - name: deploy constraints docker
       run: |
         docker login --username=${{ secrets.DOCKER_USERNAME }} -p=${{ secrets.DOCKER_PASSWORD }}
-        docker build . -f docker/option_price.Dockerfile -t ${{ GITHUB_REPOSITORY }}:${{ GITHUB_REF }}
-        docker tag ${{ GITHUB_REPOSITORY }}:${{ GITHUB_REF }} ${{ GITHUB_REPOSITORY }}:latest
+        docker build . -f docker/option_price.Dockerfile -t ${{ github.repository }}:${{ github.ref }}
+        docker tag ${{ github.repository }}:${{ github.ref }} ${{ github.repository }}:latest
     
     #- name: deploy aws
     #  run: |
