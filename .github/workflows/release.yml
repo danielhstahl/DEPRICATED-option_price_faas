@@ -15,10 +15,9 @@ jobs:
     - name: deploy constraints docker
       run: |
         docker login --username=${{ secrets.DOCKER_USERNAME }} -p=${{ secrets.DOCKER_PASSWORD }}
-        docker build . -f docker/option_price.Dockerfile -t ${{ github.repository }}:${REF//refs\/tags\/}
-        docker tag ${{ github.repository }}:${REF//refs\/tags\/} ${{ github.repository }}:latest
-      env:
-        REF: ${{ github.ref }}
+        ref=${{ github.ref }}
+        docker build . -f docker/option_price.Dockerfile -t ${{ github.repository }}:${ref//refs\/tags\/}
+        docker tag ${{ github.repository }}:${ref//refs\/tags\/} ${{ github.repository }}:latest
     #- name: deploy aws
     #  run: |
     #    node ./src/js/copyBinaries
