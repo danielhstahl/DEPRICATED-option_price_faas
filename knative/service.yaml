@@ -9,7 +9,7 @@ runLatest:
   revisionTemplate:
     spec:
     container:
-      image: docker.io/phillyfan1138/option_price_faas
+      image: gcr.io/finside/option_price_faas:1.0.0
       #env:
       #  - name: TARGET
       #value: "Rust Sample v1"

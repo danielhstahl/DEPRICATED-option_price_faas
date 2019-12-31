@@ -31,12 +31,12 @@ describe('risk_measures', () => {
 
     })
     it('returns error if not all parameters included', done => {
-        request.post({ url: 'http://localhost:8080/v1/heston/riskmetric', body: JSON.parse(error.body), json: true }, (err, { body }) => {
+        request.post({ url: 'http://localhost:8080/v1/heston/riskmetric', body: JSON.parse(error.body), json: true }, (err, response) => {
             if (err) {
                 throw (err)
             }
-            expect(body).toBeDefined()
-            expect(body).toEqual("Parameter quantile does not exist.")
+            expect(response.body).toBeDefined()
+            expect(response.body).toEqual("Parameter quantile does not exist.")
             done()
         })
     })
