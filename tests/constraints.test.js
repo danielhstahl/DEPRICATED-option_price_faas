@@ -15,50 +15,50 @@ afterEach(() => {
 describe('risk_measures', () => {
     it('returns constraints for cgmy', done => {
 
-        request.get({ url: 'http://localhost:8080/v1/cgmy/parameters/parameter_ranges', json: true }, (err, { body }) => {
+        request.get({ url: 'http://localhost:8080/v1/cgmy/parameters/parameter_ranges', json: true }, (err, response) => {
             if (err) {
                 throw (err)
             }
-            expect(body.c).toBeDefined()
-            expect(body.c).toBeTruthy()
+            expect(response.body.c).toBeDefined()
+            expect(response.body.c).toBeTruthy()
             done()
         })
 
     })
     it('returns constraints for heston', done => {
 
-        request.get({ url: 'http://localhost:8080/v1/heston/parameters/parameter_ranges', json: true }, (err, { body }) => {
+        request.get({ url: 'http://localhost:8080/v1/heston/parameters/parameter_ranges', json: true }, (err, response) => {
             if (err) {
                 throw (err)
             }
-            expect(body.v0).toBeDefined()
-            expect(body.c).toBeUndefined()
-            expect(body.mu_l).toBeUndefined()
-            expect(body.v0).toBeTruthy()
+            expect(response.body.v0).toBeDefined()
+            expect(response.body.c).toBeUndefined()
+            expect(response.body.mu_l).toBeUndefined()
+            expect(response.body.v0).toBeTruthy()
             done()
         })
 
     })
     it('returns constraints for merton', done => {
 
-        request.get({ url: 'http://localhost:8080/v1/merton/parameters/parameter_ranges', json: true }, (err, { body }) => {
+        request.get({ url: 'http://localhost:8080/v1/merton/parameters/parameter_ranges', json: true }, (err, response) => {
             if (err) {
                 throw (err)
             }
-            expect(body.mu_l).toBeDefined()
-            expect(body.mu_l).toBeTruthy()
+            expect(response.body.mu_l).toBeDefined()
+            expect(response.body.mu_l).toBeTruthy()
             done()
         })
 
     })
     it('returns constraints for market', done => {
 
-        request.get({ url: 'http://localhost:8080/v1/market/parameters/parameter_ranges', json: true }, (err, { body }) => {
+        request.get({ url: 'http://localhost:8080/v1/market/parameters/parameter_ranges', json: true }, (err, response) => {
             if (err) {
                 throw (err)
             }
-            expect(body.asset).toBeDefined()
-            expect(body.asset).toBeTruthy()
+            expect(response.body.asset).toBeDefined()
+            expect(response.body.asset).toBeTruthy()
             done()
         })
 

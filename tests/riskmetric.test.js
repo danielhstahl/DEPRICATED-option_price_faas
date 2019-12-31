@@ -17,15 +17,15 @@ afterEach(() => {
 describe('risk_measures', () => {
     it('returns risk_measures', done => {
 
-        request.post({ url: 'http://localhost:8080/v1/heston/riskmetric', body: JSON.parse(params.body), json: true }, (err, { body }) => {
+        request.post({ url: 'http://localhost:8080/v1/heston/riskmetric', body: JSON.parse(params.body), json: true }, (err, response) => {
             if (err) {
                 throw (err)
             }
-            expect(Array.isArray(body))
-            expect(body.value_at_risk).toBeDefined()
-            expect(body.expected_shortfall).toBeDefined()
-            expect(body.value_at_risk).toBeTruthy()
-            expect(body.expected_shortfall).toBeTruthy()
+            expect(Array.isArray(response.body))
+            expect(response.body.value_at_risk).toBeDefined()
+            expect(response.body.expected_shortfall).toBeDefined()
+            expect(response.body.value_at_risk).toBeTruthy()
+            expect(response.body.expected_shortfall).toBeTruthy()
             done()
         })
 

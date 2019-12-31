@@ -17,36 +17,36 @@ afterEach(() => {
 });
 describe('option prices', () => {
     it('returns array of value and points', done => {
-        request.post({ url: 'http://localhost:8080/v1/heston/calculator/put/price', body: JSON.parse(param1.body), json: true }, (err, { body }) => {
+        request.post({ url: 'http://localhost:8080/v1/heston/calculator/put/price', body: JSON.parse(param1.body), json: true }, (err, response) => {
             if (err) {
                 throw (err)
             }
-            expect(Array.isArray(body))
-            expect(body[0].value).toBeDefined()
-            expect(body[0].at_point).toBeDefined()
+            expect(Array.isArray(response.body))
+            expect(response.body[0].value).toBeDefined()
+            expect(response.body[0].at_point).toBeDefined()
             done()
         })
     })
     it('returns array of value, points, and iv', done => {
-        request.post({ url: 'http://localhost:8080/v1/heston/calculator/put/price?includeImpliedVolatility=true', body: JSON.parse(param2.body), json: true }, (err, { body }) => {
+        request.post({ url: 'http://localhost:8080/v1/heston/calculator/put/price?includeImpliedVolatility=true', body: JSON.parse(param2.body), json: true }, (err, response) => {
             if (err) {
                 throw (err)
             }
-            expect(Array.isArray(body))
-            expect(body[0].value).toBeDefined()
-            expect(body[0].at_point).toBeDefined()
-            expect(body[0].iv).toBeDefined()
-            expect(body[0].iv).toBeTruthy()
+            expect(Array.isArray(response.body))
+            expect(response.body[0].value).toBeDefined()
+            expect(response.body[0].at_point).toBeDefined()
+            expect(response.body[0].iv).toBeDefined()
+            expect(response.body[0].iv).toBeTruthy()
             done()
         })
     })
     it('returns error if not all parameters included', done => {
-        request.post({ url: 'http://localhost:8080/v1/heston/calculator/put/price?includeImpliedVolatility=true', body: JSON.parse(error.body), json: true }, (err, { body }) => {
+        request.post({ url: 'http://localhost:8080/v1/heston/calculator/put/price?includeImpliedVolatility=true', body: JSON.parse(error.body), json: true }, (err, response) => {
             if (err) {
                 throw (err)
             }
-            expect(body).toBeDefined()
-            expect(body).toEqual("Parameter strikes does not exist.")
+            expect(response.body).toBeDefined()
+            expect(response.body).toEqual("Parameter strikes does not exist.")
             done()
         })
     })
