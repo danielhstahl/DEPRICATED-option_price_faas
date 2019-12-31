@@ -28,3 +28,15 @@ Additional documentation is available at the [fang_oost_charts](https://github.c
 ## Benchmarks
 
 View benchmarks at https://realoptions.github.io/option_price_faas/report.
+
+
+## GCP
+
+When deploying to GCP, do the following steps:
+
+* Install glcoud cli (https://cloud.google.com/sdk/docs/downloads-apt-get)
+* Run `gcloud auth configure-docker`
+* Build and tag the docker image: `sudo docker build . -t gcr.io/finside/option_price_faas:1.0.0 -f ./docker/option_price.Dockerfile`
+* `gcloud auth login`
+* `gcloud config set project finside`
+* `sudo docker push gcr.io/finside/option_price_faas:1.0.0`

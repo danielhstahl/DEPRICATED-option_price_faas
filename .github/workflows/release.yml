@@ -12,14 +12,18 @@ jobs:
     - name: Run cargo test
       run: cargo test
     - uses: phillyfan1138/musl-rust-action@master
-    - name: deploy constraints docker
-      uses: jerray/publish-docker-action@master
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-        dockerfile: docker/option_price.Dockerfile
-        auto_tag: true
-    
+    #- name: Publish Docker
+    #  id: gcloud
+    #  uses: elgohr/gcloud-login-action@master
+    #  with:
+    #    account_key: ${{ secrets.GCLOUD_KEY }}
+    #- name: Publish to Registry
+    #  uses: elgohr/Publish-Docker-Github-Action@master
+    #  with:
+    #    name: option_price_faas/repository
+    #    username: ${{ steps.gcloud.outputs.username }}
+    #    password: ${{ steps.gcloud.outputs.password }}
+    #    registry: gcr.io
     #- name: deploy aws
     #  run: |
     #    node ./src/js/copyBinaries
