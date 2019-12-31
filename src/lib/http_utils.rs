@@ -1,12 +1,15 @@
 use hyper::{Body, Response, StatusCode};
+use serde_json::json;
 use std::collections::HashMap;
 use std::error::Error;
 use url::form_urlencoded;
-
+fn construct_error(e_message: &str) -> String {
+    json!({ "err": e_message }).to_string()
+}
 pub fn http_fail<T: Error>(e: T) -> Result<Response<Body>, hyper::Error> {
     Ok(Response::builder()
         .status(StatusCode::BAD_REQUEST)
-        .body(e.to_string().into())
+        .body(construct_error(&e.to_string()).into())
         .unwrap())
 }
 

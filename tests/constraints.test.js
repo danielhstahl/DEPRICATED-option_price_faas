@@ -5,13 +5,13 @@ const request = require('request')
 const { spawn } = require('child_process')
 jest.setTimeout(timeout)
 let server
-beforeEach(() => {
+beforeAll(() => {
     server = spawn(command, [], { env: { PORT: '8080' } })
-});
+})
 
-afterEach(() => {
+afterAll(() => {
     server.kill()
-});
+})
 describe('risk_measures', () => {
     it('returns constraints for cgmy', done => {
 

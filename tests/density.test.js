@@ -7,11 +7,10 @@ const params = require('./parameter3.json')
 const error = require('./densityError.json')
 jest.setTimeout(timeout)
 let server
-beforeEach(() => {
+beforeAll(() => {
     server = spawn(command, [], { env: { PORT: '8080' } })
-});
-
-afterEach(() => {
+})
+afterAll(() => {
     server.kill()
 });
 describe('density', () => {
@@ -34,7 +33,7 @@ describe('density', () => {
                 throw (err)
             }
             expect(response.body).toBeDefined()
-            expect(response.body).toEqual("missing field `rate` at line 1 column 100")
+            expect(response.body.err).toEqual("missing field `rate` at line 1 column 100")
             done()
         })
     })

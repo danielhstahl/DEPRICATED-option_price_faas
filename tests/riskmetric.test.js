@@ -7,13 +7,13 @@ const params = require('./parameter4.json')
 const error = require('./riskMetricError.json')
 jest.setTimeout(timeout)
 let server
-beforeEach(() => {
+beforeAll(() => {
     server = spawn(command, [], { env: { PORT: '8080' } })
-});
+})
 
-afterEach(() => {
+afterAll(() => {
     server.kill()
-});
+})
 describe('risk_measures', () => {
     it('returns risk_measures', done => {
 
@@ -36,7 +36,7 @@ describe('risk_measures', () => {
                 throw (err)
             }
             expect(response.body).toBeDefined()
-            expect(response.body).toEqual("Parameter quantile does not exist.")
+            expect(response.body.err).toEqual("Parameter quantile does not exist.")
             done()
         })
     })

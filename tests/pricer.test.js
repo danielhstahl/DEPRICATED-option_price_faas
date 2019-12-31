@@ -8,13 +8,13 @@ const param2 = require('./parameter2.json')
 const error = require('./pricerError.json')
 jest.setTimeout(timeout)
 let server
-beforeEach(() => {
+beforeAll(() => {
     server = spawn(command, [], { env: { PORT: '8080' } })
-});
+})
 
-afterEach(() => {
+afterAll(() => {
     server.kill()
-});
+})
 describe('option prices', () => {
     it('returns array of value and points', done => {
         request.post({ url: 'http://localhost:8080/v1/heston/calculator/put/price', body: JSON.parse(param1.body), json: true }, (err, response) => {
@@ -46,7 +46,7 @@ describe('option prices', () => {
                 throw (err)
             }
             expect(response.body).toBeDefined()
-            expect(response.body).toEqual("Parameter strikes does not exist.")
+            expect(response.body.err).toEqual("Parameter strikes does not exist.")
             done()
         })
     })
