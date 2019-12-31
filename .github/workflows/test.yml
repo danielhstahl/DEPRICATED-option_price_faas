@@ -38,9 +38,13 @@ jobs:
       steps:
         - uses: actions/checkout@v1
         - uses: hecrj/setup-rust-action@master
+          with:
+             rust-version: stable
         - name: Build
           run: cargo build --release
         - name: Run integration tests
           run: |
             npm ci
             npm test
+          env:
+            CI: true
