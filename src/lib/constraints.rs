@@ -9,6 +9,7 @@ pub enum ErrorType {
     NoExist(String),
     FunctionError(String),
     NoConvergence(),
+    ValueAtRiskError(String),
 }
 
 #[derive(Debug, PartialEq)]
@@ -28,6 +29,7 @@ impl ParameterError {
                     format!("Function indicator {} does not exist.", parameter)
                 }
                 ErrorType::NoConvergence() => format!("Root does not exist for implied volatility"),
+                ErrorType::ValueAtRiskError(message) => format!("{}", message),
             },
         }
     }
