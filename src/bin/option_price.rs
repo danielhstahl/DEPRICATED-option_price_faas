@@ -9,6 +9,8 @@ use std::env;
 use utils::{constraints, maps};
 const OPTION_SCALE: f64 = 10.0;
 const DENSITY_SCALE: f64 = 5.0;
+use rocket::config::{Config, Environment};
+
 #[get("/v1/<model>/parameters/parameter_ranges")]
 fn parameters(model: &RawStr) -> JsonValue {
     match model.as_str() {
@@ -114,8 +116,16 @@ fn risk_metric(
     Ok(json!(results))
 }
 
-fn main() {
-    rocket::ignite()
+fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    let port_str = env::var("PORT")?;
+    let port = port_str.parse::<u16>()?;
+    let config = Config::build(Environment::Production)
+        .address("0.0.0.0")
+        .port(port)
+        .finalize()?;
+    rocket::custom(config)
         .mount("/", routes![parameters, calculator, density, risk_metric])
         .launch();
+
+    Ok(())
 }
