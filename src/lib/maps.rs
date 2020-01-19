@@ -57,25 +57,6 @@ pub fn get_fn_indicators(
         )),
     }
 }
-/// Gets whether implied volatility should be included
-/// # Examples
-///
-/// ```
-/// extern crate utils;
-/// use utils::maps;
-/// # fn main() {
-/// let include_iv = maps::get_iv_choice(
-///     &"true"
-/// );
-/// assert!(include_iv);
-/// # }
-/// ```
-/*pub fn get_iv_choice(query: &str) -> bool {
-    match query {
-        "true" => true,
-        _ => false,
-    }
-}*/
 
 fn get_cgmy_cf(
     cf_parameters: &crate::constraints::CGMYParameters,
