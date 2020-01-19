@@ -54,7 +54,7 @@ paths:
           schema:
             type: string
             enum: [price, delta, gamma, theta]
-        - name: includeImpliedVolatility
+        - name: include_implied_volatility
           in: query
           description: Whether to include implied volatility in the results.  Defaults to 'false'.  Only applicable for sensitivity='price'
           schema:
@@ -99,7 +99,7 @@ paths:
           schema:
             type: string
             enum: [price, delta, gamma, theta]
-        - name: includeImpliedVolatility
+        - name: include_implied_volatility
           in: query
           description: Whether to include implied volatility in the results.  Defaults to 'false'.  Only applicable for sensitivity='price'
           schema:
@@ -145,7 +145,7 @@ paths:
           schema:
             type: string
             enum: [price, delta, gamma, theta]
-        - name: includeImpliedVolatility
+        - name: include_implied_volatility
           in: query
           description: Whether to include implied volatility in the results.  Defaults to 'false'.  Only applicable for sensitivity='price'
           schema:

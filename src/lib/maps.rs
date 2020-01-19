@@ -70,12 +70,12 @@ pub fn get_fn_indicators(
 /// assert!(include_iv);
 /// # }
 /// ```
-pub fn get_iv_choice(query: &str) -> bool {
+/*pub fn get_iv_choice(query: &str) -> bool {
     match query {
         "true" => true,
         _ => false,
     }
-}
+}*/
 
 fn get_cgmy_cf(
     cf_parameters: &crate::constraints::CGMYParameters,
@@ -230,11 +230,6 @@ pub fn get_density_results_as_json(
     }
 }
 
-fn map_value_at_risk_error<T: std::error::Error>(e: T) -> crate::constraints::ParameterError {
-    crate::constraints::ParameterError::new(&crate::constraints::ErrorType::ValueAtRiskError(
-        e.to_string(),
-    ))
-}
 pub fn get_risk_measure_results_as_json(
     cf_parameters: &crate::constraints::CFParameters,
     density_scale: f64,
@@ -245,27 +240,21 @@ pub fn get_risk_measure_results_as_json(
 ) -> Result<cf_dist_utils::RiskMetric, crate::constraints::ParameterError> {
     match cf_parameters {
         crate::constraints::CFParameters::CGMY(cf_params) => {
-            let (cf_inst, vol) =
-                get_cgmy_cf(cf_params, maturity, rate).map_err(map_value_at_risk_error)?;
+            let (cf_inst, vol) = get_cgmy_cf(cf_params, maturity, rate)?;
             let x_max_density = vol * density_scale;
-            let result = get_risk_measure_results(num_u, x_max_density, quantile, &cf_inst)
-                .map_err(map_value_at_risk_error)?;
+            let result = get_risk_measure_results(num_u, x_max_density, quantile, &cf_inst)?;
             Ok(result)
         }
         crate::constraints::CFParameters::Merton(cf_params) => {
-            let (cf_inst, vol) =
-                get_merton_cf(cf_params, maturity, rate).map_err(map_value_at_risk_error)?;
+            let (cf_inst, vol) = get_merton_cf(cf_params, maturity, rate)?;
             let x_max_density = vol * density_scale;
-            let result = get_risk_measure_results(num_u, x_max_density, quantile, &cf_inst)
-                .map_err(map_value_at_risk_error)?;
+            let result = get_risk_measure_results(num_u, x_max_density, quantile, &cf_inst)?;
             Ok(result)
         }
         crate::constraints::CFParameters::Heston(cf_params) => {
-            let (cf_inst, vol) =
-                get_heston_cf(cf_params, maturity, rate).map_err(map_value_at_risk_error)?;
+            let (cf_inst, vol) = get_heston_cf(cf_params, maturity, rate)?;
             let x_max_density = vol * density_scale;
-            let result = get_risk_measure_results(num_u, x_max_density, quantile, &cf_inst)
-                .map_err(map_value_at_risk_error)?;
+            let result = get_risk_measure_results(num_u, x_max_density, quantile, &cf_inst)?;
             Ok(result)
         }
     }

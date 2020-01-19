@@ -3,9 +3,6 @@ const request = require('request')
 const { location, timeout } = require('./binaryLocation.json')
 const command = `./${location}`
 const { spawn } = require('child_process')
-const param1 = require('./parameter1.json')
-const param2 = require('./parameter2.json')
-const error = require('./pricerError.json')
 jest.setTimeout(timeout)
 let server
 beforeAll(() => {
@@ -17,7 +14,16 @@ afterAll(() => {
 })
 describe('option prices', () => {
     it('returns array of value and points', done => {
-        request.post({ url: 'http://localhost:8080/v1/heston/calculator/put/price', body: JSON.parse(param1.body), json: true }, (err, response) => {
+        const body = {
+            num_u: 8,
+            rate: 0.1,
+            maturity: 0.5,
+            asset: 38,
+            cf_parameters: { sigma: 0.5, speed: 0.1, v0: 0.2, eta_v: 0.1, rho: -0.5 },
+            strikes: [100],
+            quantile: 0.01
+        }
+        request.post({ url: 'http://localhost:8080/v2/heston/calculator/put/price', body, json: true }, (err, response) => {
             if (err) {
                 throw (err)
             }
@@ -28,7 +34,16 @@ describe('option prices', () => {
         })
     })
     it('returns array of value, points, and iv', done => {
-        request.post({ url: 'http://localhost:8080/v1/heston/calculator/put/price?includeImpliedVolatility=true', body: JSON.parse(param2.body), json: true }, (err, response) => {
+        const body = {
+            num_u: 8,
+            rate: 0.1,
+            maturity: 0.5,
+            asset: 38,
+            cf_parameters: { sigma: 0.5, speed: 0.1, v0: 0.2, eta_v: 0.1, rho: -0.5 },
+            strikes: [100],
+            quantile: 0.01
+        }
+        request.post({ url: 'http://localhost:8080/v2/heston/calculator/put/price?include_implied_volatility=true', body, json: true }, (err, response) => {
             if (err) {
                 throw (err)
             }
@@ -41,14 +56,21 @@ describe('option prices', () => {
         })
     })
     it('returns error if not all parameters included', done => {
-        request.post({ url: 'http://localhost:8080/v1/heston/calculator/put/price?includeImpliedVolatility=true', body: JSON.parse(error.body), json: true }, (err, response) => {
+        const body = {
+            num_u: 8,
+            rate: 0.1,
+            maturity: 0.5,
+            asset: 38,
+            cf_parameters: { sigma: 0.5, speed: 0.1, v0: 0.2, eta_v: 0.1, rho: -0.5 },
+            quantile: 0.01
+        }
+        request.post({ url: 'http://localhost:8080/v2/heston/calculator/put/price?include_implied_volatility=true', body, json: true }, (err, response) => {
             if (err) {
                 throw (err)
             }
             expect(response.body).toBeDefined()
-            expect(response.body.err).toEqual("Parameter strikes does not exist.")
+            expect(response.body).toEqual("Parameter strikes does not exist.")
             done()
         })
     })
 })
-

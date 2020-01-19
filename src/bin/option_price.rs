@@ -4,14 +4,14 @@ extern crate rocket;
 #[macro_use]
 extern crate rocket_contrib;
 use rocket::http::RawStr;
-use rocket_contrib::json::{Json, JsonValue};
+use rocket_contrib::json::{Json, JsonError, JsonValue};
 use std::env;
 use utils::{constraints, maps};
 const OPTION_SCALE: f64 = 10.0;
 const DENSITY_SCALE: f64 = 5.0;
 use rocket::config::{Config, Environment};
 
-#[get("/v1/<model>/parameters/parameter_ranges")]
+#[get("/v2/<model>/parameters/parameter_ranges")]
 fn parameters(model: &RawStr) -> JsonValue {
     match model.as_str() {
         "heston" => json!(constraints::get_heston_constraints()),
@@ -22,16 +22,17 @@ fn parameters(model: &RawStr) -> JsonValue {
 }
 
 #[post(
-    "/v1/<_model>/calculator/<option_type>/<sensitivity>?<include_implied_volatility>",
+    "/v2/<_model>/calculator/<option_type>/<sensitivity>?<include_implied_volatility>",
     data = "<parameters>"
 )]
 fn calculator(
     _model: &RawStr,
     option_type: &RawStr,
     sensitivity: &RawStr,
-    parameters: Json<constraints::OptionParameters>,
+    parameters: Result<Json<constraints::OptionParameters>, JsonError>,
     include_implied_volatility: Option<bool>,
 ) -> Result<JsonValue, constraints::ParameterError> {
+    let parameters = parameters?;
     let fn_indicator = maps::get_fn_indicators(option_type, sensitivity)?;
     constraints::check_parameters(&parameters, &constraints::get_constraints())?;
     let constraints::OptionParameters {
@@ -63,11 +64,12 @@ fn calculator(
     Ok(json!(results))
 }
 
-#[post("/v1/<_model>/density", data = "<parameters>")]
+#[post("/v2/<_model>/density", data = "<parameters>")]
 fn density(
     _model: &RawStr,
-    parameters: Json<constraints::OptionParameters>,
+    parameters: Result<Json<constraints::OptionParameters>, JsonError>,
 ) -> Result<JsonValue, constraints::ParameterError> {
+    let parameters = parameters?;
     constraints::check_parameters(&parameters, &constraints::get_constraints())?;
 
     let constraints::OptionParameters {
@@ -86,11 +88,12 @@ fn density(
     Ok(json!(results))
 }
 
-#[post("/v1/<_model>/riskmetric", data = "<parameters>")]
+#[post("/v2/<_model>/riskmetric", data = "<parameters>")]
 fn risk_metric(
     _model: &RawStr,
-    parameters: Json<constraints::OptionParameters>,
+    parameters: Result<Json<constraints::OptionParameters>, JsonError>,
 ) -> Result<JsonValue, constraints::ParameterError> {
+    let parameters = parameters?;
     constraints::check_parameters(&parameters, &constraints::get_constraints())?;
 
     let constraints::OptionParameters {

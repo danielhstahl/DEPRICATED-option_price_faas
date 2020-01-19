@@ -81,13 +81,7 @@ paths:
           content:
             application/json:
               schema: &ref_2
-                type: object
-                properties:
-                  err:
-                    type: string
-                required:
-                  - err
-                additionalProperties: false
+                type: string
       parameters:
         - name: optionType
           in: path
@@ -109,7 +103,7 @@ paths:
               - delta
               - gamma
               - theta
-        - name: includeImpliedVolatility
+        - name: include_implied_volatility
           in: query
           description: >-
             Whether to include implied volatility in the results.  Defaults to
@@ -221,7 +215,7 @@ paths:
               - delta
               - gamma
               - theta
-        - name: includeImpliedVolatility
+        - name: include_implied_volatility
           in: query
           description: >-
             Whether to include implied volatility in the results.  Defaults to
@@ -322,7 +316,7 @@ paths:
               - delta
               - gamma
               - theta
-        - name: includeImpliedVolatility
+        - name: include_implied_volatility
           in: query
           description: >-
             Whether to include implied volatility in the results.  Defaults to

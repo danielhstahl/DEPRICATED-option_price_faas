@@ -15,7 +15,7 @@ afterAll(() => {
 describe('risk_measures', () => {
     it('returns constraints for cgmy', done => {
 
-        request.get({ url: 'http://localhost:8080/v1/cgmy/parameters/parameter_ranges', json: true }, (err, response) => {
+        request.get({ url: 'http://localhost:8080/v2/cgmy/parameters/parameter_ranges', json: true }, (err, response) => {
             if (err) {
                 throw (err)
             }
@@ -27,7 +27,7 @@ describe('risk_measures', () => {
     })
     it('returns constraints for heston', done => {
 
-        request.get({ url: 'http://localhost:8080/v1/heston/parameters/parameter_ranges', json: true }, (err, response) => {
+        request.get({ url: 'http://localhost:8080/v2/heston/parameters/parameter_ranges', json: true }, (err, response) => {
             if (err) {
                 throw (err)
             }
@@ -41,7 +41,7 @@ describe('risk_measures', () => {
     })
     it('returns constraints for merton', done => {
 
-        request.get({ url: 'http://localhost:8080/v1/merton/parameters/parameter_ranges', json: true }, (err, response) => {
+        request.get({ url: 'http://localhost:8080/v2/merton/parameters/parameter_ranges', json: true }, (err, response) => {
             if (err) {
                 throw (err)
             }
@@ -53,7 +53,7 @@ describe('risk_measures', () => {
     })
     it('returns constraints for market', done => {
 
-        request.get({ url: 'http://localhost:8080/v1/market/parameters/parameter_ranges', json: true }, (err, response) => {
+        request.get({ url: 'http://localhost:8080/v2/market/parameters/parameter_ranges', json: true }, (err, response) => {
             if (err) {
                 throw (err)
             }

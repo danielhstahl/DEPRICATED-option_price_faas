@@ -1,8 +1,10 @@
+use rocket::response::Responder;
+use rocket_contrib::json::JsonError;
+
 use serde_derive::{Deserialize, Serialize};
 use std::collections::VecDeque;
 use std::error::Error;
 use std::fmt;
-
 #[derive(Debug, PartialEq)]
 pub enum ErrorType {
     OutOfBounds(String),
@@ -10,8 +12,10 @@ pub enum ErrorType {
     FunctionError(String),
     NoConvergence(),
     ValueAtRiskError(String),
+    JsonError(String),
 }
-
+#[derive(Responder)]
+#[response(status = 400, content_type = "json")]
 #[derive(Debug, PartialEq)]
 pub struct ParameterError {
     msg: String,
@@ -30,8 +34,24 @@ impl ParameterError {
                 }
                 ErrorType::NoConvergence() => format!("Root does not exist for implied volatility"),
                 ErrorType::ValueAtRiskError(message) => format!("{}", message),
+                ErrorType::JsonError(message) => format!("{}", message),
             },
         }
+    }
+}
+
+impl From<cf_dist_utils::ValueAtRiskError> for ParameterError {
+    fn from(error: cf_dist_utils::ValueAtRiskError) -> ParameterError {
+        ParameterError::new(&ErrorType::ValueAtRiskError(error.to_string()))
+    }
+}
+impl From<JsonError<'_>> for ParameterError {
+    fn from(error: JsonError) -> ParameterError {
+        let msg = match error {
+            JsonError::Io(err) => err.to_string(),
+            JsonError::Parse(v, err) => format!("parse error {}, received {}", err, v),
+        };
+        ParameterError::new(&ErrorType::JsonError(msg))
     }
 }
 
