@@ -1,6 +1,4 @@
-# Use the official Rust image.
-# https://hub.docker.com/_/rust
-FROM rust:1.40-slim-stretch
+FROM rustlang/rust:nightly-slim
 
 # Copy local code to the container image.
 WORKDIR /usr/src/app
