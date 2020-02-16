@@ -61,7 +61,7 @@ jobs:
     - name: gcloud Set up
       run: |
         gcloud config set project $PROJECT_ID
-        gcloud config set run/region $RUN_REGION
+        gcloud auth configure-docker
     # Build and push image to Google Container Registry
     - name: Build
       run: |
@@ -73,6 +73,7 @@ jobs:
       run: |
         gcloud run deploy $SERVICE_NAME \
           --image gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA \
+          --region $RUN_REGION 
           --platform managed \
           --allow-unauthenticated
     # Firebase hosting
