@@ -73,7 +73,7 @@ jobs:
       run: |
         gcloud run deploy $SERVICE_NAME \
           --image gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA \
-          --region $RUN_REGION 
+          --region $RUN_REGION \
           --platform managed \
           --allow-unauthenticated
     # Firebase hosting
