@@ -6,8 +6,9 @@ info:
 
 servers:
   - url: https://api.finside.org/realoptions
-    description: Production server
-
+    description: AWS server
+  - url: https://api.finside.org/realoptions
+    description: GCP server
 components:
   securitySchemes:
     ApiKeyAuth:

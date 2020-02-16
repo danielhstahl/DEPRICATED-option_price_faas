@@ -10,7 +10,7 @@
       {
         "source": "**",
         "run": {
-          "serviceId": "helloworld", // "service name" (from when you deployed the container image)
+          "serviceId": "realoptions",
           "region": "us-central1"
         }
       }

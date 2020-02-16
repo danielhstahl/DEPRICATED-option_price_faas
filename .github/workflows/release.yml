@@ -3,7 +3,10 @@ on:
   push:
     tags:
     - '*'
-
+env:
+  PROJECT_ID: finside
+  RUN_REGION: us-central1
+  SERVICE_NAME: realoptions
 jobs:
   release: 
     runs-on: ubuntu-latest
@@ -11,42 +14,62 @@ jobs:
     - uses: actions/checkout@v1
     - name: Run cargo test
       run: cargo test
-    - uses: phillyfan1138/musl-rust-action@master
-    #- name: Publish Docker
-    #  id: gcloud
-    #  uses: elgohr/gcloud-login-action@master
-    #  with:
-    #    account_key: ${{ secrets.GCLOUD_KEY }}
-    #- name: Publish to Registry
-    #  uses: elgohr/Publish-Docker-Github-Action@master
-    #  with:
-    #    name: option_price_faas/repository
-    #    username: ${{ steps.gcloud.outputs.username }}
-    #    password: ${{ steps.gcloud.outputs.password }}
-    #    registry: gcr.io
-    #- name: deploy aws
-    #  run: |
-    #    node ./src/js/copyBinaries
-    #    npx serverless deploy
-    #  env:
-    #    AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-    #    AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        
-    # - name: release files
-    #   uses: ncipollo/release-action@v1
-    #   with:
-    #     artifacts: "./target/x86_64-unknown-linux-musl/release/*,./serverless.yml,./docs/openapi_merged.yml"
-    #     # bodyFile: "body.md"
-    #     token: ${{ secrets.ACCESS_TOKEN }}
 
-    # - name: kickoff main site job
-    #   run: |
-    #     curl -s -X POST \
-    #       -H "Content-Type: application/json" \
-    #       -H "Accept: application/vnd.github.everest-preview+json" \
-    #       -H "Authorization: token  ${{ secrets.ACCESS_TOKEN }}" \
-    #       -d '{"event_type": "on-demand-test"}' \
-    #       https://api.github.com/repos/realoptions/main_site/dispatches
+    # Setup gcloud CLI
+    # To create a service account, 
+    # gcloud iam service-accounts create [SA-NAME] \
+    # --description "[SA-DESCRIPTION]" \
+    # --display-name "[SA-DISPLAY-NAME]"
 
-    
-    
+    # to create a key for the service account,
+    # gcloud iam service-accounts keys create ~/key.json \
+    # --iam-account [SA-NAME]@[PROJECT-ID].iam.gserviceaccount.com
+
+    # to base64 it,
+    # cat ~/key.json | base64
+
+    # to get email address,
+    # gcloud iam service-accounts list
+
+    # to grant roles, 
+    # gcloud projects add-iam-policy-binding [project] \
+    # --member serviceAccount:[emailaddress] \
+    # --role roles/run.admin 
+    # gcloud projects add-iam-policy-binding [project] \
+    # --member serviceAccount:[emailaddress] \
+    # --role roles/viewer
+    # gcloud projects add-iam-policy-binding [project] \
+    # --member serviceAccount:[emailaddress] \
+    # --role roles/cloudbuild.builds.builder
+    # gcloud projects add-iam-policy-binding [project] \
+    # --member serviceAccount:[emailaddress] \
+    # --role roles/iam.serviceAccountUser
+    - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      with:
+        version: '275.0.0'
+        service_account_email: ${{ secrets.SA_EMAIL }}
+        service_account_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS}}
+
+    # Configure gcloud CLI
+    - name: gcloud Set up
+      run: |
+        gcloud config set project $PROJECT_ID
+        gcloud config set run/region $RUN_REGION
+    # Build and push image to Google Container Registry
+    - name: Build
+      run: |
+        gcloud builds submit -t gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA
+    # Deploy image to Cloud Run
+    - name: Deploy
+      run: |
+        gcloud run deploy $SERVICE_NAME \
+          --image gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA \
+          --platform managed \
+          --allow-unauthenticated
+    # Firebase hosting
+    - name: Set up firebase
+      uses: w9jds/firebase-action@master
+      with:
+        args: deploy --only hosting
+      env:
+        GCP_SA_KEY: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
