@@ -55,7 +55,7 @@ impl From<JsonError<'_>> for ParameterError {
 
 impl fmt::Display for ParameterError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.msg.get("err").unwrap())
+        write!(f, "{}", self.msg.get("err").unwrap().as_str().unwrap())
     }
 }
 impl Error for ParameterError {
