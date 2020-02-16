@@ -1,67 +1,55 @@
 'use strict'
 const { location, timeout } = require('./binaryLocation.json')
-const command = `./${location}`
-const request = require('request')
+const fetch = require('node-fetch')
 const { spawn } = require('child_process')
 jest.setTimeout(timeout)
 let server
 beforeAll(() => {
-    server = spawn(command, [], { env: { PORT: '8080' } })
+    server = spawn(location, [], { env: { PORT: '8080' } })
 })
 
 afterAll(() => {
     server.kill()
 })
 describe('risk_measures', () => {
-    it('returns constraints for cgmy', done => {
-
-        request.get({ url: 'http://localhost:8080/v2/cgmy/parameters/parameter_ranges', json: true }, (err, response) => {
-            if (err) {
-                throw (err)
-            }
-            expect(response.body.c).toBeDefined()
-            expect(response.body.c).toBeTruthy()
-            done()
+    it('returns constraints for cgmy', () => {
+        return fetch(
+            'http://localhost:8080/v2/cgmy/parameters/parameter_ranges',
+            { method: 'GET', headers: { 'Content-Type': 'application/json' }, }
+        ).then(res => res.json()).then(response => {
+            return expect(response.c).toBeTruthy()
+        })
+    })
+    it('returns constraints for heston', () => {
+        return fetch(
+            'http://localhost:8080/v2/heston/parameters/parameter_ranges',
+            { method: 'GET', headers: { 'Content-Type': 'application/json' }, }
+        ).then(res => res.json()).then(response => {
+            return Promise.all([
+                expect(response.v0).toBeDefined(),
+                expect(response.c).toBeUndefined(),
+                expect(response.mu_l).toBeUndefined(),
+                expect(response.v0).toBeTruthy(),
+            ])
         })
 
     })
-    it('returns constraints for heston', done => {
-
-        request.get({ url: 'http://localhost:8080/v2/heston/parameters/parameter_ranges', json: true }, (err, response) => {
-            if (err) {
-                throw (err)
-            }
-            expect(response.body.v0).toBeDefined()
-            expect(response.body.c).toBeUndefined()
-            expect(response.body.mu_l).toBeUndefined()
-            expect(response.body.v0).toBeTruthy()
-            done()
+    it('returns constraints for merton', () => {
+        return fetch(
+            'http://localhost:8080/v2/merton/parameters/parameter_ranges',
+            { method: 'GET', headers: { 'Content-Type': 'application/json' }, }
+        ).then(res => res.json()).then(response => {
+            return expect(response.mu_l).toBeTruthy()
         })
 
     })
-    it('returns constraints for merton', done => {
-
-        request.get({ url: 'http://localhost:8080/v2/merton/parameters/parameter_ranges', json: true }, (err, response) => {
-            if (err) {
-                throw (err)
-            }
-            expect(response.body.mu_l).toBeDefined()
-            expect(response.body.mu_l).toBeTruthy()
-            done()
+    it('returns constraints for market', () => {
+        return fetch(
+            'http://localhost:8080/v2/market/parameters/parameter_ranges',
+            { method: 'GET', headers: { 'Content-Type': 'application/json' }, }
+        ).then(res => res.json()).then(response => {
+            return expect(response.asset).toBeTruthy()
         })
-
-    })
-    it('returns constraints for market', done => {
-
-        request.get({ url: 'http://localhost:8080/v2/market/parameters/parameter_ranges', json: true }, (err, response) => {
-            if (err) {
-                throw (err)
-            }
-            expect(response.body.asset).toBeDefined()
-            expect(response.body.asset).toBeTruthy()
-            done()
-        })
-
     })
 
 })

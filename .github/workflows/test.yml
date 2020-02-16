@@ -40,6 +40,6 @@ jobs:
         - name: Run integration tests
           run: |
             npm ci
-            npm test
+            npm test --runInBand
           env:
             CI: true

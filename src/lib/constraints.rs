@@ -1,11 +1,10 @@
 use rocket::response::Responder;
-use rocket_contrib::json::JsonError;
-
+use rocket_contrib::json::{JsonError, JsonValue};
 use serde_derive::{Deserialize, Serialize};
 use std::collections::VecDeque;
 use std::error::Error;
 use std::fmt;
-#[derive(Debug, PartialEq)]
+
 pub enum ErrorType {
     OutOfBounds(String),
     NoExist(String),
@@ -14,17 +13,16 @@ pub enum ErrorType {
     ValueAtRiskError(String),
     JsonError(String),
 }
-#[derive(Responder)]
+#[derive(Debug, PartialEq, Responder, Serialize)]
 #[response(status = 400, content_type = "json")]
-#[derive(Debug, PartialEq)]
 pub struct ParameterError {
-    msg: String,
+    msg: JsonValue,
 }
 
 impl ParameterError {
     pub fn new(error_type: &ErrorType) -> Self {
         ParameterError {
-            msg: match error_type {
+            msg: json!({"err":match error_type {
                 ErrorType::OutOfBounds(parameter) => {
                     format!("Parameter {} out of bounds.", parameter)
                 }
@@ -35,7 +33,7 @@ impl ParameterError {
                 ErrorType::NoConvergence() => format!("Root does not exist for implied volatility"),
                 ErrorType::ValueAtRiskError(message) => format!("{}", message),
                 ErrorType::JsonError(message) => format!("{}", message),
-            },
+            }}),
         }
     }
 }
@@ -57,12 +55,12 @@ impl From<JsonError<'_>> for ParameterError {
 
 impl fmt::Display for ParameterError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.msg)
+        write!(f, "{}", self.msg.get("err").unwrap())
     }
 }
 impl Error for ParameterError {
     fn description(&self) -> &str {
-        &self.msg
+        self.msg.get("err").unwrap().as_str().unwrap()
     }
 }
 
