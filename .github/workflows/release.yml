@@ -12,8 +12,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - name: Run cargo test
-      run: cargo test
+    - uses: hecrj/setup-rust-action@master
+      with:
+        rust-version: nightly
+
+    - name: Build
+      run: cargo build
+    - name: Run tests nightly
+      run: |
+        cargo test
 
     # Setup gcloud CLI
     # To create a service account, 
