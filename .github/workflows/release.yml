@@ -51,6 +51,10 @@ jobs:
     # gcloud projects add-iam-policy-binding [project] \
     # --member serviceAccount:[emailaddress] \
     # --role roles/iam.serviceAccountUser
+    # gcloud projects add-iam-policy-binding [project] \
+    # --member serviceAccount:[emailaddress] \
+    # --role roles/firebasehosting.admin
+    #
     - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
       with:
         version: '275.0.0'
