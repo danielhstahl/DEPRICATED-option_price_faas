@@ -118,7 +118,7 @@ jobs:
     - name: Policy binding
       run: |
         gcloud run services add-iam-policy-binding $SERVICE_NAME \
-          --member "serviceAccount:${secrets.ESP_PROJECT_NUMBER}-compute@developer.gserviceaccount.com" \
+          --member "serviceAccount:${{secrets.ESP_PROJECT_NUMBER}}-compute@developer.gserviceaccount.com" \
           --role "roles/run.invoker" \
           --platform managed \
           --region $RUN_REGION  \
