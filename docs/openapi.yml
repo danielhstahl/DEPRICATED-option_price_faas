@@ -1,26 +1,18 @@
-openapi: 3.0.0
+swagger: '2.0'
 info:
   title: Option Pricing and Sensitivities
   description: Option pricing using advanced models such as Heston, Extended Merton, and Extended CGMY.
-  version: '1'
-
-servers:
-  - url: https://api.finside.org/realoptions
-    description: AWS server
-  - url: https://api.finside.org/realoptions
-    description: GCP server
-components:
-  securitySchemes:
-    ApiKeyAuth:
-      type: apiKey
-      in: header
-      name: x-api-Key
-
-security:
-  - ApiKeyAuth: []
+  version: 2.0.0
+host: realoptions-gateway-lnmfgwrxtq-uc.a.run.app # todo! autopopulate
+schemes:
+  - https
+produces:
+  - application/json
+x-google-backend:
+  address: https://realoptions-lnmfgwrxtq-uc.a.run.app # todo! autopopulate
 
 paths:
-  /v1/cgmy/calculator/{optionType}/{sensitivity}:
+  /v2/cgmy/calculator/{optionType}/{sensitivity}:
     post:
       summary: Calculator for computing option prices and sensitivities for a CGMY process
       description: Computes European option prices, implied volatilities, and sensitivities at every strike price for an asset that follows an extended CGMY process
@@ -66,7 +58,7 @@ paths:
           application/json:
             schema:
               $ref: './PostCGMYRequestOptions.json'
-  /v1/heston/calculator/{optionType}/{sensitivity}:
+  /v2/heston/calculator/{optionType}/{sensitivity}:
     post:
       summary: Calculator for computing option prices and sensitivities for a Heston model
       description: Computes European option prices, implied volatilities, and sensitivities at every strike price for an asset that follows a Heston process
@@ -112,7 +104,7 @@ paths:
             schema:
               $ref: './PostHestonRequestOptions.json'
 
-  /v1/merton/calculator/{optionType}/{sensitivity}:
+  /v2/merton/calculator/{optionType}/{sensitivity}:
     post:
       summary: Calculator for computing option prices and sensitivities for a Merton model
       description: Computes European option prices, implied volatilities, and sensitivities at every strike price for an asset that follows an extended Merton process
@@ -158,7 +150,7 @@ paths:
             schema:
               $ref: './PostMertonRequestOptions.json'
 
-  /v1/cgmy/density:
+  /v2/cgmy/density:
     post:
       summary: Calculator for computing probability densities for CGMY process
       description: Computes probability density for an extended CGMY process
@@ -184,7 +176,7 @@ paths:
             schema:
               $ref: './PostCGMYRequestDensity.json'
 
-  /v1/heston/density:
+  /v2/heston/density:
     post:
       summary: Calculator for computing probability densities for Heston model
       description: Computes probability density for a Heston model
@@ -210,7 +202,7 @@ paths:
             schema:
               $ref: './PostHestonRequestDensity.json'
 
-  /v1/merton/density:
+  /v2/merton/density:
     post:
       summary: Calculator for computing probability densities for Merton model
       description: Computes probability density for a Merton model
@@ -236,7 +228,7 @@ paths:
             schema:
               $ref: './PostMertonRequestDensity.json'
 
-  /v1/cgmy/riskmetric:
+  /v2/cgmy/riskmetric:
     post:
       summary: Calculator for computing risk metrics for CGMY process
       description: Computes value at risk and expected shortfall for extended CGMY process
@@ -261,7 +253,7 @@ paths:
           application/json:
             schema:
               $ref: './PostCGMYRequestRiskMetric.json'
-  /v1/heston/riskmetric:
+  /v2/heston/riskmetric:
     post:
       summary: Calculator for computing risk metrics for Heston model
       description: Computes value at risk and expected shortfall for a Heston model
@@ -286,7 +278,7 @@ paths:
           application/json:
             schema:
               $ref: './PostHestonRequestRiskMetric.json'
-  /v1/merton/riskmetric:
+  /v2/merton/riskmetric:
     post:
       summary: Calculator for computing risk metrics for Merton model
       description: Computes value at risk and expected shortfall for an extended Merton model
@@ -312,7 +304,7 @@ paths:
             schema:
               $ref: './PostMertonRequestRiskMetric.json'
 
-  /v1/heston/parameters/parameter_ranges:
+  /v2/heston/parameters/parameter_ranges:
     get:
       summary: Parameter Constraints
       description: Obtains the constraints that the parameters in the post requests are required to conform to for Heston.
@@ -331,7 +323,7 @@ paths:
             application/json: 
               schema:
                 $ref: './ErrorResponse.json'
-  /v1/cgmy/parameters/parameter_ranges:
+  /v2/cgmy/parameters/parameter_ranges:
     get:
       summary: Parameter Constraints
       description: Obtains the constraints that the parameters in the post requests are required to conform to for CGMY.
@@ -351,7 +343,7 @@ paths:
               schema:
                 $ref: './ErrorResponse.json'
 
-  /v1/merton/parameters/parameter_ranges:
+  /v2/merton/parameters/parameter_ranges:
     get:
       summary: Parameter Constraints
       description: Obtains the constraints that the parameters in the post requests are required to conform to for Merton.
@@ -370,7 +362,7 @@ paths:
             application/json: 
               schema:
                 $ref: './ErrorResponse.json'
-  /v1/market/parameters/parameter_ranges:
+  /v2/market/parameters/parameter_ranges:
     get:
       summary: Market Constraints
       description: Obtains the constraints that correspond with the market.

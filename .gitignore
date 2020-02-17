@@ -11,3 +11,4 @@ grcov
 *.xml
 .terraform
 terraform.tfstate*
+build_image.sh

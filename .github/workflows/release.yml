@@ -80,7 +80,7 @@ jobs:
           --region $RUN_REGION \
           --platform managed \
           --allow-unauthenticated
-    # API Gateway
+    # API Gateway Cloud Run
     - name: Gateway
       run: |
         gcloud run deploy ${SERVICE_NAME}-gateway \
@@ -89,3 +89,20 @@ jobs:
           --platform managed \
           --region $RUN_REGION \
           --project=$PROJECT_ID
+    # API Management
+    # gcloud services enable servicecontrol.googleapis.com
+    # gcloud services enable endpoints.googleapis.com
+    # gcloud projects add-iam-policy-binding [project] \
+    # --member serviceAccount:[emailaddress] \
+    # --role roles/servicemanagement.configEditor
+    - name: Swagger
+      run: |
+        gcloud endpoints services deploy docs/openapi_merged.yml \
+          --project $PROJECT_ID
+
+    - name: Build API Gateway
+      run: |
+        curl -o build_image.sh https://raw.githubusercontent.com/GoogleCloudPlatform/esp-v2/ff38ffe6aa170c17822c3ad988e8a1f7a0b864c1/docker/serverless/gcloud_build_image
+        chmod +x build_image.sh
+        ./build_image.sh -s realoptions-gateway-lnmfgwrxtq-uc.a.run.app \
+          -c [config from step Swagger] -p $PROJECT_ID 
