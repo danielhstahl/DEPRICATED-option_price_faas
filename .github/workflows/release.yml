@@ -7,6 +7,8 @@ env:
   PROJECT_ID: finside
   RUN_REGION: us-central1
   SERVICE_NAME: realoptions
+  GATEWAY_SERVICE: realoptions-gateway-lnmfgwrxtq-uc.a.run.app
+  GATEWAY_CONFIG: 2020-02-17r0 #temporary, assign this dynamically
 jobs:
   release: 
     runs-on: ubuntu-latest
@@ -78,17 +80,8 @@ jobs:
         gcloud run deploy $SERVICE_NAME \
           --image gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA \
           --region $RUN_REGION \
-          --platform managed \
-          --allow-unauthenticated
-    # API Gateway Cloud Run
-    - name: Gateway
-      run: |
-        gcloud run deploy ${SERVICE_NAME}-gateway \
-          --image=gcr.io/endpoints-release/endpoints-runtime-serverless:2 \
-          --allow-unauthenticated \
-          --platform managed \
-          --region $RUN_REGION \
-          --project=$PROJECT_ID
+          --platform managed 
+
     # API Management
     # gcloud services enable servicecontrol.googleapis.com
     # gcloud services enable endpoints.googleapis.com
@@ -99,10 +92,36 @@ jobs:
       run: |
         gcloud endpoints services deploy docs/openapi_merged.yml \
           --project $PROJECT_ID
-
+        
+    ## Todo! dynamic service configuration
     - name: Build API Gateway
       run: |
-        curl -o build_image.sh https://raw.githubusercontent.com/GoogleCloudPlatform/esp-v2/ff38ffe6aa170c17822c3ad988e8a1f7a0b864c1/docker/serverless/gcloud_build_image
-        chmod +x build_image.sh
-        ./build_image.sh -s realoptions-gateway-lnmfgwrxtq-uc.a.run.app \
-          -c [config from step Swagger] -p $PROJECT_ID 
+        GATEWAY_CONFIG=$(gcloud endpoints configs list --service ${GATEWAY_SERVICE} --limit 1 \
+          | grep $(date +'%Y-%m-%d') | head -n1 | awk '{print $1;}')
+        curl --fail -o "service.json" -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+          "https://servicemanagement.googleapis.com/v1/services/${GATEWAY_SERVICE}/configs/${GATEWAY_CONFIG}?view=FULL" 
+        docker build . -f docker/gateway.Dockerfile --tag gcr.io/${PROJECT_ID}/endpoints-runtime-serverless:${GATEWAY_SERVICE}-${GATEWAY_CONFIG}
+        docker push gcr.io/${PROJECT_ID}/endpoints-runtime-serverless:${GATEWAY_SERVICE}-${GATEWAY_CONFIG}
+
+    - name: Deploy Gateway
+      run: |
+        GATEWAY_CONFIG=$(gcloud endpoints configs list --service ${GATEWAY_SERVICE} --limit 1 \
+          | grep $(date +'%Y-%m-%d') | head -n1 | awk '{print $1;}')
+        gcloud run deploy ${SERVICE_NAME}-gateway \
+          --image=gcr.io/${PROJECT_ID}/endpoints-runtime-serverless:${GATEWAY_SERVICE}-${GATEWAY_CONFIG} \
+          --set-env-vars=ESPv2_ARGS=--cors_preset=basic \
+          --allow-unauthenticated \
+          --platform managed \
+          --project $PROJECT_ID \
+          --region $RUN_REGION 
+
+    - name: Policy binding
+      run: |
+        gcloud run services add-iam-policy-binding $SERVICE_NAME \
+          --member "serviceAccount:${secrets.ESP_PROJECT_NUMBER}-compute@developer.gserviceaccount.com" \
+          --role "roles/run.invoker" \
+          --platform managed \
+          --region $RUN_REGION  \
+          --project ${PROJECT_ID}
+
+          

@@ -12,3 +12,4 @@ grcov
 .terraform
 terraform.tfstate*
 build_image.sh
+service.json
