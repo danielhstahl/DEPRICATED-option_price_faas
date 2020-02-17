@@ -80,10 +80,12 @@ jobs:
           --region $RUN_REGION \
           --platform managed \
           --allow-unauthenticated
-    # Firebase hosting
-    - name: Set up firebase
-      uses: w9jds/firebase-action@master
-      with:
-        args: deploy --only hosting
-      env:
-        GCP_SA_KEY: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+    # API Gateway
+    - name: Gateway
+      run: |
+        gcloud run deploy ${SERVICE_NAME}-gateway \
+          --image=gcr.io/endpoints-release/endpoints-runtime-serverless:2 \
+          --allow-unauthenticated \
+          --platform managed \
+          --region $RUN_REGION \
+          --project=$PROJECT_ID
