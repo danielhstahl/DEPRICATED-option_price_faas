@@ -1,17 +1,21 @@
-swagger: '2.0'
+openapi: 3.0.0
 info:
   title: Option Pricing and Sensitivities
   description: >-
     Option pricing using advanced models such as Heston, Extended Merton, and
     Extended CGMY.
-  version: 2.0.0
-host: realoptions-gateway-lnmfgwrxtq-uc.a.run.app
-schemes:
-  - https
-produces:
-  - application/json
-x-google-backend:
-  address: 'https://realoptions-lnmfgwrxtq-uc.a.run.app'
+  version: '1'
+servers:
+  - url: 'https://api.finside.org/realoptions'
+    description: Production server
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-Key
+security:
+  - ApiKeyAuth: []
 paths:
   '/v2/cgmy/calculator/{optionType}/{sensitivity}':
     post:
