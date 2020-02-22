@@ -4,13 +4,14 @@ info:
   title: Option Pricing and Sensitivities
   description: Option pricing using advanced models such as Heston, Extended Merton, and Extended CGMY.
   version: 2.0.0
-host: realoptions-gateway-lnmfgwrxtq-uc.a.run.app 
+host: api2.finside.org  
 schemes:
   - https
 produces:
   - application/json
 x-google-backend:
   address: https://realoptions-lnmfgwrxtq-uc.a.run.app 
+  path_translation: APPEND_PATH_TO_ADDRESS
 
 securityDefinitions:
   firebase:
