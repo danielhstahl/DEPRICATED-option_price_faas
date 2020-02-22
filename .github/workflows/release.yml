@@ -123,5 +123,3 @@ jobs:
           --platform managed \
           --region $RUN_REGION  \
           --project ${PROJECT_ID}
-
-          

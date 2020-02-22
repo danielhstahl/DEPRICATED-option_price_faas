@@ -13,14 +13,18 @@ x-google-backend:
   address: https://realoptions-lnmfgwrxtq-uc.a.run.app 
 
 securityDefinitions:
-  # This section configures basic authentication with an API key.
-  api_key:
-    type: "apiKey"
-    name: "key"
-    in: "query"
+  firebase:
+    authorizationUrl: ""
+    flow: "implicit"
+    type: "oauth2"
+    x-google-issuer: "https://securetoken.google.com/finside"
+    x-google-jwks_uri: "https://www.googleapis.com/service_accounts/v1/metadata/x509/securetoken@system.gserviceaccount.com"
+    x-google-audiences: "finside"
+
 
 security:
-  - api_key: []
+  - firebase: []
+  
   
 
 paths:
