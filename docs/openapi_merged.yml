@@ -4,7 +4,7 @@ info:
   title: Option Pricing and Sensitivities
   description: Option pricing using advanced models such as Heston, Extended Merton, and Extended CGMY.
   version: 2.0.0
-host: api2.finside.org  
+host: api2.finside.org
 schemes:
   - https
 produces:
