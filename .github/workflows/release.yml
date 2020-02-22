@@ -77,7 +77,6 @@ jobs:
     # Deploy image to Cloud Run
     - name: Deploy
       run: |
-        sed -ri 's/^(\s*)(image\s*:\s*api2.finside.org\s*$)/\1image: realoptions-gateway-lnmfgwrxtq-uc.a.run.app/' docs/openapi_merged.yml
         gcloud run deploy $SERVICE_NAME \
           --image gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA \
           --region $RUN_REGION \
@@ -91,7 +90,8 @@ jobs:
     # --role roles/servicemanagement.configEditor
     - name: Swagger
       run: |
-        gcloud endpoints services deploy docs/openapi_merged.yml \
+        sed 's/api2.finside.org/realoptions-gateway-lnmfgwrxtq-uc.a.run.app/g' docs/openapi_merged.yml  > docs/urlsubstitute.yml
+        gcloud endpoints services deploy docs/urlsubstitute.yml \
           --project $PROJECT_ID
         
     ## Todo! dynamic service configuration
