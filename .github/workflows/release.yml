@@ -130,3 +130,11 @@ jobs:
         artifacts: "./target/x86_64-unknown-linux-musl/release/*,./serverless.yml,./docs/openapi_v2.yml"
         # bodyFile: "body.md"
         token: ${{ secrets.ACCESS_TOKEN }}
+    - name: kickoff main site job
+      run: |
+        curl -s -X POST \
+          -H "Content-Type: application/json" \
+          -H "Accept: application/vnd.github.everest-preview+json" \
+          -H "Authorization: token  ${{ secrets.ACCESS_TOKEN }}" \
+          -d '{"event_type": "on-demand-test"}' \
+          https://api.github.com/repos/realoptions/developer_site/dispatches
