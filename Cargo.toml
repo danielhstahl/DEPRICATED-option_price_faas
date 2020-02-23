@@ -21,8 +21,8 @@ rayon = "1.0.1"
 black_scholes = "0.5.0"
 cf_functions = "0.10"
 num-complex = "0.2"
-lambda_http = "0.1.0"
-lambda_runtime = "0.2.0"
+rocket = "0.4.2"
+rocket_contrib = "0.4.2"
 
 [dev-dependencies]
 rand = "0.5"
@@ -30,23 +30,12 @@ approx = "0.2.0"
 criterion = "0.2"
 
 [badges]
-travis-ci = { repository = "realoptions/option_price_faas" }
+codecov = { repository = "realoptions/option_price_faas", branch = "master", service = "github" }
 
 [[bin]]
-name = "constraints"
-path = "src/bin/output_constraints.rs"
+name = "option_price"
+path = "src/bin/option_price.rs"
 
-[[bin]]
-name = "pricer"
-path = "src/bin/pricer.rs"
-
-[[bin]]
-name = "riskmetric"
-path = "src/bin/riskmetric.rs"
-
-[[bin]]
-name = "density"
-path = "src/bin/density.rs"
 
 [lib]
 name = "utils"

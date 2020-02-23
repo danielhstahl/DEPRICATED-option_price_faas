@@ -2,8 +2,8 @@
 | :---------------: | :-----------------: |
 | ![lin-badge]      | ![cov-badge]        |
 
-[lin-badge]: https://travis-ci.com/realoptions/option_price_faas.svg "Travis build status"
-[lin-link]:  https://travis-ci.com/realoptions/option_price_faas "Travis build status"
+[lin-badge]: https://github.com/realoptions/option_price_faas/workflows/test/badge.svg
+[lin-link]:  https://github.com/realoptions/option_price_faas/actions
 [cov-badge]: https://codecov.io/gh/realoptions/option_price_faas/branch/master/graph/badge.svg
 [cov-link]:  https://codecov.io/gh/realoptions/option_price_faas
 
@@ -28,3 +28,17 @@ Additional documentation is available at the [fang_oost_charts](https://github.c
 ## Benchmarks
 
 View benchmarks at https://realoptions.github.io/option_price_faas/report.
+
+
+## GCP
+
+When deploying to GCP, do the following steps:
+
+* Install glcoud cli (https://cloud.google.com/sdk/docs/downloads-apt-get)
+* Run `gcloud auth configure-docker`
+* Build and tag the docker image: `docker build . -t gcr.io/finside/option_price_faas:1.0.0 -f ./docker/option_price.Dockerfile`
+* `gcloud auth login`
+* `gcloud config set project finside`
+* `docker push gcr.io/finside/option_price_faas:1.0.0`
+* `gcloud run deploy optionpricefaas --image gcr.io/finside/option_price_faas:1.0.0 --platform managed --allow-unauthenticated`
+* To delete: `gcloud run services delete optionpricefaas --platform managed`
