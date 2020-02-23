@@ -5,6 +5,7 @@ info:
   description: Option pricing using advanced models such as Heston, Extended Merton, and Extended CGMY.
   version: 2.0.0
 host: api2.finside.org
+basePath: "/v2"
 schemes:
   - https
 produces:
@@ -21,15 +22,19 @@ securityDefinitions:
     x-google-issuer: "https://securetoken.google.com/finside"
     x-google-jwks_uri: "https://www.googleapis.com/service_accounts/v1/metadata/x509/securetoken@system.gserviceaccount.com"
     x-google-audiences: "finside"
-
+  JWT:  
+    type: apiKey  
+    in: query  
+    name: access_token  
 
 security:
   - firebase: []
+  - JWT: []
   
   
 
 paths:
-  "/v2/cgmy/calculator/{optionType}/{sensitivity}":
+  "/cgmy/calculator/{optionType}/{sensitivity}":
     post:
       operationId: computeCGMYOptions
       summary: Calculator for computing option prices and sensitivities for a CGMY
@@ -180,7 +185,7 @@ paths:
           - cf_parameters
           - strikes
           additionalProperties: false
-  "/v2/heston/calculator/{optionType}/{sensitivity}":
+  "/heston/calculator/{optionType}/{sensitivity}":
     post:
       operationId: computeHestonOptions
       summary: Calculator for computing option prices and sensitivities for a Heston
@@ -319,7 +324,7 @@ paths:
           - cf_parameters
           - strikes
           additionalProperties: false
-  "/v2/merton/calculator/{optionType}/{sensitivity}":
+  "/merton/calculator/{optionType}/{sensitivity}":
     post:
       operationId: computeMertonOptions
       summary: Calculator for computing option prices and sensitivities for a Merton
@@ -467,7 +472,7 @@ paths:
           - cf_parameters
           - strikes
           additionalProperties: false
-  "/v2/cgmy/density":
+  "/cgmy/density":
     post:
       operationId: computeCGMYDensity
       summary: Calculator for computing probability densities for CGMY process
@@ -806,7 +811,7 @@ paths:
           - maturity
           - cf_parameters
           additionalProperties: false
-  "/v2/heston/density":
+  "/heston/density":
     post:
       operationId: computeHestonDensity
       summary: Calculator for computing probability densities for Heston model
@@ -1133,7 +1138,7 @@ paths:
           - maturity
           - cf_parameters
           additionalProperties: false
-  "/v2/merton/density":
+  "/merton/density":
     post:
       operationId: computeMertonDensity
       summary: Calculator for computing probability densities for Merton model
@@ -1469,7 +1474,7 @@ paths:
           - maturity
           - cf_parameters
           additionalProperties: false
-  "/v2/cgmy/riskmetric":
+  "/cgmy/riskmetric":
     post:
       operationId: computeCGMYMetric
       summary: Calculator for computing risk metrics for CGMY process
@@ -1556,7 +1561,7 @@ paths:
           - maturity
           - cf_parameters
           additionalProperties: false
-  "/v2/heston/riskmetric":
+  "/heston/riskmetric":
     post:
       operationId: computeHestonMetric
       summary: Calculator for computing risk metrics for Heston model
@@ -1631,7 +1636,7 @@ paths:
           - cf_parameters
           - quantile
           additionalProperties: false
-  "/v2/merton/riskmetric":
+  "/merton/riskmetric":
     post:
       operationId: computeMertonMetric
       summary: Calculator for computing risk metrics for Merton model
@@ -1716,7 +1721,7 @@ paths:
           - cf_parameters
           - quantile
           additionalProperties: false
-  "/v2/heston/parameters/parameter_ranges":
+  "/heston/parameters/parameter_ranges":
     get:
       operationId: getHestonRange
       summary: Parameter Constraints
@@ -1829,7 +1834,7 @@ paths:
               err: 
                 type: string
       parameters: []
-  "/v2/cgmy/parameters/parameter_ranges":
+  "/cgmy/parameters/parameter_ranges":
     get:
       operationId: getCGMYRange
       summary: Parameter Constraints
@@ -2014,7 +2019,7 @@ paths:
               err: 
                 type: string
       parameters: []
-  "/v2/merton/parameters/parameter_ranges":
+  "/merton/parameters/parameter_ranges":
     get:
       operationId: getMertonRange
       summary: Parameter Constraints
@@ -2181,7 +2186,7 @@ paths:
               err: 
                 type: string
       parameters: []
-  "/v2/market/parameters/parameter_ranges":
+  "/market/parameters/parameter_ranges":
     get:
       operationId: getMarketRange
       summary: Market Constraints
